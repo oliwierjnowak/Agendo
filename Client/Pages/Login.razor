@@ -1,0 +1,34 @@
+﻿@page "/login";
+@using Agendo.Shared
+@* httpclient is bad style should be replaced with a service injection*@
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+
+<h3>Login</h3>
+
+<EditForm Model="user" OnSubmit="LoginUser">
+    <label for="username"> username </label>
+    <InputText id="username" @bind-Value="user.Username"></InputText>
+    <p/>
+    <label for="password"> password </label>
+    <InputText id="password" @bind-Value="user.Password" type="passowrd"></InputText>
+    <p />
+    <button class="btn btn-primary" type="submit"> login!</button>
+
+</EditForm>
+
+@code {
+    UserLoginDto user = new UserLoginDto();
+
+    async Task LoginUser()
+    {
+        var result = await Http.PostAsJsonAsync("api/auth",user);
+
+        var token = await result.Content.ReadAsStringAsync();
+
+        await LocalStorage.SetItemAsync("token", token);
+
+        await AuthStateProvider.GetAuthenticationStateAsync();
+    }
+}

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Agendo.Server.Controllers
 {
+    //add authorization to the controllers
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
