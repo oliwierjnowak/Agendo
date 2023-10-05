@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\Agendo.Client.csproj" />
     <ProjectReference Include="..\Shared\Agendo.Shared.csproj" />
+  <ProjectReference Include="..\AuthAPI\Agendo.AuthAPI.csproj" />
   </ItemGroup>
 
 

@@ -1,6 +1,6 @@
-﻿using Agendo.Shared;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Agendo.Shared;
 
 namespace Agendo.Server.Controllers
 {
