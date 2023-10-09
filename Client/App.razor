@@ -1,7 +1,12 @@
-﻿<CascadingAuthenticationState>
+﻿@using Agendo.Client.Pages
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
+            
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <Login/>
+                </Authorizing>
                 <NotAuthorized>Sorry not authorized</NotAuthorized>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />

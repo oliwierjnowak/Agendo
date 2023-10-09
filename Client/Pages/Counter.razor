@@ -1,5 +1,4 @@
 ﻿@page "/counter"
-@attribute [Authorize(Roles = "Iron Man")]
 
 <PageTitle>Counter</PageTitle>
 
@@ -10,7 +9,7 @@
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 <p/>
-<AuthorizeView Roles="Iron Man">
+<AuthorizeView>
     <NotAuthorized>
         <span>u are not authorized</span>
     </NotAuthorized>

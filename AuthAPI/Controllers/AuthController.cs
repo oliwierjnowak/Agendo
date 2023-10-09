@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Agendo.Shared;
+using Agendo.AuthAPI.Model;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Agendo.Server.Controllers
 {
@@ -8,15 +13,78 @@ namespace Agendo.Server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        public static User user = new User();
+        private readonly IConfiguration _configuration;
 
-        [HttpPost]
-        public async Task<ActionResult<string>> Login(UserLoginDto request)
+        public AuthController(IConfiguration configuration)
         {
+            _configuration = configuration;
+        }
+
+        [HttpPost("login")]
+        public ActionResult<User> Login(UserLoginDto request)
+        {
+
+            if(request.Username != user.Username)
+            {
+                return BadRequest("Not found");
+            }
+
+            if(!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            {
+                return BadRequest("Not found");
+            }
             //should be replaced with real token creation 
-            string token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiVG9ueSBTdGFyayIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Iklyb24gTWFuIiwiZXhwIjozMTY4NTQwMDAwfQ.IbVQa1lNYYOzwso69xYfsMOHnQfO3VLvVqV2SOXS7sTtyyZ8DEf5jmmwz2FGLJJvZnQKZuieHnmHkg7CGkDbvA";
+
+            //token genrator and read db users password
+            string token = CreateToken(user);
 
 
-            return token;
+            return Ok(token);
+        }
+
+        [HttpPost("register")]
+        public ActionResult<User> Register(UserLoginDto request)
+        {
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            user.Username = request.Username;
+            user.PasswordHash= passwordHash;
+            return Ok(User);
+
+        }
+
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                          _configuration.GetSection("AppSettings:Token").Value!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds
+
+                );
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
         }
     }
 }
+
+
+
+/* for postman
+ 
+ {
+    "Username": "anton_blyad",
+    "Password": "bimbimbambam"
+}
+ 
+ */

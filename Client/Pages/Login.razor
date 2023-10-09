@@ -23,7 +23,7 @@
 
     async Task LoginUser()
     {
-        var result = await Http.PostAsJsonAsync("api/auth",user);
+        var result = await Http.PostAsJsonAsync("api/auth/login",user);
 
         var token = await result.Content.ReadAsStringAsync();
 
