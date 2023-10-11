@@ -1,4 +1,5 @@
 using Agendo.Server.Persistance;
+using Agendo.Server.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -18,7 +19,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
+
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
+builder.Services.AddSingleton<IDomainService, DomainService>();
+
 
 var app = builder.Build();
 

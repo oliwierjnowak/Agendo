@@ -1,4 +1,5 @@
 using Agendo.Server.Persistance;
+using Agendo.Server.Services;
 using Agendo.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +16,8 @@ namespace Agendo.Server.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IDomainRepository _domainRepository;
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IDomainRepository domainRepository)
+        private readonly IDomainService _domainRepository;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IDomainService domainRepository)
         {
             _logger = logger;
             _domainRepository = domainRepository;

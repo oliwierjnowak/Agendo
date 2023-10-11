@@ -1,0 +1,45 @@
+﻿@page "/employees"
+@using Agendo.Server.Models;
+@using Agendo.Shared
+@inject HttpClient Http
+
+<PageTitle>Employees</PageTitle>
+
+<h1>Employees</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (employees == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in employees)
+            {
+                <tr>
+                    <td>@employee.do_no</td>
+                    <td>@employee.do_name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<DomainDTO>? employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        
+    }
+}
