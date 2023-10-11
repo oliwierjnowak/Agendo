@@ -1,11 +1,24 @@
+using Agendo.Server.Persistance;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .Build();
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(@"Data Source=DESKTOP-FHCPRGN\SQLEXPRESS;Database=agendo;Trusted_Connection=True;"));
+builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 
 var app = builder.Build();
 

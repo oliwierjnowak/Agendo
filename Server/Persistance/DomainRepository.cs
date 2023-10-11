@@ -3,30 +3,34 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Xml.Linq;
+using Dapper;
 
 namespace Agendo.Server.Persistance
 {
     public interface IDomainRepository
     {
-        List<DomainDTO> GetAll(); 
+        Task<List<DomainDTO>> GetAllAsync(); 
     }
 
     public class DomainRepository : IDomainRepository
     {
-        private readonly IConfiguration _config;
 
         private  IDbConnection _connection;
 
-        public DomainRepository(IConfiguration config)
+        public DomainRepository(IDbConnection connection)
         {
-            _config = config;
+            _connection = connection;
 
-           // _connection = new DbConnection(_configuration.GetSection("AppSettings:Token").Value!);
         }
 
-        public List<DomainDTO> GetAll()
+        public async Task<List<DomainDTO>> GetAllAsync()
         {
-            throw new NotImplementedException();
+                _connection.Open();
+            string selectQuery = "select * from [dbo].[csmd_domain]";
+            IEnumerable<DomainDTO> data = await _connection.QueryAsync<DomainDTO>(selectQuery);
+            return (List<DomainDTO>)data;
+            
         }
     }
 }
