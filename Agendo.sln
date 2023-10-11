@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agendo.Client", "Client\Age
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agendo.Shared", "Shared\Agendo.Shared.csproj", "{97FB0401-47FA-452B-A5DA-3DC32E730EEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agendo.AuthAPI", "AuthAPI\Agendo.AuthAPI.csproj", "{E78D9FA7-A205-4813-B4E4-0447C258E0BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agendo.AuthAPI", "AuthAPI\Agendo.AuthAPI.csproj", "{E78D9FA7-A205-4813-B4E4-0447C258E0BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
