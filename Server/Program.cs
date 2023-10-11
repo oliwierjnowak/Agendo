@@ -17,7 +17,7 @@ var configuration = new ConfigurationBuilder()
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(@"Data Source=DESKTOP-FHCPRGN\SQLEXPRESS;Database=agendo;Trusted_Connection=True;"));
+builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 
 var app = builder.Build();
