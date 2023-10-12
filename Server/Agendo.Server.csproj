@@ -19,5 +19,9 @@
   <ProjectReference Include="..\AuthAPI\Agendo.AuthAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 
 </Project>
