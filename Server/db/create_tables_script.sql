@@ -9,7 +9,7 @@ CREATE TABLE [dbo].[csmd_domain](
 
        [do_name] [nvarchar](1024) NOT NULL --Angezeigter Name des MA)
 	   )
-GO
+
   
 CREATE TABLE [dbo].[csti_do_shift](
 
@@ -51,7 +51,7 @@ CREATE TABLE [dbo].[csti_daily_schedule](
 
 ALTER TABLE [dbo].[csti_do_shift]
 ADD CONSTRAINT fk_dosh_do_no
-FOREIGN KEY ([dosh_no])
+FOREIGN KEY ([dosh_do_no])
 REFERENCES [dbo].[csmd_domain]([do_no]);
 
 
