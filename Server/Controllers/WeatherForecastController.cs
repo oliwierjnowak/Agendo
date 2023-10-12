@@ -1,3 +1,5 @@
+using Agendo.Server.Persistance;
+using Agendo.Server.Services;
 using Agendo.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,15 +16,17 @@ namespace Agendo.Server.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly IDomainService _domainRepository;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IDomainService domainRepository)
         {
             _logger = logger;
+            _domainRepository = domainRepository;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
+            var x = await _domainRepository.GetAllAsync();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
