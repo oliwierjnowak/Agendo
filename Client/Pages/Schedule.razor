@@ -1,6 +1,9 @@
 ﻿@page "/schedule"
 @using System.Collections;
 @using Agendo.Shared;
+@using Radzen.Blazor;
+@using Radzen;
+
 @inject DialogService DialogService
 
 <PageTitle>Schdule</PageTitle>
@@ -14,28 +17,44 @@
     </div>
 </div>
 
-<RadzenScheduler SlotRender=@OnSlotRender TItem="Shift" Data=@shifts
+<RadzenScheduler
+               @ref=@scheduler
+                 TItem="Shift"
+                 Data=@shifts
+                 SlotRender=@OnSlotRender
+                 SlotSelect=@OnSlotSelect
+                 AppointmentSelect=@OnAppointmentSelect
+                 AppointmentRender=@OnAppointmentRender
+                 
                  TextProperty="Text" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
+                    
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
     <RadzenMonthView />
 </RadzenScheduler>
 
+<EventConsole @ref=@console />
+
 
 
 @code {
-    public ParameterAttribute aaa = new ParameterAttribute();
     public DateTime? valstart1 = new DateTime(2023, 1, 1, 0, 0, 0);
     public DateTime? valstart2 = new DateTime(2023, 1, 1, 23, 59, 59);
-    public RadzenScheduler<Shift> scheduler;
+    public RadzenScheduler<Shift> scheduler { get; set; } = new RadzenScheduler<Shift>();
     public RadzenHeader header = new RadzenHeader();
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
+    public Action<SchedulerAppointmentRenderEventArgs<Shift>> AppointmentRender { get; set; }
+
+
+    public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
+    EventConsole console;
+
     public IList<Shift> shifts = new List<Shift>()
     {
-        new Shift{Start  = DateTime.Now, End = DateTime.Now.AddHours(2),Text  ="Termin 1" },
-        new Shift{Start  = DateTime.Now, End = DateTime.Now.AddHours(2),Text  ="Termin 2" }
+        new Shift{Start  = DateTime.Now, End = DateTime.Now.AddHours(1),Text  = "Meeting" },
+        new Shift{Start  = DateTime.Now, End = DateTime.Now.AddHours(10),Text  = "Late Night Shift" }
     };
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -51,6 +70,87 @@
         if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
         {
             args.Attributes["style"] = "background: rgba(155,220,40,.2);";
+        }
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+
+        // Initialize the dictionary
+        var dict = new Dictionary<string, object>
+    {
+        { "Start", args.Start },
+        { "End", args.End }
+    };
+
+        // Open the dialog and handle exceptions
+        try
+        {
+            Shift data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
+            if (data != null)
+            {
+                shifts.Add(data);
+                console.Log(data);
+
+                // Trigger a re-render of the componen
+
+                StateHasChanged();
+                await scheduler.Reload();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle the exception (e.g., log it or show an error message)
+            console.Log($"Error: {ex.Message}");
+        }
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Shift> args)
+    {
+        try
+        {
+            console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
+
+            Shift copy = new Shift
+            {
+                Start = args.Data.Start,
+                End = args.Data.End,
+                Text = args.Data.Text
+            };
+
+            var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> { { "Shift", copy } });
+
+            if (data != null)
+            {
+                console.Log("data: " + data);
+
+                // Update the appointment
+                args.Data.Start = data.Start;
+                args.Data.End = data.End;
+                args.Data.Text = data.Text;
+
+                // Trigger a re-render of the component
+              
+                await scheduler.Reload();
+            }
+        }
+        catch (Exception ex)
+        {
+            console.Log($"An error occurred: {ex.Message}");
+            // Handle or log the exception as needed
+        }
+    }
+
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Shift> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        if (args.Data.Text == "Birthday")
+        {
+            args.Attributes["style"] = "background: red";
         }
     }
 
