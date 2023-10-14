@@ -23,6 +23,8 @@ builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configura
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
 
+builder.Services.AddSingleton<IEmployeeShiftRepository, EmployeeShiftRepository>();
+builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
 
 var app = builder.Build();
 
