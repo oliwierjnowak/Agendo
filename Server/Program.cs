@@ -1,6 +1,7 @@
 using Agendo.Server.Persistance;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.ResponseCompression;
+using Radzen;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -17,6 +18,7 @@ var configuration = new ConfigurationBuilder()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddRadzenComponents();
 
 builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
 
