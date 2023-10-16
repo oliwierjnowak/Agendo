@@ -1,13 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavManager
 
 <RadzenComponents />
 
 <div class="page">
-
     <AuthorizeView>
-
         <NotAuthorized>
-          <Agendo.Client.Pages.Login></Agendo.Client.Pages.Login>
+            @if (NavManager.Uri.EndsWith("/register"))
+            {
+                @Body
+            }
+            else
+            {
+                <Agendo.Client.Pages.Login />
+            }
         </NotAuthorized>
 
         <Authorized>
@@ -25,7 +31,5 @@
                 </article>
             </main>
         </Authorized>
-
     </AuthorizeView>
-
 </div>
