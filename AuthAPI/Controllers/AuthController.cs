@@ -77,14 +77,3 @@ namespace Agendo.Server.Controllers
         }
     }
 }
-
-
-
-/* for postman
- 
- {
-    "Username": "anton_blyad",
-    "Password": "bimbimbambam"
-}
- 
- */

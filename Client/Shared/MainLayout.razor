@@ -27,7 +27,13 @@
                 </div>
 
                 <article class="content px-4">
-                    @Body
+
+                    @if (!NavManager.Uri.EndsWith("/register") && !NavManager.Uri.EndsWith("/login"))
+                    {
+                        @Body
+                    }else{
+                        NavManager.NavigateTo("/");
+                    }
                 </article>
             </main>
         </Authorized>
