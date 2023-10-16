@@ -1,17 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-    <RadzenComponents />
+<RadzenComponents />
 
 <div class="page">
 
+    <AuthorizeView>
 
-        <AuthorizeView>
-            <NotAuthorized>
-                 
-                <Agendo.Client.Pages.Login />
-                
-            </NotAuthorized>
-            <Authorized>
+        <NotAuthorized>
+          <Agendo.Client.Pages.Login></Agendo.Client.Pages.Login>
+        </NotAuthorized>
+
+        <Authorized>
             <div class="sidebar">
                 <NavMenu />
             </div>
@@ -25,9 +24,8 @@
                     @Body
                 </article>
             </main>
-            </Authorized>
+        </Authorized>
 
-        </AuthorizeView>
-       
-    
+    </AuthorizeView>
+
 </div>
