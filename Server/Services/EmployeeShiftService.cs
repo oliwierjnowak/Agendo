@@ -1,11 +1,14 @@
 ﻿using Agendo.Server.Models;
 using Agendo.Server.Persistance;
+using Agendo.Shared.Form.CreateEmployeeShift;
+using System;
 using System.Globalization;
 
 namespace Agendo.Server.Services
 {
     public interface IEmployeeShiftService 
     {
+        Task CreateShift(CreateEmployeeShift empshift);
         Task<List<EmployeeShift>> GetAllAsync();
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp);
     }
@@ -19,7 +22,28 @@ namespace Agendo.Server.Services
         {
             _employeeShiftRepository = employeeShiftRepository;
         }
-        public async Task<List<EmployeeShift>> GetAllAsync()
+
+        public Task CreateShift(CreateEmployeeShift empshift)
+        {
+            // out of datetime generate iso week iso year and day
+            var isoweek =  ISOWeek.GetWeekOfYear(empshift.ShiftDate);
+            var isoyear = empshift.ShiftDate.Year;
+            DayOfWeek dayOfWeek = empshift.ShiftDate.DayOfWeek;
+            var empNR = empshift.EmpNr;
+            var shiftNR = empshift.ShiftNr;
+
+             EmployeeShift employeeShift = new EmployeeShift()
+             {
+                 EmpNr = empshift.EmpNr,
+                 ISOWeek = isoweek,
+                 ISOYear = isoyear,
+                 DOW = (int)dayOfWeek,
+                 ShiftHours = shiftNR
+             };
+            _employeeShiftRepository.CreateShift(employeeShift);
+        }
+
+    public async Task<List<EmployeeShift>> GetAllAsync()
         {
             return await _employeeShiftRepository.GetAllAsync();
         }
@@ -29,7 +53,7 @@ namespace Agendo.Server.Services
             var ShiftsDTO = new List<EmployeeShiftDTO>(); 
             foreach(var shift in shifts)
             {
-                var fromISOWeek = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DayOfWeek);
+                var fromISOWeek = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW);
                 var startTime = new DateTime(fromISOWeek.Year, fromISOWeek.Month, fromISOWeek.Day,8,0,0);
                
                 var EmpDTO = new EmployeeShiftDTO
@@ -47,5 +71,9 @@ namespace Agendo.Server.Services
 
                 return ShiftsDTO;
         }
+
+
+
+
     }
 }
