@@ -1,14 +1,15 @@
 ﻿@inject DialogService DialogService
+@using Agendo.Server.Models;
 @using Radzen.Blazor;
 @using Radzen
 
-<RadzenTemplateForm TItem="Shift" Data="@model" Submit=@OnSubmit>
+<RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
     <div class="row" style="margin-bottom: 16px">
         <div class="col-md-3">
-            <RadzenLabel Text="Text" />
+            <RadzenLabel Text="EmpNr" />
         </div>
         <div class="col">
-            <RadzenTextBox @bind-Value="@model.Text" Name="Text" />
+            <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
             <RadzenRequiredValidator Text="Title is required" Component="Text" />
         </div>
     </div>
@@ -30,6 +31,33 @@
             <RadzenRequiredValidator Component="End" Text="End is required" />
         </div>
     </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftName" />
+        </div>
+        <div class="col">
+            <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
+            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftNR" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.ShiftNR" Name="ShiftNR" />
+            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Text" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.ShiftHours" Name="ShiftHours" />
+            <RadzenRequiredValidator Text="Title is required" Component="Number" />
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col">
@@ -38,13 +66,21 @@
     </div>
 </RadzenTemplateForm>
 @code {
+    public int EmpNr { get; set; }
+
     [Parameter]
     public DateTime Start { get; set; }
 
     [Parameter]
     public DateTime End { get; set; }
 
-    Shift model = new Shift();
+    public int ShiftNR { get; set; }
+
+    public string ShiftName { get; set; }
+
+    public int ShiftHours { get; set; }
+
+    EmployeeShiftDTO model = new EmployeeShiftDTO();
 
     protected override void OnParametersSet()
     {

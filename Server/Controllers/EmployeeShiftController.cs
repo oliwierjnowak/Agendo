@@ -18,10 +18,10 @@ namespace Agendo.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeShift>>> Get()
         {
-            return Ok( await _employeeShiftService.GetAllAsync());
+            return Ok(await _employeeShiftService.GetAllAsync());
         }
-        [HttpGet("{emp}")]
 
+        [HttpGet("{emp}")]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle(int Emp)
         {
             return Ok( await _employeeShiftService.GetSingleEmpAsync(Emp));

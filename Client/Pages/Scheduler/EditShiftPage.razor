@@ -1,0 +1,82 @@
+﻿@inject DialogService DialogService
+@using Agendo.Server.Models;
+@using Radzen.Blazor;
+@using Radzen;
+<RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="EmpNr" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
+            <RadzenRequiredValidator Text="Title is required" Component="Number" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftHours" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.ShiftHours" Name="ShiftHours" />
+            <RadzenRequiredValidator Text="Title is required" Component="Number" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftNr" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.ShiftNR" Name="ShiftNR" />
+            <RadzenRequiredValidator Text="Title is required" Component="Number" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftName" />
+        </div>
+        <div class="col">
+            <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
+            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Start" />
+        </div>
+        <div class="col">
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" />
+            <RadzenRequiredValidator Text="Start is required" Component="Start" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="End" />
+        </div>
+        <div class="col">
+            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </div>
+    </div>
+</RadzenTemplateForm>
+@code {
+    [Parameter]
+    public EmployeeShiftDTO Shift { get; set; }
+
+    EmployeeShiftDTO model = new EmployeeShiftDTO();
+
+    protected override void OnParametersSet()
+    {
+        model = Shift;
+    }
+
+    void OnSubmit(EmployeeShiftDTO model)
+    {
+        DialogService.Close(model);
+    }
+}
