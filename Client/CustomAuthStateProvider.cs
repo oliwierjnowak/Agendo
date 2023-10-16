@@ -25,7 +25,8 @@ namespace Agendo.Client
 
             _http.DefaultRequestHeaders.Authorization = null;
 
-            if (!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token) && !token.Contains("Not found")
+)
             {
                 identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
 
