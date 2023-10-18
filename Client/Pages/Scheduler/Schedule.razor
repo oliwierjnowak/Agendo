@@ -19,7 +19,7 @@
         <div class="w-full max-w-xs">
             <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Input Field Label</label>
             <input @bind="EmpNr" type="number"
-                   @oninput="EmpChanged"
+           
                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                    placeholder="Enter your text here">
         </div>
@@ -65,8 +65,16 @@
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
 
-
-    public int EmpNr = 0;
+    private int _empNr = 0;
+    public int EmpNr
+    {
+        get { return _empNr; }
+        set
+        {
+            _empNr = value;
+            EmpChanged();
+        }
+    } 
 
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
@@ -171,7 +179,6 @@
 
     async void EmpChanged()
     {
-        console.Log(EmpNr);
         var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift/" + EmpNr);
 
         shifts = (List<EmployeeShiftDTO>)x;

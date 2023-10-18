@@ -1,7 +1,11 @@
 ﻿@inject DialogService DialogService
 @using Agendo.Server.Models;
+@using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient _http;
 
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
     <div class="row" style="margin-bottom: 16px">
@@ -10,7 +14,7 @@
         </div>
         <div class="col">
             <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
-            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+            <RadzenRequiredValidator Text="Title is required" Component="EmpNr" />
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
@@ -37,7 +41,7 @@
         </div>
         <div class="col">
             <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
-            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+            <RadzenRequiredValidator Text="Title is required" Component="ShiftName" />
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
@@ -46,18 +50,10 @@
         </div>
         <div class="col">
             <RadzenNumeric @bind-Value="@model.ShiftNR" Name="ShiftNR" />
-            <RadzenRequiredValidator Text="Title is required" Component="Text" />
+            <RadzenRequiredValidator Text="Title is required" Component="ShiftNR" />
         </div>
     </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="Text" />
-        </div>
-        <div class="col">
-            <RadzenNumeric @bind-Value="@model.ShiftHours" Name="ShiftHours" />
-            <RadzenRequiredValidator Text="Title is required" Component="Number" />
-        </div>
-    </div>
+    
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col">
@@ -66,7 +62,7 @@
     </div>
 </RadzenTemplateForm>
 @code {
-    public int EmpNr { get; set; }
+
 
     [Parameter]
     public DateTime Start { get; set; }
@@ -74,13 +70,8 @@
     [Parameter]
     public DateTime End { get; set; }
 
-    public int ShiftNR { get; set; }
 
-    public string ShiftName { get; set; }
-
-    public int ShiftHours { get; set; }
-
-    EmployeeShiftDTO model = new EmployeeShiftDTO();
+    private EmployeeShiftDTO model = new EmployeeShiftDTO();
 
     protected override void OnParametersSet()
     {
@@ -88,8 +79,20 @@
         model.End = End;
     }
 
-    void OnSubmit()
+    async void OnSubmit()
     {
+
+        var body = new CreateEmployeeShift
+            {
+                EmpNr = model.EmpNr,
+                ShiftDate = model.Start,
+                ShiftNr = model.ShiftNR
+            };
+
+
+
+        var x = await _http.PostAsJsonAsync("api/EmployeeShift", body);
+        Console.WriteLine(x);
         DialogService.Close(model);
     }
 }

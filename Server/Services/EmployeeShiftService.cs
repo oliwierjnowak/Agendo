@@ -8,7 +8,7 @@ namespace Agendo.Server.Services
 {
     public interface IEmployeeShiftService 
     {
-        Task CreateShift(CreateEmployeeShift empshift);
+        Task<int> CreateShift(CreateEmployeeShift empshift);
         Task<List<EmployeeShift>> GetAllAsync();
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp);
     }
@@ -23,7 +23,7 @@ namespace Agendo.Server.Services
             _employeeShiftRepository = employeeShiftRepository;
         }
 
-        public Task CreateShift(CreateEmployeeShift empshift)
+        public async Task<int> CreateShift(CreateEmployeeShift empshift)
         {
             // out of datetime generate iso week iso year and day
             var isoweek =  ISOWeek.GetWeekOfYear(empshift.ShiftDate);
@@ -38,9 +38,9 @@ namespace Agendo.Server.Services
                  ISOWeek = isoweek,
                  ISOYear = isoyear,
                  DOW = (int)dayOfWeek,
-                 ShiftHours = shiftNR
+                 ShiftNR = shiftNR
              };
-            _employeeShiftRepository.CreateShift(employeeShift);
+            return await _employeeShiftRepository.CreateShift(employeeShift);
         }
 
     public async Task<List<EmployeeShift>> GetAllAsync()
