@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agendo.Shared", "Shared\Age
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agendo.AuthAPI", "AuthAPI\Agendo.AuthAPI.csproj", "{E78D9FA7-A205-4813-B4E4-0447C258E0BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTesting", "NUnitTesting\NUnitTesting.csproj", "{7DF9D624-BEA6-4A2E-8063-965CFA30F0FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{E78D9FA7-A205-4813-B4E4-0447C258E0BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E78D9FA7-A205-4813-B4E4-0447C258E0BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E78D9FA7-A205-4813-B4E4-0447C258E0BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DF9D624-BEA6-4A2E-8063-965CFA30F0FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DF9D624-BEA6-4A2E-8063-965CFA30F0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DF9D624-BEA6-4A2E-8063-965CFA30F0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DF9D624-BEA6-4A2E-8063-965CFA30F0FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
