@@ -27,7 +27,7 @@ namespace Agendo.Server.Controllers
             return Ok( await _employeeShiftService.GetSingleEmpAsync(Emp));
         }
 
-        [HttpPost]
+        [HttpPut]
         public async Task<int> Create([FromBody] CreateEmployeeShift empshift )
         {
             var x = await _employeeShiftService.CreateShift(empshift);
