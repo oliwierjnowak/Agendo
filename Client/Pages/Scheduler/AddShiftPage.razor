@@ -91,7 +91,7 @@
 
 
 
-        var x = await _http.PostAsJsonAsync("api/EmployeeShift", body);
+        var x = await _http.PutAsJsonAsync("api/EmployeeShift", body);
         Console.WriteLine(x);
         DialogService.Close(model);
     }
