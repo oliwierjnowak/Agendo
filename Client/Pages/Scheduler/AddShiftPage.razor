@@ -1,0 +1,98 @@
+﻿@inject DialogService DialogService
+@using Agendo.Server.Models;
+@using Agendo.Shared.Form.CreateEmployeeShift;
+@using Radzen.Blazor;
+@using Radzen
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient _http;
+
+<RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="EmpNr" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
+            <RadzenRequiredValidator Text="Title is required" Component="EmpNr" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Start" />
+        </div>
+        <div class="col">
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" />
+            <RadzenRequiredValidator Text="Start is required" Component="Start" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="End" />
+        </div>
+        <div class="col">
+            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftName" />
+        </div>
+        <div class="col">
+            <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
+            <RadzenRequiredValidator Text="Title is required" Component="ShiftName" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="ShiftNR" />
+        </div>
+        <div class="col">
+            <RadzenNumeric @bind-Value="@model.ShiftNR" Name="ShiftNR" />
+            <RadzenRequiredValidator Text="Title is required" Component="ShiftNR" />
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </div>
+    </div>
+</RadzenTemplateForm>
+@code {
+
+
+    [Parameter]
+    public DateTime Start { get; set; }
+
+    [Parameter]
+    public DateTime End { get; set; }
+
+
+    private EmployeeShiftDTO model = new EmployeeShiftDTO();
+
+    protected override void OnParametersSet()
+    {
+        model.Start = Start;
+        model.End = End;
+    }
+
+    async void OnSubmit()
+    {
+
+        var body = new CreateEmployeeShift
+            {
+                EmpNr = model.EmpNr,
+                ShiftDate = model.Start,
+                ShiftNr = model.ShiftNR
+            };
+
+
+
+        var x = await _http.PostAsJsonAsync("api/EmployeeShift", body);
+        Console.WriteLine(x);
+        DialogService.Close(model);
+    }
+}

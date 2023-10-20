@@ -1,7 +1,7 @@
 ﻿using Agendo.Server.Models;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using Agendo.Shared.Form.CreateEmployeeShift; 
 
 namespace Agendo.Server.Controllers
 {
@@ -18,13 +18,20 @@ namespace Agendo.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeShift>>> Get()
         {
-            return Ok( await _employeeShiftService.GetAllAsync());
+            return Ok(await _employeeShiftService.GetAllAsync());
         }
-        [HttpGet("{emp}")]
 
+        [HttpGet("{emp}")]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle(int Emp)
         {
             return Ok( await _employeeShiftService.GetSingleEmpAsync(Emp));
+        }
+
+        [HttpPost]
+        public async Task<int> Create([FromBody] CreateEmployeeShift empshift )
+        {
+            var x = await _employeeShiftService.CreateShift(empshift);
+            return x;
         }
     }
 }
