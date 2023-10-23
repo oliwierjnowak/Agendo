@@ -11,47 +11,35 @@
 
 <PageTitle>Counter</PageTitle>
 
+    <div class="w-full mb-3">
+        <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
+        <div class="flex justify-between">
+            <div class="relative inline-block w-min shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 
-
-
-<div>
-    <div class="rz-p-2 rz-text-align-left">
-        <div class="w-4/4 max-w-xs">
-            <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
-            <div class="flex">
-
-                <input @bind="EmpNr" type="number"
-                       class="shadow appearance-none w-1/4 border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                       placeholder="Enter your text here">
-                <div class="w-3/4 ">
-                    &#189
-                    <select @bind="EmpNr" class="w-min shadow appearance-none border rounded  py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        @if (employees != null)
-                        {
+             
+                <select @bind="EmpNr" class="appearance-none bg-transparent border-none mr-3">
+                    @if (employees != null)
+                    {
                         @foreach (var employee in employees)
                         {
                             <option value="@employee.Nr">@employee.Name</option>
                         }
-                            }
-                    </select>
+                    }
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M5.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 002.121-.293l4.293-4.293a1 1 0 00-1.414-1.414L10 12.586 5.707 7.293z" />
+                    </svg>
                 </div>
             </div>
+
+            <div>
+                <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+            </div>
         </div>
-        
-    </div>
 
+         </div>
 
-   
-    </div>
-
-    <div class="rz-p-2 rz-text-align-right">
-
-
-
-
-        <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-        <RadzenDatePicker @bind-Value=@valstart2 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-    </div>
   
 
 
