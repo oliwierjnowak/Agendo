@@ -8,15 +8,7 @@
 @inject HttpClient _http;
 
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="EmpNr" />
-        </div>
-        <div class="col">
-            <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
-            <RadzenRequiredValidator Text="Title is required" Component="EmpNr" />
-        </div>
-    </div>
+
     <div class="row" style="margin-bottom: 16px">
         <div class="col-md-3">
             <RadzenLabel Text="Start" />
@@ -24,24 +16,6 @@
         <div class="col">
             <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" />
             <RadzenRequiredValidator Text="Start is required" Component="Start" />
-        </div>
-    </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="End" />
-        </div>
-        <div class="col">
-            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" />
-            <RadzenRequiredValidator Component="End" Text="End is required" />
-        </div>
-    </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="ShiftName" />
-        </div>
-        <div class="col">
-            <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
-            <RadzenRequiredValidator Text="Title is required" Component="ShiftName" />
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
@@ -69,6 +43,8 @@
 
     [Parameter]
     public DateTime End { get; set; }
+    [Parameter]
+    public int EmpNR { get; set; }
 
 
     private EmployeeShiftDTO model = new EmployeeShiftDTO();
@@ -77,6 +53,7 @@
     {
         model.Start = Start;
         model.End = End;
+        model.EmpNr = EmpNR;
     }
 
     async void OnSubmit()
@@ -92,7 +69,6 @@
 
 
         var x = await _http.PutAsJsonAsync("api/EmployeeShift", body);
-        Console.WriteLine(x);
         DialogService.Close(model);
     }
 }

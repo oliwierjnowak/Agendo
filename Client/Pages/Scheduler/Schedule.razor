@@ -11,42 +11,37 @@
 
 <PageTitle>Counter</PageTitle>
 
-
-
-
-<div>
-    <div class="rz-p-2 rz-text-align-left">
-        <div class="w-full max-w-xs">
-            <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Input Field Label</label>
-            <input @bind="EmpNr" type="number"
-           
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                   placeholder="Enter your text here">
+<div class="w-full mb-3">
+    <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
+    <div class="flex justify-between items-center">
+        <div>
+            <RadzenDropDown TItem="DomainDTO"
+            @bind-Value=@EmpNr
+                            Data=@employees
+                            TextProperty="Name"
+                            ValueProperty="Nr"
+                            Style="width: 100%; max-width: 400px;" />
+        </div>
+        <div>
+            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
         </div>
     </div>
 
-    <div class="rz-p-2 rz-text-align-right">
-    
-
-
-
-        <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-        <RadzenDatePicker @bind-Value=@valstart2 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-    </div>
 </div>
 
-<RadzenScheduler
-               @ref=@scheduler
+
+
+
+<RadzenScheduler @ref=@scheduler
                  TItem="EmployeeShiftDTO"
                  Data=@shifts
                  SlotRender=@OnSlotRender
                  SlotSelect=@OnSlotSelect
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
-                 
                  TextProperty="ShiftName" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
-                    
+
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
     <RadzenMonthView />
@@ -65,6 +60,7 @@
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
 
+
     private int _empNr = 0;
     public int EmpNr
     {
@@ -72,9 +68,17 @@
         set
         {
             _empNr = value;
-            EmpChanged();
+            FetchEmpShifts();
         }
-    } 
+    }
+
+    private IEnumerable<DomainDTO>? employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+
+    }
 
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
@@ -106,9 +110,11 @@
 
         // Initialize the dictionary
         var dict = new Dictionary<string, object>
-    {   { "Start", args.Start },
-        { "End", args.End }
-    };
+        {
+            { "Start", args.Start },
+            { "End", args.End },
+            {"EmpNR", EmpNr}
+        };
 
         // Open the dialog and handle exceptions
         try
@@ -119,10 +125,7 @@
                 shifts.Add(data);
                 console.Log(data);
 
-                // Trigger a re-render of the componen
-
-                StateHasChanged();
-                await scheduler.Reload();
+                FetchEmpShifts();
 
             }
         }
@@ -140,21 +143,17 @@
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = new EmployeeShiftDTO
-            {
-                Start = args.Data.Start,
-                End = args.Data.End
-            };
+                {
+                    Start = args.Data.Start,
+                    End = args.Data.End
+                };
 
-            var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> { { "Shift", copy } });
+            var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
+                { "Shift", copy },
+                {"EmpNR", EmpNr}
+            });
 
-            if (data != null)
-            {
-                console.Log("data: " + data);
-                args.Data.Start = data.Start;
-                args.Data.End = data.End;
-                args.Data.ShiftName = data.Text;
-                await scheduler.Reload();
-            }
+            FetchEmpShifts();
         }
         catch (Exception ex)
         {
@@ -177,7 +176,7 @@
     }
 
 
-    async void EmpChanged()
+    async void FetchEmpShifts()
     {
         var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift/" + EmpNr);
 

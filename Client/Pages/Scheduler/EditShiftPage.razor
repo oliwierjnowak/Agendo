@@ -5,24 +5,7 @@
 @using Radzen;
 @inject HttpClient _http;
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="EmpNr" />
-        </div>
-        <div class="col">
-            <RadzenNumeric @bind-Value="@model.EmpNr" Name="EmpNr" />
-            <RadzenRequiredValidator Text="Title is required" Component="EmpNr" />
-        </div>
-    </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="ShiftHours" />
-        </div>
-        <div class="col">
-            <RadzenNumeric @bind-Value="@model.ShiftHours" Name="ShiftHours" />
-            <RadzenRequiredValidator Text="Title is required" Component="ShiftHours" />
-        </div>
-    </div>
+
     <div class="row" style="margin-bottom: 16px">
         <div class="col-md-3">
             <RadzenLabel Text="ShiftNr" />
@@ -32,15 +15,7 @@
             <RadzenRequiredValidator Text="Title is required" Component="ShiftNR" />
         </div>
     </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="ShiftName" />
-        </div>
-        <div class="col">
-            <RadzenTextBox @bind-Value="@model.ShiftName" Name="ShiftName" />
-            <RadzenRequiredValidator Text="Title is required" Component="ShiftName" />
-        </div>
-    </div>
+
     <div class="row" style="margin-bottom: 16px">
         <div class="col-md-3">
             <RadzenLabel Text="Start" />
@@ -50,15 +25,7 @@
             <RadzenRequiredValidator Text="Start is required" Component="Start" />
         </div>
     </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="End" />
-        </div>
-        <div class="col">
-            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" />
-            <RadzenRequiredValidator Component="End" Text="End is required" />
-        </div>
-    </div>
+
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col">
@@ -69,6 +36,8 @@
 @code {
     [Parameter]
     public EmployeeShiftDTO Shift { get; set; }
+    [Parameter]
+    public int EmpNR { get; set; }
 
     private EmployeeShiftDTO model = new EmployeeShiftDTO();
 
@@ -82,7 +51,7 @@
 
         var body = new CreateEmployeeShift
             {
-                EmpNr = model.EmpNr,
+                EmpNr = EmpNR,
                 ShiftDate = model.Start,
                 ShiftNr = model.ShiftNR
             };
