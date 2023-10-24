@@ -15,13 +15,13 @@
     <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
     <div class="flex justify-between items-center">
         <div>
-                <RadzenDropDown TItem="DomainDTO"
-                                @bind-Value=@EmpNr
-                                Data=@employees
-                                TextProperty="Name"
-                                ValueProperty="Nr"
-                                Style="width: 100%; max-width: 400px;" />
-            </div>
+            <RadzenDropDown TItem="DomainDTO"
+            @bind-Value=@EmpNr
+                            Data=@employees
+                            TextProperty="Name"
+                            ValueProperty="Nr"
+                            Style="width: 100%; max-width: 400px;" />
+        </div>
         <div>
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
         </div>
@@ -29,169 +29,160 @@
 
 </div>
 
-  
-
-
-    <RadzenScheduler @ref=@scheduler
-                     TItem="EmployeeShiftDTO"
-                     Data=@shifts
-                     SlotRender=@OnSlotRender
-                     SlotSelect=@OnSlotSelect
-                     AppointmentSelect=@OnAppointmentSelect
-                     AppointmentRender=@OnAppointmentRender
-                     TextProperty="ShiftName" SelectedIndex="1"
-                     StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
-
-
-        <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
-        <RadzenMonthView />
-    </RadzenScheduler>
-
-    <EventConsole @ref=@console />
 
 
 
-    @code {
-        public DateTime? valstart1 = new DateTime(2023, 1, 1, 0, 0, 0);
-        public DateTime? valstart2 = new DateTime(2023, 1, 1, 23, 59, 59);
-        public RadzenScheduler<EmployeeShiftDTO> scheduler { get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
-        public RadzenHeader header = new RadzenHeader();
-        public TimeSpan Endtime = new TimeSpan(23, 59, 59);
-        public TimeSpan Starttime = new TimeSpan(0, 0, 0);
-        public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
+<RadzenScheduler @ref=@scheduler
+                 TItem="EmployeeShiftDTO"
+                 Data=@shifts
+                 SlotRender=@OnSlotRender
+                 SlotSelect=@OnSlotSelect
+                 AppointmentSelect=@OnAppointmentSelect
+                 AppointmentRender=@OnAppointmentRender
+                 TextProperty="ShiftName" SelectedIndex="1"
+                 StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
 
 
-        private int _empNr = 0;
-        public int EmpNr
+    <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
+    <RadzenMonthView />
+</RadzenScheduler>
+
+<EventConsole @ref=@console />
+
+
+
+@code {
+    public DateTime? valstart1 = new DateTime(2023, 1, 1, 0, 0, 0);
+    public DateTime? valstart2 = new DateTime(2023, 1, 1, 23, 59, 59);
+    public RadzenScheduler<EmployeeShiftDTO> scheduler { get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
+    public RadzenHeader header = new RadzenHeader();
+    public TimeSpan Endtime = new TimeSpan(23, 59, 59);
+    public TimeSpan Starttime = new TimeSpan(0, 0, 0);
+    public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
+
+
+    private int _empNr = 0;
+    public int EmpNr
+    {
+        get { return _empNr; }
+        set
         {
-            get { return _empNr; }
-            set
-            {
-                _empNr = value;
-                EmpChanged();
-            }
+            _empNr = value;
+            FetchEmpShifts();
         }
+    }
 
-        private IEnumerable<DomainDTO>? employees;
+    private IEnumerable<DomainDTO>? employees;
 
-        protected override async Task OnInitializedAsync()
-        {
-            employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
 
-        }
-
-
-        public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
-        EventConsole console;
-
-        public IList<EmployeeShiftDTO> shifts = new List<EmployeeShiftDTO>()
-        {
-        };
-
-        void OnSlotRender(SchedulerSlotRenderEventArgs args)
-        {
+    }
 
 
-            if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
-            {
-                args.Attributes["style"] = "background: rgba(255,220,40,.2);";
-            }
+    public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
+    EventConsole console;
 
-
-            if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
-            {
-                args.Attributes["style"] = "background: rgba(155,220,40,.2);";
-            }
-        }
-
-        async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
-        {
-            console.Log($"SlotSelect: Start={args.Start} End={args.End}");
-
-            // Initialize the dictionary
-            var dict = new Dictionary<string, object>
-    {   { "Start", args.Start },
-        { "End", args.End },
-        {"EmpNR", EmpNr}
+    public IList<EmployeeShiftDTO> shifts = new List<EmployeeShiftDTO>()
+    {
     };
 
-            // Open the dialog and handle exceptions
-            try
-            {
-                EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
-                if (data != null)
-                {
-                    shifts.Add(data);
-                    console.Log(data);
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
 
-                    // Trigger a re-render of the componen
 
-                    StateHasChanged();
-                    await scheduler.Reload();
-
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle the exception (e.g., log it or show an error message)
-                console.Log($"Error: {ex.Message}");
-            }
+        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        {
+            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
         }
 
-        async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
-        {
-            try
-            {
-                console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
-                EmployeeShiftDTO copy = new EmployeeShiftDTO
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: rgba(155,220,40,.2);";
+        }
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+
+        // Initialize the dictionary
+        var dict = new Dictionary<string, object>
+        {
+            { "Start", args.Start },
+            { "End", args.End },
+            {"EmpNR", EmpNr}
+        };
+
+        // Open the dialog and handle exceptions
+        try
+        {
+            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
+            if (data != null)
+            {
+                shifts.Add(data);
+                console.Log(data);
+
+                FetchEmpShifts();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle the exception (e.g., log it or show an error message)
+            console.Log($"Error: {ex.Message}");
+        }
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
+    {
+        try
+        {
+            console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
+
+            EmployeeShiftDTO copy = new EmployeeShiftDTO
                 {
                     Start = args.Data.Start,
                     End = args.Data.End
                 };
 
-                var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
+            var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy },
                 {"EmpNR", EmpNr}
             });
 
-                if (data != null)
-                {
-                    console.Log("data: " + data);
-                    args.Data.Start = data.Start;
-                    args.Data.End = data.End;
-                    args.Data.ShiftName = data.Text;
-                    await scheduler.Reload();
-                }
-            }
-            catch (Exception ex)
-            {
-                console.Log($"An error occurred: {ex.Message}");
-            }
+            FetchEmpShifts();
         }
-
-
-        void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
+        catch (Exception ex)
         {
-            // if (args.Data.ShiftName == "Birthday")
-            // {
-            //     args.Attributes["style"] = "background: red";
-            // }
-        }
-
-        void ChangeStartTime()
-        {
-            Starttime = new TimeSpan(valstart1.Value.Hour, valstart1.Value.Minute, valstart1.Value.Second);
-        }
-
-
-        async void EmpChanged()
-        {
-            var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift/" + EmpNr);
-
-            shifts = (List<EmployeeShiftDTO>)x;
-            StateHasChanged();
-            await scheduler.Reload();
-
+            console.Log($"An error occurred: {ex.Message}");
         }
     }
+
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
+    {
+        // if (args.Data.ShiftName == "Birthday")
+        // {
+        //     args.Attributes["style"] = "background: red";
+        // }
+    }
+
+    void ChangeStartTime()
+    {
+        Starttime = new TimeSpan(valstart1.Value.Hour, valstart1.Value.Minute, valstart1.Value.Second);
+    }
+
+
+    async void FetchEmpShifts()
+    {
+        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift/" + EmpNr);
+
+        shifts = (List<EmployeeShiftDTO>)x;
+        StateHasChanged();
+        await scheduler.Reload();
+
+    }
+}
