@@ -1,6 +1,5 @@
 ﻿using Agendo.Server.Models;
 using Agendo.Server.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendo.Server.Controllers

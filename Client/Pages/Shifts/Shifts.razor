@@ -1,0 +1,65 @@
+﻿@page "/shifts"
+@using Agendo.Shared;
+@using Agendo.Shared.DTOs;
+@using Agendo.Shared.Form.CreateShift;
+@using Radzen;
+@using Radzen.Blazor;
+@using Agendo.Server.Models;
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient Http
+@inject DialogService DialogService
+<PageTitle>Shifts</PageTitle>
+
+<h1>Shifts</h1>
+
+
+<RadzenButton Click="OpenAddShift">New Shift</RadzenButton>
+@if (shifts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var shift in shifts)
+            {
+                <tr>
+                    <td>@shift.Nr</td>
+                    <td>@shift.Name</td>
+                    <td>@shift.Hours</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private IEnumerable<DailyScheduleDTO>? shifts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        shifts = await Http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+
+    }
+    async Task OpenAddShift()
+    {
+        Console.WriteLine("helo");
+        DailyScheduleDTO data = await DialogService.OpenAsync<AddNewShiftPage>("Add Shift");
+        if(data != null)
+        {
+
+        }
+        await OnInitializedAsync();
+    }
+
+}
