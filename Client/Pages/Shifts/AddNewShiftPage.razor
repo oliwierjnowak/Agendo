@@ -1,0 +1,66 @@
+﻿@using Agendo.Server.Models;
+@using Agendo.Shared.DTOs;
+@using Agendo.Shared.Form.CreateShift;
+@using Radzen.Blazor;
+@using Radzen
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient _http;
+@inject DialogService DialogService
+
+
+<RadzenTemplateForm TItem="DailyScheduleDTO" Data="@model" Submit=@OnSubmit>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Name" />
+        </div>
+        <div class="col">
+            <RadzenTextBox @bind-Value="@model.Name" Name="Name" />
+            <RadzenRequiredValidator Text="Enter shift name" Component="Name" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Hours" />
+        </div>
+        <div class="col">
+            <RadzenNumeric  Min="1" @bind-Value="@model.Hours" Name="Hours" />
+            <RadzenRequiredValidator Text="shift hours" Component="Hours" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </div>
+    </div>
+</RadzenTemplateForm>
+
+
+
+@code {
+
+
+
+    public string Name { get; set; }
+
+
+    public int Hours { get; set; } = 1;
+
+
+    private DailyScheduleDTO model = new DailyScheduleDTO();
+
+
+    async void OnSubmit()
+    {
+        var body = new CreateShift
+            {
+                Name = model.Name,
+                Hours = model.Hours
+
+            };
+        var x = await _http.PostAsJsonAsync("api/dailySchedule", body);
+        Console.WriteLine(x);
+        DialogService.Close(model);
+    }
+}
