@@ -42,6 +42,9 @@
     UserLoginDto user = new UserLoginDto();
     string confirmPassword = string.Empty;
 
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
     async Task RegisterUser()
     {
         if (user.Password != confirmPassword)
@@ -54,7 +57,7 @@
 
         if (result.IsSuccessStatusCode)
         {
-            // Handle successful registration, e.g., navigate to login or home page
+            NavigationManager.NavigateTo("/login", true);
         }
         else
         {

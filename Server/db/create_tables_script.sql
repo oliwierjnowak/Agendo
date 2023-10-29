@@ -7,7 +7,8 @@ CREATE TABLE [dbo].[csmd_domain](
 
        [do_no] [bigint] PRIMARY KEY IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
 
-       [do_name] [nvarchar](1024) NOT NULL --Angezeigter Name des MA)
+       [do_name] [nvarchar](1024) NOT NULL, --Angezeigter Name des MA)
+	   [do_password] [nvarchar](1024) --password des MA)
 	   )
 
   
