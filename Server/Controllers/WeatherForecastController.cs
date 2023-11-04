@@ -1,6 +1,7 @@
 using Agendo.Server.Persistance;
 using Agendo.Server.Services;
 using Agendo.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendo.Server.Controllers
@@ -24,6 +25,7 @@ namespace Agendo.Server.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "719")]
         public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
             var x = await _domainRepository.GetAllAsync();
