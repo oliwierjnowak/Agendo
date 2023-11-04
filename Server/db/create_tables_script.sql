@@ -1,3 +1,5 @@
+--drop table  [dbo].[csmd_authorizations_domain_entity];
+--drop table [dbo].[csmd_authorizations];
 --drop table [dbo].[csti_do_shift];
 --drop table [dbo].[csmd_domain];
 --drop table [dbo].[csti_daily_schedule];
@@ -10,7 +12,7 @@ CREATE TABLE [dbo].[csmd_domain](
        [do_name] [nvarchar](1024) NOT NULL, --Angezeigter Name des MA)
 	   [do_password] [nvarchar](1024) --password des MA)
 	   )
-
+GO
   
 CREATE TABLE [dbo].[csti_do_shift](
 
@@ -39,7 +41,7 @@ CREATE TABLE [dbo].[csti_do_shift](
        [dosh_ws_no] [int] NULL
 
 )
-
+GO
 CREATE TABLE [dbo].[csti_daily_schedule](
 
        [ds_no] [bigint] PRIMARY KEY IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
@@ -49,6 +51,23 @@ CREATE TABLE [dbo].[csti_daily_schedule](
        [ds_hours] [smallint] NOT NULL --Stunden dieser Schicht, für Auswertung
 
 )
+GO
+CREATE TABLE [dbo].[csmd_authorizations_domain_entity](
+       [audoen_no] [int] NOT NULL, --Fortlaufende Nummer aus csmd_authorizations
+       [audoen_do_no] [bigint] NOT NULL, --Eindeutige Nummer vom Vorgesetzten
+       [audoen_en_no] [bigint] NOT NULL, --Eindeutige Nummer vom Mitarbeiter
+)
+GO
+
+CREATE TABLE [dbo].[csmd_authorizations](
+       [au_no] [int] IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
+       [au_ri_no] [int] NOT NULL, --Nummer eines Rechts, Bsp. 719 für Schichtverwaltung
+       [au_enabled] [bit] NOT NULL, --Ist das Recht aktiviert, oder deaktiviert
+       [au_from] [date] NOT NULL, --Ab Wann ist dieser Eintrag gültig (bei uns meistens 01.01.1900)
+       [au_to] [date] NOT NULL    --Bis wann ist dieser Eintrag gültig (bei uns meistens 31.12.3000)
+)
+GO
+
 
 ALTER TABLE [dbo].[csti_do_shift]
 ADD CONSTRAINT fk_dosh_do_no
@@ -91,3 +110,14 @@ ALTER TABLE [dbo].[csti_do_shift]
 ADD CONSTRAINT fk_dosh_sunday
 FOREIGN KEY ([dosh_sunday])
 REFERENCES[dbo].[csti_daily_schedule]([ds_no]);
+
+ALTER TABLE [dbo].[csmd_authorizations_domain_entity]
+ADD CONSTRAINT PK_authorizations PRIMARY KEY ([audoen_do_no],[audoen_en_no]);
+
+ALTER TABLE [dbo].[csmd_authorizations_domain_entity]
+ADD CONSTRAINT FK_audoen_do_no_csmd_domain FOREIGN KEY ([audoen_do_no])
+REFERENCES [dbo].[csmd_domain]([do_no]);
+ 
+ALTER TABLE [dbo].[csmd_authorizations_domain_entity]
+ADD CONSTRAINT FK_audoen_en_no_csmd_domain FOREIGN KEY ([audoen_en_no])
+REFERENCES [dbo].[csmd_domain]([do_no]);
