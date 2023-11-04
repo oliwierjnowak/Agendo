@@ -1,15 +1,15 @@
 
 -- domain
-insert into [dbo].[csmd_domain] ([do_name]) values ('Emmett');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Kettel');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Bachs');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Gartell');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Tante');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Gemnett');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Chad');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Soaper');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Rack');
-insert into [dbo].[csmd_domain] ([do_name]) values ('Cheel');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Emmett','$2a$11$2GhIw4g1hqztupAeq1u1L.tU1tcNwSWGIe2m/Kz0HRRAvgI4Q5pLC'); --password
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Kettel','$2a$11$jXTOhzTvZo6CphJnV73xgO2g5ELaM2cvzKmOojEc4Y1B0H670IGda');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Bachs','$2a$11$UXNGuDpUyALU4VlVJXVSvetBRimFExbEM4HbC7QeFHHRo3wfig9o6');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Gartell','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Tante','$2a$11$g0xU3zjXcJ4XxGll0c3UtOvMSYt9mZbPfDQvPO.YMIw0R37k.i5xO');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Gemnett','$2a$11$g0xU3zjXcJ4XxGll0c3UtOvMSYt9mZbPfDQvPO.YMIw0R37k.i5xO');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Chad','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Soaper','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Rack','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
+insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Cheel','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
 
 -- daily_schedule
 INSERT INTO [dbo].[csti_daily_schedule] ([ds_name], [ds_hours]) VALUES     ('empty', 0),     ('standard shift', 8),     ('part time shift', 4), ('babymonat', 3), ('senior', 6);
@@ -67,3 +67,18 @@ insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year]
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (10, 50, 2023, 3, 1, 3, 5, 2, 3, 5, 55);
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (7, 51, 2022, 4, 1, 4, 2, 5, 4, 2, 76);
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (3, 52, 2023, 3, 2, 2, 2, 3, 3, 5, 89);
+
+
+insert into [dbo].[csmd_authorizations] ([au_ri_no], [au_enabled],[au_from],[au_to]) values (719,1,'1900-01-01','3000-12-31'); -- schichtverwalten 
+insert into [dbo].[csmd_authorizations] ([au_ri_no], [au_enabled],[au_from],[au_to]) values (1000,1,'1900-01-01','3000-12-31'); -- schicht lesen
+
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (719,1,1);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,1,2);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,1,3);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,1,4);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,1,5);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (719,6,6);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,7);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,8);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,9);
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,10);

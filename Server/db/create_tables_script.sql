@@ -69,7 +69,6 @@ CREATE TABLE [dbo].[csmd_authorizations](
 GO
 
 
-
 ALTER TABLE [dbo].[csti_do_shift]
 ADD CONSTRAINT fk_dosh_do_no
 FOREIGN KEY ([dosh_do_no])
