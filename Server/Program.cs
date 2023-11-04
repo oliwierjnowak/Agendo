@@ -5,6 +5,7 @@ using Radzen;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using Agendo.AuthAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
 
 builder.Services.AddSingleton<IDailyScheduleRepository, DailyScheduleRepository>();
 builder.Services.AddSingleton<IDailyScheduleService, DailyScheduleService>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
