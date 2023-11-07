@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Agendo.AuthAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Agendo.Server.Controllers
 {

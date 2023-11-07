@@ -1,37 +1,62 @@
 ﻿using Agendo.Server.Models;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Agendo.Shared.Form.CreateEmployeeShift; 
+using Agendo.Shared.Form.CreateEmployeeShift;
+using Microsoft.AspNetCore.Authorization;
+using Agendo.AuthAPI.Model;
 
 namespace Agendo.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class EmployeeShiftController : ControllerBase
     {
         private readonly IEmployeeShiftService _employeeShiftService;
-
-        public EmployeeShiftController(IEmployeeShiftService employeeShiftService)
+        private readonly IRightsService _rightsService;
+        public EmployeeShiftController(IEmployeeShiftService employeeShiftService, IRightsService rightsService)
         {
             _employeeShiftService = employeeShiftService;
-        }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeShift>>> Get()
-        {
-            return Ok(await _employeeShiftService.GetAllAsync());
+            _rightsService = rightsService;
         }
 
-        [HttpGet("{emp}")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle(int Emp)
+
+        [HttpGet]
+        [Authorize(Roles = "719,1000")]
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle([FromQuery] int Emp, [FromQuery] int User)
         {
-            return Ok( await _employeeShiftService.GetSingleEmpAsync(Emp));
+            var right = await _rightsService.RightsOverEmp(Emp, User);
+            if (right == false) {
+                return Forbid();
+            }
+            else
+            {
+                return Ok(await _employeeShiftService.GetSingleEmpAsync(Emp));
+            }
+           
         }
 
         [HttpPut]
+        [Authorize(Roles = "719")]
         public async Task<int> Create([FromBody] CreateEmployeeShift empshift )
         {
             var x = await _employeeShiftService.CreateShift(empshift);
             return x;
         }
+
+        [HttpGet("shiftmanagment")]
+        [Authorize(Roles ="719")]
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromBody] IEnumerable<int> Emps, [FromQuery] int User)
+        {
+            var rights = await _rightsService.RightsOverEmps(Emps, User);
+            if (rights == false)
+            {
+                return Forbid();
+            }
+            else
+            {
+                return Ok(await _employeeShiftService.GetMultipleEmpsAsync(Emps));
+            }
+        }
+
     }
 }
