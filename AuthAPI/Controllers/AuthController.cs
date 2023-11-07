@@ -68,7 +68,8 @@ namespace Agendo.Server.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.Actor, user.EmpID)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

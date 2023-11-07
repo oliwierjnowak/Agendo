@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@using System.Security.Claims;
 
 <PageTitle>Counter</PageTitle>
 
@@ -20,12 +21,16 @@
     <Authorized >
         <span>Authorized Managment as @context.User.Identity.Name</span>
         <p>  <span>Role: @context.User.Identity.ToString()</span></p>
+
+        <span>Authorized Managment as @context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Type</span>
+        <p>  <span>Actor:@context.User.Claims.FirstOrDefault(claim => claim.Type ==  ClaimTypes.Actor).Value</span></p>
     </Authorized>
+
 </AuthorizeView>
 
 @code {
     private int currentCount = 0;
-
+    
     private void IncrementCount()
     {
         currentCount++;

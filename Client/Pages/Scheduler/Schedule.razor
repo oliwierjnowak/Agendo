@@ -7,6 +7,8 @@
 
 @inject DialogService DialogService
 @inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+
 <PageTitle>Schdule</PageTitle>
 
 <PageTitle>Counter</PageTitle>
@@ -26,7 +28,6 @@
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
         </div>
     </div>
-
 </div>
 
 
@@ -178,6 +179,8 @@
 
     async void FetchEmpShifts()
     {
+        var aaa = await AuthStateProvider.GetAuthenticationStateAsync();
+        var assas = aaa.User.Claims.FirstOrDefault(claim => claim.Type == "Actor");
         var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift/" + EmpNr);
 
         shifts = (List<EmployeeShiftDTO>)x;
