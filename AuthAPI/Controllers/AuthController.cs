@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Agendo.AuthAPI.Services;
 
 namespace Agendo.Server.Controllers
 {
@@ -13,31 +14,34 @@ namespace Agendo.Server.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
         private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration, IAuthService authService)
         {
             _configuration = configuration;
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public ActionResult<User> Login(UserLoginDto request)
         {
 
-            if(request.Username != user.Username)
+            var x = _authService.Login(request.Username).Result;
+
+            if(x.Username.IsNullOrEmpty())
             {
                 return BadRequest("Not found");
             }
 
-            if(!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            if(!BCrypt.Net.BCrypt.Verify(request.Password, x.PasswordHash))
             {
                 return BadRequest("Not found");
             }
             //should be replaced with real token creation 
 
             //token genrator and read db users password
-            string token = CreateToken(user);
+            string token = CreateToken(x);
 
 
             return Ok(token);
@@ -48,8 +52,13 @@ namespace Agendo.Server.Controllers
         {
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-            user.Username = request.Username;
-            user.PasswordHash= passwordHash;
+
+            _authService.Register(new User
+            {
+                Username = request.Username,
+                PasswordHash = passwordHash
+
+            });
             return Ok(User);
 
         }
@@ -68,7 +77,7 @@ namespace Agendo.Server.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds
 
                 );

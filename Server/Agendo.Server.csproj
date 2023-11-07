@@ -10,6 +10,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.11" />
 	<PackageReference Include="Radzen.Blazor" Version="4.17.1" />  
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
@@ -21,9 +22,6 @@
   <ProjectReference Include="..\AuthAPI\Agendo.AuthAPI.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 
 
 </Project>

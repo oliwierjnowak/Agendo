@@ -5,6 +5,10 @@ using Radzen;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using Agendo.AuthAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +23,18 @@ var configuration = new ConfigurationBuilder()
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddRadzenComponents();
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
@@ -27,6 +42,11 @@ builder.Services.AddSingleton<IDomainService, DomainService>();
 
 builder.Services.AddSingleton<IEmployeeShiftRepository, EmployeeShiftRepository>();
 builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
+
+builder.Services.AddSingleton<IDailyScheduleRepository, DailyScheduleRepository>();
+builder.Services.AddSingleton<IDailyScheduleService, DailyScheduleService>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -41,6 +61,9 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
