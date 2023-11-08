@@ -33,7 +33,8 @@ namespace Agendo.AuthAPI.Services
         {
             var query = @$"select do_name as Username, do_password AS PasswordHash, 
                             audoen_no as Role,
-                            audoen_do_no as SuperiorID
+                            audoen_do_no as SuperiorID,
+                            audoen_en_no as EmpID
                             from csmd_domain 
                             join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no 
                             where do_name = '{username}'";

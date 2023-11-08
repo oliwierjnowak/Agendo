@@ -28,7 +28,6 @@ namespace Agendo.Server.Controllers
         [Authorize(Roles = "719")]
         public async Task<IEnumerable<WeatherForecast>> GetAsync()
         {
-            var x = await _domainRepository.GetAllAsync();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),

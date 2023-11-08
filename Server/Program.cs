@@ -46,6 +46,9 @@ builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
 builder.Services.AddSingleton<IDailyScheduleRepository, DailyScheduleRepository>();
 builder.Services.AddSingleton<IDailyScheduleService, DailyScheduleService>();
 
+builder.Services.AddSingleton<IRightsRepository, RightsRepository>();
+builder.Services.AddSingleton<IRightsService, RightsService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();

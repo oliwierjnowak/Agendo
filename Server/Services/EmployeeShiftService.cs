@@ -10,6 +10,7 @@ namespace Agendo.Server.Services
     {
         Task<int> CreateShift(CreateEmployeeShift empshift);
         Task<List<EmployeeShift>> GetAllAsync();
+        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp);
     }
     
@@ -47,6 +48,32 @@ namespace Agendo.Server.Services
         {
             return await _employeeShiftRepository.GetAllAsync();
         }
+
+        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(IEnumerable<int> emps)
+        {
+            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(emps);
+            var ShiftsDTO = new List<EmployeeShiftDTO>();
+            foreach (var shift in shifts)
+            {
+                var fromISOWeek = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW);
+                var startTime = new DateTime(fromISOWeek.Year, fromISOWeek.Month, fromISOWeek.Day, 8, 0, 0);
+
+                var EmpDTO = new EmployeeShiftDTO
+                {
+                    EmpNr = shift.EmpNr,
+                    ShiftHours = shift.ShiftHours,
+                    ShiftName = shift.ShiftName,
+                    ShiftNR = shift.ShiftNR,
+                    Start = startTime,
+                    End = startTime.AddHours(shift.ShiftHours),
+
+                };
+                ShiftsDTO.Add(EmpDTO);
+            }
+
+            return ShiftsDTO;
+        }
+
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp)
         {
             var shifts = await _employeeShiftRepository.GetSingleEmpAsync(Emp);

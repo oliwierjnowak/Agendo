@@ -5,7 +5,7 @@ namespace Agendo.Server.Services
 {
     public interface IDomainService
     {
-        Task<List<DomainDTO>> GetAllAsync();
+        Task<List<DomainDTO>> GetAllAsync(int superior);
     }
 
     public class DomainService : IDomainService
@@ -17,9 +17,9 @@ namespace Agendo.Server.Services
             _domainRepository = domainRepository;
         }
 
-        public async Task<List<DomainDTO>> GetAllAsync()
+        public async Task<List<DomainDTO>> GetAllAsync(int superior)
         {
-            return await _domainRepository.GetAllAsync();
+            return await _domainRepository.GetAllAsync(superior);
         }
     }
 }

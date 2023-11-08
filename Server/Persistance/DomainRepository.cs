@@ -10,7 +10,7 @@ namespace Agendo.Server.Persistance
 {
     public interface IDomainRepository
     {
-        Task<List<DomainDTO>> GetAllAsync(); 
+        Task<List<DomainDTO>> GetAllAsync(int superior); 
     }
 
     public class DomainRepository : IDomainRepository
@@ -24,11 +24,16 @@ namespace Agendo.Server.Persistance
 
         }
         
-        public async Task<List<DomainDTO>> GetAllAsync()
+        public async Task<List<DomainDTO>> GetAllAsync(int superior)
         {
                 _connection.Open();
-            string selectQuery = "select do_no AS 'Nr',do_name AS 'Name'   from [dbo].[csmd_domain]";
-            IEnumerable<DomainDTO> data = await _connection.QueryAsync<DomainDTO>(selectQuery);
+            string selectQuery = @"select do_no AS 'Nr',do_name AS 'Name'   from [dbo].[csmd_domain]
+                                    join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no
+                                    where audoen_do_no = @superior;";
+            IEnumerable<DomainDTO> data = await _connection.QueryAsync<DomainDTO>(selectQuery, new
+            {
+                superior = superior
+            });
             _connection.Close();
             return (List<DomainDTO>)data;
             

@@ -1,8 +1,9 @@
 ﻿@page "/employees"
 @using Agendo.Server.Models;
 @using Agendo.Shared
+@using System.Security.Claims;
 @inject HttpClient Http
-
+@inject AuthenticationStateProvider AuthStateProvider
 <PageTitle>Employees</PageTitle>
 
 <h1>Employees</h1>
@@ -39,7 +40,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var sup = authstate.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
+        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain?superior=" + sup);
         
     }
 }
