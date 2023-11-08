@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using Agendo.AuthAPI.Model;
+using System.Security.Claims;
 
 namespace Agendo.Server.Controllers
 {
@@ -22,15 +23,19 @@ namespace Agendo.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles = "719,1000")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle([FromQuery] int Emp, [FromQuery] int User)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle([FromQuery] int? Emp)
         {
-            var right = await _rightsService.RightsOverEmp(Emp, User);
+          
+            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+            var emp = Emp == null ? userid : (int) Emp;
+            
+            var right = await _rightsService.RightsOverEmp(emp, userid);
             if (right == false) {
                 return Forbid();
             }
             else
             {
-                return Ok(await _employeeShiftService.GetSingleEmpAsync(Emp));
+                return Ok(await _employeeShiftService.GetSingleEmpAsync(emp));
             }
            
         }
@@ -45,9 +50,10 @@ namespace Agendo.Server.Controllers
 
         [HttpGet("shiftmanagment")]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromBody] IEnumerable<int> Emps, [FromQuery] int User)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromBody] IEnumerable<int> Emps)
         {
-            var rights = await _rightsService.RightsOverEmps(Emps, User);
+            var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
+            var rights = await _rightsService.RightsOverEmps(Emps, int.Parse(userid));
             if (rights == false)
             {
                 return Forbid();
