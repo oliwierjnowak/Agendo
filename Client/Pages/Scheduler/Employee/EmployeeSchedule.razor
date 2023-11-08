@@ -9,7 +9,6 @@
 
 @inject DialogService DialogService
 @inject HttpClient Http
-@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Schdule</PageTitle>
 
@@ -79,9 +78,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
-        var sup = authstate.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + sup + "&User=" + sup);
+        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift");
 
         shifts = (List<EmployeeShiftDTO>)x;
         StateHasChanged();
@@ -186,9 +183,7 @@
 
     async void FetchEmpShifts()
     {
-        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
-        var sup = authstate.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr + "&User=" + sup);
+        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
 
         shifts = (List<EmployeeShiftDTO>)x;
         StateHasChanged();

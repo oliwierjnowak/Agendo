@@ -25,8 +25,8 @@ namespace Agendo.Server.Services
             {
                 return false;
             }
-            if((right.Emp == emp && right.Superior == emp) || 
-                (right.Emp == emp && right.Emp == user))
+            if((right.Emp == emp && right.Superior == emp && emp == user) || 
+                (right.Emp == emp && right.Superior == user))
             {
                 return true;
             }

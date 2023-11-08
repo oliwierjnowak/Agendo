@@ -40,9 +40,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
-        var sup = authstate.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain?superior=" + sup);
+        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
         
     }
 }

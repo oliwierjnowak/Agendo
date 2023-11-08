@@ -2,6 +2,7 @@
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Agendo.Server.Controllers
 {
@@ -18,9 +19,10 @@ namespace Agendo.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<DomainDTO>>> Get([FromQuery] int superior)
+        public async Task<ActionResult<IEnumerable<DomainDTO>>> Get()
         {
-            return Ok( await _domainService.GetAllAsync(superior));
+            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+            return Ok( await _domainService.GetAllAsync(userid));
         }
     }
 }
