@@ -143,10 +143,10 @@
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = new EmployeeShiftDTO
-                {
-                    Start = args.Data.Start,
-                    End = args.Data.End
-                };
+            {
+                Start = args.Data.Start,
+                End = args.Data.End
+            };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy },
@@ -164,10 +164,30 @@
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
     {
-        // if (args.Data.ShiftName == "Birthday")
-        // {
-        //     args.Attributes["style"] = "background: red";
-        // }
+        if (args.Data.ShiftName == "senior")
+        {
+            args.Attributes["style"] = "background: #e9c46a";
+        }
+        else if (args.Data.ShiftName == "part time shift")
+        {
+            args.Attributes["style"] = "background: #2a9d8f";
+
+        }
+        else if (args.Data.ShiftName == "babymonat")
+        {
+            args.Attributes["style"] = "background: #e76f51";
+
+        }
+        else if (args.Data.ShiftName == "standard shift")
+        {
+            args.Attributes["style"] = "background: #264653"; 
+
+        }
+        else if (args.Data.ShiftName == "empty")
+        {
+            args.Attributes["style"] = "background: gray"; 
+
+        }
     }
 
     void ChangeStartTime()
