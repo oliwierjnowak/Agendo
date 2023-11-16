@@ -30,7 +30,7 @@ namespace Agendo.Server.Controllers
             var emp = Emp == null ? userid : (int) Emp;
             
             var right = await _rightsService.RightsOverEmp(emp, userid);
-            if (right == false) {
+            if (right == false && userid != emp) {
                 return Forbid();
             }
             else
