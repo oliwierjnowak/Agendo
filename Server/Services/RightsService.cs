@@ -1,5 +1,4 @@
 ﻿using Agendo.Server.Persistance;
-using Agendo.Shared.DTOs;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Agendo.Server.Services

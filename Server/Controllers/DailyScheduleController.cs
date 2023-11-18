@@ -1,5 +1,5 @@
-﻿using Agendo.Server.Services;
-using Agendo.Shared.DTOs;
+﻿using Agendo.Server.Models;
+using Agendo.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +33,7 @@ namespace Agendo.Server.Controllers
         [Authorize(Roles ="719")]
         public async Task<ActionResult<IEnumerable<DailyScheduleDTO>>> AddNewShift([FromBody] DailyScheduleDTO dailyScheduleDTO)
         {
-            return Ok(await _dailyScheduleService.AddNewShift(dailyScheduleDTO.Name, dailyScheduleDTO.Hours));
+            return Ok(await _dailyScheduleService.AddNewShift(dailyScheduleDTO.Name, dailyScheduleDTO.Hours, dailyScheduleDTO.Color));
         }
     }
 }

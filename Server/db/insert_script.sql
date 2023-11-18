@@ -12,7 +12,7 @@ insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Rack','$2a$11
 insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Cheel','$2a$11$qQemBgIwFIBr81c0RqtBn.z8ohB9CJ888Q5JwxOYDObciuKnxtYbe');
 
 -- daily_schedule
-INSERT INTO [dbo].[csti_daily_schedule] ([ds_name], [ds_hours]) VALUES     ('empty', 0),     ('standard shift', 8),     ('part time shift', 4), ('babymonat', 3), ('senior', 6);
+INSERT INTO [dbo].[csti_daily_schedule] ([ds_name], [ds_hours], [ds_color]) VALUES     ('empty', 0, '#e9c46a'),     ('standard shift', 8, '#98f5e1'),     ('part time shift', 4, '#8eecf5'), ('babymonat', 3, '#cfbaf0'), ('senior', 6, '#f4a261');
 
 -- do_shift (currently every employee has only one week of a scedule 1-52 -> needs to be changed in the future)
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (2, 1, 2023, 3, 5, 5, 2, 5, 1, 5, 32);

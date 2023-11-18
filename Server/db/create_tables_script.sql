@@ -48,7 +48,10 @@ CREATE TABLE [dbo].[csti_daily_schedule](
 
        [ds_name] [nvarchar](1024) NOT NULL, --Angezeigter Schichtname
 
-       [ds_hours] [smallint] NOT NULL --Stunden dieser Schicht, für Auswertung
+       [ds_hours] [smallint] NOT NULL, --Stunden dieser Schicht, fï¿½r Auswertung
+
+       [ds_color] [nvarchar](1024) NOT NULL -- Farbe der Schicht
+
 
 )
 GO
@@ -61,10 +64,10 @@ GO
 
 CREATE TABLE [dbo].[csmd_authorizations](
        [au_no] [int] IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
-       [au_ri_no] [int] NOT NULL, --Nummer eines Rechts, Bsp. 719 für Schichtverwaltung
+       [au_ri_no] [int] NOT NULL, --Nummer eines Rechts, Bsp. 719 fï¿½r Schichtverwaltung
        [au_enabled] [bit] NOT NULL, --Ist das Recht aktiviert, oder deaktiviert
-       [au_from] [date] NOT NULL, --Ab Wann ist dieser Eintrag gültig (bei uns meistens 01.01.1900)
-       [au_to] [date] NOT NULL    --Bis wann ist dieser Eintrag gültig (bei uns meistens 31.12.3000)
+       [au_from] [date] NOT NULL, --Ab Wann ist dieser Eintrag gï¿½ltig (bei uns meistens 01.01.1900)
+       [au_to] [date] NOT NULL    --Bis wann ist dieser Eintrag gï¿½ltig (bei uns meistens 31.12.3000)
 )
 GO
 
