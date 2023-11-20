@@ -12,34 +12,37 @@
 
 
 <RadzenButton Click="OpenAddShift">New Shift</RadzenButton>
+
 @if (shifts == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-<div class="card-container grid grid-cols-3 gap-8 mt-8">
+<div class="card-container grid grid-cols-1 gap-4 min-w-[1070px] md:max-w-[860px] md:grid-cols-3 md:gap-8 mt-8">
     @foreach (var shift in shifts)
     {
-        <div class=" w-full h-100px bg-indigo-50 rounded-lg overflow-hidden shadow-xl">
+       
+        <div class="w-full h-100px bg-indigo-50 rounded-lg overflow-hidden shadow-xl">
             <!-- 'rounded-lg' adds a border-radius of 15 pixels -->
             <div class="card-wrapper p-4">
                 <p class="text-2xl font-bold block">@shift.Name</p>
                 <p class="block">Duration: @shift.Hours h</p>
             </div>
             <div class="card-color h-4 w-full" style="background-color: @shift.Color;"></div>
-
         </div>
     }
 </div>
-
-
-
+    <div>
+       
+    </div>
 }
 
 @code {
 
     private IEnumerable<DailyScheduleDTO>? shifts;
+
+
 
     protected override async Task OnInitializedAsync()
     {
