@@ -62,6 +62,9 @@
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
+    public EmployeeShiftDTO e;
+    private IEnumerable<DailyScheduleDTO>? DailyShifts;
+
 
 
     private int _empNr = 0;
@@ -80,6 +83,8 @@
     protected override async Task OnInitializedAsync()
     {
         employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        DailyShifts = await Http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+
     }
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
@@ -144,10 +149,10 @@
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = new EmployeeShiftDTO
-                {
-                    Start = args.Data.Start,
-                    End = args.Data.End
-                };
+            {
+                Start = args.Data.Start,
+                End = args.Data.End
+            };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy },
@@ -165,10 +170,12 @@
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
     {
-        // if (args.Data.ShiftName == "Birthday")
-        // {
-        //     args.Attributes["style"] = "background: red";
-        // }
+        var matchingShift = DailyShifts.FirstOrDefault(shift => shift.Name == args.Data.ShiftName);
+
+        if (matchingShift != null)
+        {
+            args.Attributes["style"] = $"background: {matchingShift.Color}";
+        }
     }
 
     void ChangeStartTime()

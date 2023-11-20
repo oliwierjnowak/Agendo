@@ -1,6 +1,5 @@
 ﻿@inject DialogService DialogService
 @using Agendo.Server.Models;
-@using Agendo.Shared.DTOs;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen
@@ -11,6 +10,7 @@
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
     <div class="row" style="margin-bottom: 16px">
+
         <div class="col-md-3">
             <RadzenLabel Text="Start" />
         </div>

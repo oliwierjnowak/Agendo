@@ -1,6 +1,5 @@
 ﻿@page "/shifts"
 @using Agendo.Shared;
-@using Agendo.Shared.DTOs;
 @using Agendo.Shared.Form.CreateShift;
 @using Radzen;
 @using Radzen.Blazor;
@@ -25,6 +24,8 @@ else
                 <th>Number</th>
                 <th>Name</th>
                 <th>Hours</th>
+                <th>Color</th>
+
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,8 @@ else
                     <td>@shift.Nr</td>
                     <td>@shift.Name</td>
                     <td>@shift.Hours</td>
+                    <td style="background-color:@shift.Color"></td>
+
                 </tr>
             }
         </tbody>

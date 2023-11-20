@@ -1,5 +1,5 @@
-﻿using Agendo.Server.Persistance;
-using Agendo.Shared.DTOs;
+﻿using Agendo.Server.Models;
+using Agendo.Server.Persistance;
 
 
 namespace Agendo.Server.Services
@@ -8,7 +8,7 @@ namespace Agendo.Server.Services
     {
         Task<List<DailyScheduleDTO>> GetAllAsync();
         Task<List<DailyScheduleDTO>> GetSingleShiftAsync(int Shift);
-        Task<int> AddNewShift(string Name, int Hrs);
+        Task<int> AddNewShift(string Name, int Hrs, string Color);
 
     }
     public class DailyScheduleService : IDailyScheduleService
@@ -31,9 +31,9 @@ namespace Agendo.Server.Services
      
         }
 
-        public async Task<int> AddNewShift(string Name, int Hrs)
+        public async Task<int> AddNewShift(string Name, int Hrs, string Color)
         {
-            return await _dailyScheduleRepository.AddNewShift(Name, Hrs);
+            return await _dailyScheduleRepository.AddNewShift(Name, Hrs,Color);
         }
         
     }

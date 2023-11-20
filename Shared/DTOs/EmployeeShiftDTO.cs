@@ -1,4 +1,7 @@
-﻿namespace Agendo.Server.Models
+﻿using Agendo.Server.Models;
+using Radzen;
+
+namespace Agendo.Server.Models
 {
     public record EmployeeShiftDTO
     {
