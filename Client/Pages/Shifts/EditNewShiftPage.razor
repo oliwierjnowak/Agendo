@@ -53,12 +53,12 @@
     async void OnSubmit()
     {
         var body = new CreateShift
-            {
-                Nr = model.Nr,
-                Name = model.Name,
-                Hours = model.Hours
+        {
+            Nr = model.Nr,
+            Name = model.Name,
+            Hours = model.Hours
 
-            };
+        };
         var x = await _http.PutAsJsonAsync("api/dailySchedule", body);
         Console.WriteLine(x);
         DialogService.Close(model);

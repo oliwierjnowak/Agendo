@@ -12,35 +12,27 @@
 
 
 <RadzenButton Click="OpenAddShift">New Shift</RadzenButton>
+
 @if (shifts == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Number</th>
-                <th>Name</th>
-                <th>Hours</th>
-                <th>Color</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var shift in shifts)
-            {
-                <tr>
-                    <td>@shift.Nr</td>
-                    <td>@shift.Name</td>
-                    <td>@shift.Hours</td>
-                    <td style="background-color:@shift.Color"></td>
-
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="card-container grid grid-cols-1 gap-4 min-w-[1070px] md:max-w-[860px] md:grid-cols-3 md:gap-8 mt-8">
+    @foreach (var shift in shifts)
+    {
+       
+        <div class="w-full h-100px bg-indigo-50 rounded-lg overflow-hidden shadow-xl">
+            <!-- 'rounded-lg' adds a border-radius of 15 pixels -->
+            <div class="card-wrapper p-4">
+                <p class="text-2xl font-bold block">@shift.Name</p>
+                <p class="block">Duration: @shift.Hours h</p>
+            </div>
+            <div class="card-color h-4 w-full" style="background-color: @shift.Color;"></div>
+        </div>
+    }
+</div>
 }
 
 @code {
@@ -54,12 +46,7 @@ else
     }
     async Task OpenAddShift()
     {
-        Console.WriteLine("helo");
         DailyScheduleDTO data = await DialogService.OpenAsync<AddNewShiftPage>("Add Shift");
-        if(data != null)
-        {
-
-        }
         await OnInitializedAsync();
     }
 
