@@ -26,8 +26,8 @@ namespace Agendo.Server.Controllers
 
         [HttpPost("login")]
         public ActionResult<User> Login(UserLoginDto request)
-        {            var x = _authService.Login(request.Username).Result;
-
+        {
+            var x = _authService.Login(request.Username).Result;
             if(x.Username.IsNullOrEmpty())
             {
                 return BadRequest("Not found");

@@ -33,16 +33,11 @@ else
         </div>
     }
 </div>
-    <div>
-       
-    </div>
 }
 
 @code {
 
     private IEnumerable<DailyScheduleDTO>? shifts;
-
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,12 +46,7 @@ else
     }
     async Task OpenAddShift()
     {
-        Console.WriteLine("helo");
         DailyScheduleDTO data = await DialogService.OpenAsync<AddNewShiftPage>("Add Shift");
-        if (data != null)
-        {
-
-        }
         await OnInitializedAsync();
     }
 
