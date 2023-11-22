@@ -20,11 +20,17 @@
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO"
-            @bind-Value=@EmpNr
+                            @bind-Value=@EmpNrs
                             Data=@employees
                             TextProperty="Name"
                             ValueProperty="Nr"
+                            Multiple=true
+                            Placeholder="Select Employees"
+                            AllowClear="true"
+                            Chips="true"
                             Style="width: 100%; max-width: 400px;" />
+
+
         </div>
         <div>
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
@@ -37,13 +43,15 @@
 
 <RadzenScheduler @ref=@scheduler
                  TItem="EmployeeShiftDTO"
-                 Data=@shifts
+                 Data=@employeeShiftDTOs
                  SlotRender=@OnSlotRender
                  SlotSelect=@OnSlotSelect
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
                  TextProperty="ShiftName" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
+
+ 
 
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
@@ -65,8 +73,6 @@
     public EmployeeShiftDTO e;
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
 
-
-
     private int _empNr = 0;
     public int EmpNr
     {
@@ -78,11 +84,23 @@
         }
     }
 
-    private IEnumerable<DomainDTO>? employees;
+
+    private List<int> _empNrs = new List<int>();
+    public List<int> EmpNrs
+    {
+        get { return _empNrs; }
+        set
+        {
+            _empNrs = value;
+            FetchEmpShifts();
+        }
+    }
+
+    private List<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
     {
-        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        employees = (List<DomainDTO>)await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
         DailyShifts = await Http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
 
     }
@@ -90,9 +108,7 @@
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
     EventConsole console;
 
-    public IList<EmployeeShiftDTO> shifts = new List<EmployeeShiftDTO>()
-    {
-    };
+    List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
@@ -128,7 +144,7 @@
             EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
             if (data != null)
             {
-                shifts.Add(data);
+                employeeShiftDTOs.Add(data);
                 console.Log(data);
 
                 FetchEmpShifts();
@@ -186,11 +202,66 @@
 
     async void FetchEmpShifts()
     {
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
+        try
+        {
+            if (EmpNrs != null && EmpNrs.Any())
+            {
+                var employeeShifts = new List<EmployeeShiftDTO>();
 
-        shifts = (List<EmployeeShiftDTO>)x;
-        StateHasChanged();
-        await scheduler.Reload();
+                foreach (var empNr in EmpNrs)
+                {
+                    var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + empNr);
 
+                    if (x != null)
+                    {
+                        employeeShifts.AddRange(x);
+                    }
+                }
+
+                employeeShiftDTOs = employeeShifts;
+                StateHasChanged();
+                await scheduler.Reload();
+            }
+            else
+            {
+                // Handle the case where no employees are selected
+                // Clear the scheduler data and reload
+                employeeShiftDTOs.Clear();
+                StateHasChanged();
+                await scheduler.Reload();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the exception
+            console.Log($"Error fetching employee shifts: {ex.Message}");
+        }
     }
+
+    async void FetchEmpShiftsNr()
+    {
+        try
+        {
+            var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
+
+            if (x != null)
+            {
+                employeeShiftDTOs = (List<EmployeeShiftDTO>)x;
+                StateHasChanged();
+                await scheduler.Reload();
+            }
+            else
+            {
+                // Log or handle the case where the data is null
+                console.Log("Error: Received null data from the server.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the exception
+            console.Log($"Error fetching employee shifts: {ex.Message}");
+        }
+    }
+
+
 }
