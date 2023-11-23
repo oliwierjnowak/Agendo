@@ -24,4 +24,7 @@
     <ProjectReference Include="..\Shared\Agendo.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\agendo_logo.png" />
+  </ItemGroup>
 </Project>
