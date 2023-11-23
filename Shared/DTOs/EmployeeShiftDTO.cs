@@ -1,7 +1,4 @@
-﻿using Agendo.Server.Models;
-using Radzen;
-
-namespace Agendo.Server.Models
+﻿namespace Agendo.Server.Models
 {
     public record EmployeeShiftDTO
     {
@@ -11,5 +8,23 @@ namespace Agendo.Server.Models
         public int ShiftNR { get; set; }
         public string ShiftName { get; set; }
         public int ShiftHours { get; set; }
+        public DomainDTO DomainDTO { get; set; }
+
+        // New property to concatenate ShiftName and DomainName
+        public string ShiftAndDomainName
+        {
+            get
+            {
+                // Ensure DomainDTO is not null
+                if (DomainDTO != null)
+                {
+                    return $"{ShiftName} - {DomainDTO.Name}";
+                }
+                else
+                {
+                    return ShiftName;
+                }
+            }
+        }
     }
 }
