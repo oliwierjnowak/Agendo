@@ -1,4 +1,5 @@
 ﻿@using System.Collections;
+@using Agendo.Client.HttpClients;
 @using Agendo.Server.Models;
 @using Agendo.Shared;
 @using Radzen.Blazor;
@@ -9,6 +10,7 @@
 
 @inject DialogService DialogService
 @inject HttpClient Http
+@inject IScheduleManagementClient ApiShiftManagment;
 @inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Schdule</PageTitle>
@@ -19,41 +21,30 @@
     <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
     <div class="flex justify-between items-center">
         <div>
-            <RadzenDropDown TItem="DomainDTO"
-                            @bind-Value=@EmpNrs
-                            Data=@employees
-                            TextProperty="Name"
-                            ValueProperty="Nr"
-                            Multiple=true
-                            Placeholder="Select Employees"
-                            AllowClear="true"
-                            Chips="true"
-                            Style="width: 100%; max-width: 400px;" />
+            <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
+                Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
+                Style="width: 100%; max-width: 400px;" />
 
 
         </div>
 
         <div>
-            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
+            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
+                DateFormat="HH:mm" />
         </div>
     </div>
 </div>
 
 
 
-<RadzenScheduler @ref=@scheduler
-                 TItem="EmployeeShiftDTO"
-                 Data=@employeeShiftDTOs
-                 SlotRender=@OnSlotRender
-                 SlotSelect=@OnSlotSelect
-                 AppointmentSelect=@OnAppointmentSelect
-                 AppointmentRender=@OnAppointmentRender
-                 TextProperty="ShiftAndDomainName" SelectedIndex="1"
-                 StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
+<RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
+    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
+    TextProperty="ShiftAndDomainName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
+    Style="width: auto; height: 700px;">
 
 
-<RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
-<RadzenMonthView />
+    <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
+    <RadzenMonthView />
 </RadzenScheduler>
 
 
@@ -133,10 +124,10 @@
         // Initialize the dictionary with the common data for all selected employees
         var dict = new Dictionary<string, object>
 {
-        { "Start", args.Start },
-        { "End", args.End },
-        // Add other common data if needed
-    };
+{ "Start", args.Start },
+{ "End", args.End },
+// Add other common data if needed
+};
 
         foreach (var empNr in EmpNrs)
         {
@@ -171,15 +162,15 @@
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = new EmployeeShiftDTO
-            {
-                Start = args.Data.Start,
-                End = args.Data.End
-            };
+                {
+                    Start = args.Data.Start,
+                    End = args.Data.End
+                };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-                { "Shift", copy },
-                {"EmpNR", EmpNr}
-            });
+{ "Shift", copy },
+{"EmpNR", EmpNr}
+});
 
             FetchEmpShifts();
         }
