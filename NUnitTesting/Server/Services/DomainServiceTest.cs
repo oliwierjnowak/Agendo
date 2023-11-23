@@ -25,7 +25,7 @@ namespace NUnitTesting.Server.Services
             };
 
 
-            mockRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(data);
+            mockRepository.Setup(r => r.GetAllAsync(1)).ReturnsAsync(data);
 
 
             return mockRepository;
@@ -40,7 +40,7 @@ namespace NUnitTesting.Server.Services
             var service = new DomainService(repo.Object);
 
             //act
-            var x = service.GetAllAsync().Result;
+            var x = service.GetAllAsync(1).Result;
 
             //assert
             Assert.IsNotNull(x);

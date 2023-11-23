@@ -1,54 +1,69 @@
-﻿using Agendo.Server.Controllers;
+﻿using Agendo.AuthAPI.Model;
+using Agendo.Server.Controllers;
 using Agendo.Server.Persistance;
 using Agendo.Server.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Playwright;
+using Microsoft.Playwright.NUnit;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NUnitTesting.Server.ApplicationFactories;
 
 namespace NUnitTesting.Server.controller
 {
-    internal class DomainControllerTest
+    [TestFixture]
+    internal class DomainControllerTest : PlaywrightTest
     {
-        private Mock<IDomainService> ArrangeRepository()
+        private IAPIRequestContext Request = null;
+        private DomainApplicationFactory _applicationFactory;
+        public readonly HttpClient _client;
+
+        public DomainControllerTest()
         {
-            var mockService= new Mock<IDomainService>();
-
-            List<Agendo.Server.Models.DomainDTO> data = new List<Agendo.Server.Models.DomainDTO>() {
-               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
-            };
-
-
-            mockService.Setup(r => r.GetAllAsync()).ReturnsAsync(data);
-
-
-            return mockService;
+            _applicationFactory = new DomainApplicationFactory();
+            _client = _applicationFactory.CreateClient();
         }
 
+        [SetUp]
+        public async Task SetUpAPITesting()
+        {            
+            await CreateAPIRequestContext();
+        }
+
+        private async Task CreateAPIRequestContext()
+        {
+            var headers = new Dictionary<string, string>();
+            headers.Add("Authorization", "Bearer " + "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiRW1tZXR0IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiNzE5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwOS8wOS9pZGVudGl0eS9jbGFpbXMvYWN0b3IiOiIxIiwiZXhwIjoyNTI0NjA0NDAwfQ.VeJRyuaJz2vcSfReKuQ8xYCM7Z4U4TrpC-JDT4KvrX5UDhmy0vgEpZX_i2JgMz6r8KdI2Y5aeUWvJbaG-HtJtA");
+
+            Request = await this.Playwright.APIRequest.NewContextAsync(new()
+            {
+                // All requests we send go to this API endpoint.
+                BaseURL = _applicationFactory.ServerAddress,
+                ExtraHTTPHeaders = headers
+            });
+        }
 
         [Test]
-        public void GetAllAsync()
+        public async Task GetAllAsyncWithFactoryAsync()
         {
             //ArrangeRepository
-            var service = ArrangeRepository();
-            var controller = new DomainController(service.Object);
+            var x = await _client.GetAsync("api/domain/string");
+            var request = await Request.GetAsync("string");
 
-            //act
-            var x = controller.Get().Result;
-            // assert
-            var okObjectResult = x.Result as OkObjectResult;
-            Assert.IsNotNull(okObjectResult);
-            Assert.AreEqual(200, okObjectResult.StatusCode);
 
-            var model = okObjectResult.Value as IEnumerable<Agendo.Server.Models.DomainDTO>;
-            Assert.IsNotNull(model);
-            Assert.AreEqual(3, model.Count());
-
+            Assert.True(request.Ok);
         }
+
+        [Test]
+        public async Task AuthDomainGet719()
+        {
+            var request = await Request.GetAsync("api/domain");
+
+
+            Assert.True(request.Ok);
+        }
+
     }
 }
