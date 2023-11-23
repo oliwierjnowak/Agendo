@@ -1,5 +1,6 @@
 ﻿using Agendo.AuthAPI.Model;
 using Agendo.Server.Controllers;
+using Agendo.Server.Models;
 using Agendo.Server.Persistance;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.Playwright.NUnit;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Moq;
 using NUnitTesting.Server.ApplicationFactories;
+using System.Text.Json;
 
 namespace NUnitTesting.Server.controller
 {
@@ -63,6 +65,38 @@ namespace NUnitTesting.Server.controller
 
 
             Assert.True(request.Ok);
+
+            var issuesJsonResponse = await request.JsonAsync();
+
+           Assert.NotNull(issuesJsonResponse);
+
+            var list = ConvertJsonElementToList(issuesJsonResponse.Value);
+            Assert.AreEqual(list, new List<Agendo.Server.Models.DomainDTO>() {
+               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
+               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
+               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
+            });
+        }
+
+
+        static List<DomainDTO> ConvertJsonElementToList(JsonElement root)
+        {
+            List<DomainDTO> domainDTOList = new List<DomainDTO>();
+
+            // Iterate through the array elements
+            foreach (JsonElement element in root.EnumerateArray())
+            {
+                // Deserialize each element to DomainDTO
+                DomainDTO domainDTO = JsonSerializer.Deserialize<DomainDTO>(element.GetRawText(), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // Use CamelCase naming policy to match the JSON property names
+                });
+
+                // Add the deserialized object to the list
+                domainDTOList.Add(domainDTO);
+            }
+
+            return domainDTOList;
         }
 
     }
