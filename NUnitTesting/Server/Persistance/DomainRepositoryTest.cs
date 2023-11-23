@@ -39,7 +39,7 @@ namespace Testing.Server.Persistance
             var repository = new DomainRepository(connection.Object);
 
             //act
-            var x = repository.GetAllAsync().Result;
+            var x = repository.GetAllAsync(1).Result;
 
             //assert
             Assert.IsNotNull(x);
