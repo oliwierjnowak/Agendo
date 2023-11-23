@@ -1,5 +1,7 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Client.Pages.Shifts;
+using Agendo.Server.Models;
 using Agendo.Server.Persistance;
+using Agendo.Shared;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using System;
 using System.Globalization;
@@ -10,7 +12,7 @@ namespace Agendo.Server.Services
     {
         Task<int> CreateShift(CreateEmployeeShift empshift);
         Task<List<EmployeeShift>> GetAllAsync();
-        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(IEnumerable<int> emps);
+        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp);
     }
     
@@ -18,10 +20,12 @@ namespace Agendo.Server.Services
     public class EmployeeShiftService : IEmployeeShiftService
     {
         private readonly IEmployeeShiftRepository _employeeShiftRepository;
+        private readonly IDomainService _domainService;
 
-        public EmployeeShiftService(IEmployeeShiftRepository employeeShiftRepository)
+        public EmployeeShiftService(IEmployeeShiftRepository employeeShiftRepository, IDomainService domainService)
         {
             _employeeShiftRepository = employeeShiftRepository;
+            _domainService = domainService;
         }
 
         public async Task<int> CreateShift(CreateEmployeeShift empshift)
@@ -44,34 +48,35 @@ namespace Agendo.Server.Services
             return await _employeeShiftRepository.CreateShift(employeeShift);
         }
 
-    public async Task<List<EmployeeShift>> GetAllAsync()
+        public async Task<List<EmployeeShift>> GetAllAsync()
         {
             return await _employeeShiftRepository.GetAllAsync();
         }
 
-        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(IEnumerable<int> emps)
+        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
             var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(emps);
-            var ShiftsDTO = new List<EmployeeShiftDTO>();
-            foreach (var shift in shifts)
+
+
+            List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
+
+            foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
             {
-                var fromISOWeek = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW);
-                var startTime = new DateTime(fromISOWeek.Year, fromISOWeek.Month, fromISOWeek.Day, 8, 0, 0);
+                var domainIds = group.Select( g =>  g.EmpNr);
+                var domains = await _domainService.GetListAsync(sup, domainIds);
 
-                var EmpDTO = new EmployeeShiftDTO
+                employeeShiftDTOs.Add(new EmployeeShiftDTO
                 {
-                    EmpNr = shift.EmpNr,
-                    ShiftHours = shift.ShiftHours,
-                    ShiftName = shift.ShiftName,
-                    ShiftNR = shift.ShiftNR,
-                    Start = startTime,
-                    End = startTime.AddHours(shift.ShiftHours),
-
-                };
-                ShiftsDTO.Add(EmpDTO);
+                    Domains = domains,
+                    Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
+                    End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8+group.Key.ShiftHours),
+                    ShiftNR = group.Key.ShiftNR,
+                    ShiftName = group.Key.ShiftName,
+                    ShiftHours = group.Key.ShiftHours
+                });
             }
 
-            return ShiftsDTO;
+            return employeeShiftDTOs;
         }
 
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp)
@@ -85,7 +90,7 @@ namespace Agendo.Server.Services
                
                 var EmpDTO = new EmployeeShiftDTO
                 {
-                    EmpNr = shift.EmpNr,
+                    Domains = new List<DomainDTO>(),
                     ShiftHours = shift.ShiftHours,
                     ShiftName = shift.ShiftName,    
                     ShiftNR = shift.ShiftNR,    

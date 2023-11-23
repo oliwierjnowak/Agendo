@@ -2,7 +2,7 @@
 {
     public record EmployeeShiftDTO
     {
-        public int EmpNr { get; set; }
+        public IEnumerable<DomainDTO> Domains { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public int ShiftNR { get; set; }
