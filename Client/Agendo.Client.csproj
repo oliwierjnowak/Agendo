@@ -27,10 +27,4 @@
   <ItemGroup>
     <Content Remove="wwwroot\agendo_logo.png" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="HttpClients\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="HttpClients\" />
-  </ItemGroup>
 </Project>
