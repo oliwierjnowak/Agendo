@@ -32,12 +32,12 @@
 
 
         </div>
+
         <div>
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
         </div>
     </div>
 </div>
-
 
 
 
@@ -48,15 +48,14 @@
                  SlotSelect=@OnSlotSelect
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
-                 TextProperty="ShiftName" SelectedIndex="1"
+                 TextProperty="ShiftAndDomainName" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
 
- 
 
-
-    <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
-    <RadzenMonthView />
+<RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
+<RadzenMonthView />
 </RadzenScheduler>
+
 
 <EventConsole @ref=@console />
 
@@ -70,8 +69,8 @@
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
-    public EmployeeShiftDTO e;
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
+    private IEnumerable<EmployeeShiftDTO>? employeeShiftManagement;
 
     private int _empNr = 0;
     public int EmpNr
@@ -96,19 +95,20 @@
         }
     }
 
-    private List<DomainDTO>? employees;
+    private IEnumerable<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
     {
         employees = (List<DomainDTO>)await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
         DailyShifts = await Http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
-
     }
+
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
     EventConsole console;
 
     List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
+
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
@@ -130,31 +130,37 @@
     {
         console.Log($"SlotSelect: Start={args.Start} End={args.End}");
 
-        // Initialize the dictionary
+        // Initialize the dictionary with the common data for all selected employees
         var dict = new Dictionary<string, object>
-        {
-            { "Start", args.Start },
-            { "End", args.End },
-            {"EmpNR", EmpNr}
-        };
+{
+        { "Start", args.Start },
+        { "End", args.End },
+        // Add other common data if needed
+    };
 
-        // Open the dialog and handle exceptions
-        try
+        foreach (var empNr in EmpNrs)
         {
-            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
-            if (data != null)
+            // Add employee-specific data to the dictionary
+            dict["EmpNR"] = empNr;
+
+            // Open the dialog and handle exceptions
+            try
             {
-                employeeShiftDTOs.Add(data);
-                console.Log(data);
+                EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
+                if (data != null)
+                {
+                    employeeShiftDTOs.Add(data);
+                    console.Log(data);
 
-                FetchEmpShifts();
-
+                    // Fetch shifts for each employee
+                    FetchEmpShiftsNr(empNr);
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            // Handle the exception (e.g., log it or show an error message)
-            console.Log($"Error: {ex.Message}");
+            catch (Exception ex)
+            {
+                // Handle the exception (e.g., log it or show an error message)
+                console.Log($"Error: {ex.Message}");
+            }
         }
     }
 
@@ -184,6 +190,7 @@
     }
 
 
+
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
     {
         var matchingShift = DailyShifts.FirstOrDefault(shift => shift.Name == args.Data.ShiftName);
@@ -191,8 +198,11 @@
         if (matchingShift != null)
         {
             args.Attributes["style"] = $"background: {matchingShift.Color}";
+            args.Attributes["title"] = $"EmpNr: {args.Data.EmpNr}, ShiftName: {args.Data.ShiftName}";
         }
     }
+
+
 
     void ChangeStartTime()
     {
@@ -238,7 +248,7 @@
         }
     }
 
-    async void FetchEmpShiftsNr()
+    async void FetchEmpShiftsNr(int nr)
     {
         try
         {
