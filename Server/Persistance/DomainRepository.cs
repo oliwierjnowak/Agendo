@@ -1,11 +1,6 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Configuration;
 using System.Data;
-using System.Data.Common;
-using System.Xml.Linq;
-using Dapper;
 using Agendo.Server.Models;
-using System.Data.SqlClient;
 
 namespace Agendo.Server.Persistance
 {
