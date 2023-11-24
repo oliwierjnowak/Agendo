@@ -8,7 +8,6 @@ using Agendo.AuthAPI.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Hosting.Server;
-using System.Runtime.InteropServices.JavaScript;
 
 namespace NUnitTesting.Server.ApplicationFactories
 {

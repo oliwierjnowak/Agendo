@@ -1,9 +1,6 @@
-﻿using Agendo.Client.Pages.Shifts;
-using Agendo.Server.Models;
+﻿using Agendo.Server.Models;
 using Agendo.Server.Persistance;
-using Agendo.Shared;
 using Agendo.Shared.Form.CreateEmployeeShift;
-using System;
 using System.Globalization;
 
 namespace Agendo.Server.Services
@@ -11,9 +8,8 @@ namespace Agendo.Server.Services
     public interface IEmployeeShiftService 
     {
         Task<int> CreateShift(CreateEmployeeShift empshift);
-        Task<List<EmployeeShift>> GetAllAsync();
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
-        Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp);
+        Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
     }
     
     
@@ -48,16 +44,9 @@ namespace Agendo.Server.Services
             return await _employeeShiftRepository.CreateShift(employeeShift);
         }
 
-        public async Task<List<EmployeeShift>> GetAllAsync()
-        {
-            return await _employeeShiftRepository.GetAllAsync();
-        }
-
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(emps);
-
-
+            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps);
             List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -79,9 +68,9 @@ namespace Agendo.Server.Services
             return employeeShiftDTOs;
         }
 
-        public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int Emp)
+        public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp)
         {
-            var shifts = await _employeeShiftRepository.GetSingleEmpAsync(Emp);
+            var shifts = await _employeeShiftRepository.GetSingleEmpAsync(superior,emp);
             var ShiftsDTO = new List<EmployeeShiftDTO>(); 
             foreach(var shift in shifts)
             {
