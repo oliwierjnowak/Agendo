@@ -61,7 +61,7 @@ namespace Agendo.Server.Controllers
             else
             {
                 //Emps --> parameter zum Abrufen der Einträge die man haben will
-                return Ok(await _employeeShiftService.GetMultipleEmpsAsync(Emps));
+                return Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
             }
         }
 
