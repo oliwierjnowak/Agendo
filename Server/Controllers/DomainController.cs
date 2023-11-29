@@ -8,6 +8,7 @@ namespace Agendo.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "719,1000")]
     public class DomainController : ControllerBase
     {
         private readonly IDomainService _domainService;

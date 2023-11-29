@@ -1,8 +1,6 @@
 using Agendo.Server.Persistance;
 using Agendo.Server.Services;
-using Microsoft.AspNetCore.ResponseCompression;
 using Radzen;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using Agendo.AuthAPI.Services;

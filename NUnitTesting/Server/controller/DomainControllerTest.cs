@@ -1,15 +1,6 @@
-﻿using Agendo.AuthAPI.Model;
-using Agendo.Server.Controllers;
-using Agendo.Server.Models;
-using Agendo.Server.Persistance;
-using Agendo.Server.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Agendo.Server.Models;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using Moq;
 using NUnitTesting.Server.ApplicationFactories;
 using System.Text.Json;
 
