@@ -52,17 +52,23 @@ namespace Agendo.Server.Services
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
             {
                 var domainIds = group.Select( g =>  g.EmpNr);
-                var domains = await _domainService.GetListAsync(sup, domainIds);
 
-                employeeShiftDTOs.Add(new EmployeeShiftDTO
+                // because of that if statement we only select empshift where all of the emps are working and not just only one  
+                if ((domainIds.All(emps.Contains) && domainIds.Count() == emps.Count()))
                 {
-                    Domains = domains,
-                    Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
-                    End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8+group.Key.ShiftHours),
-                    ShiftNR = group.Key.ShiftNR,
-                    ShiftName = group.Key.ShiftName,
-                    ShiftHours = group.Key.ShiftHours
-                });
+                    var domains = await _domainService.GetListAsync(sup, domainIds);
+
+                    employeeShiftDTOs.Add(new EmployeeShiftDTO
+                    {
+                        Domains = domains,
+                        Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
+                        End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8 + group.Key.ShiftHours),
+                        ShiftNR = group.Key.ShiftNR,
+                        ShiftName = group.Key.ShiftName,
+                        ShiftHours = group.Key.ShiftHours
+                    }); ;
+                }
+               
             }
 
             return employeeShiftDTOs;
