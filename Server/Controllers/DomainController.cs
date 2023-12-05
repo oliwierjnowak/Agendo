@@ -9,15 +9,8 @@ namespace Agendo.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "719,1000")]
-    public class DomainController : ControllerBase
+    public class DomainController(IDomainService _domainService) : ControllerBase
     {
-        private readonly IDomainService _domainService;
-
-        public DomainController(IDomainService domainService)
-        {
-            _domainService = domainService;
-        }
-
         [HttpGet]
         [Authorize(Roles ="719")]
         public async Task<ActionResult<IEnumerable<DomainDTO>>> Get()

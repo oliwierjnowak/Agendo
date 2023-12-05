@@ -11,13 +11,8 @@ namespace Agendo.AuthAPI.Services
         Task<User> Login(string username);
     }
 
-    public class AuthService : IAuthService
+    public class AuthService(IDbConnection _connection) : IAuthService
     {
-        private readonly IDbConnection _connection;
-        public AuthService(IDbConnection connection)
-        {
-                _connection = connection;
-        }
 
         public async Task<int> Register(User user)
         {

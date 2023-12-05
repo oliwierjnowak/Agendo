@@ -11,15 +11,8 @@ namespace Agendo.Server.Services
         Task<int> AddNewShift(string Name, int Hrs, string Color);
 
     }
-    public class DailyScheduleService : IDailyScheduleService
+    public class DailyScheduleService(IDailyScheduleRepository _dailyScheduleRepository) : IDailyScheduleService
     {
-        private readonly IDailyScheduleRepository _dailyScheduleRepository;
-
-        public DailyScheduleService(IDailyScheduleRepository dailyScheduleRepository)
-        {
-            _dailyScheduleRepository = dailyScheduleRepository;
-        }
-
         public async Task<List<DailyScheduleDTO>> GetAllAsync()
         {
             return await _dailyScheduleRepository.GetAllAsync();

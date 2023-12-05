@@ -1,6 +1,7 @@
 ﻿using Agendo.Server.Persistance;
 using Agendo.Server.Services;
 using Moq;
+using NUnit.Framework.Legacy;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -43,8 +44,8 @@ namespace NUnitTesting.Server.Services
             var x = service.GetAllAsync(1).Result;
 
             //assert
-            Assert.IsNotNull(x);
-            Assert.AreEqual(x.Count, 3);
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 3);
 
         }
     }

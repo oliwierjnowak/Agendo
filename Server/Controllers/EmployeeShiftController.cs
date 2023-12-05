@@ -10,14 +10,8 @@ namespace Agendo.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "719,1000")]
-    public class EmployeeShiftController : ControllerBase
+    public class EmployeeShiftController(IEmployeeShiftService _employeeShiftService) : ControllerBase
     {
-        private readonly IEmployeeShiftService _employeeShiftService;
-        public EmployeeShiftController(IEmployeeShiftService employeeShiftService)
-        {
-            _employeeShiftService = employeeShiftService;
-        }
-
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle([FromQuery] int? Emp)

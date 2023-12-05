@@ -10,16 +10,8 @@ namespace Agendo.Server.Persistance
         Task<List<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps);
         Task<List<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
     }
-    public class EmployeeShiftRepository : IEmployeeShiftRepository
+    public class EmployeeShiftRepository(IDbConnection _connection) : IEmployeeShiftRepository
     {
-        private IDbConnection _connection;
-		
-
-        public EmployeeShiftRepository(IDbConnection connection)
-        {
-            _connection = connection;
-        }
-
         public async Task<int> CreateShift(EmployeeShift employeeShift)
         {
 			var dow = "";

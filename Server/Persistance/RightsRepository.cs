@@ -10,13 +10,8 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<EmployeeRights>> RightsOverEmps(IEnumerable<int> emp, int user);
     }
 
-    public class RightsRepository : IRightsRepository
+    public class RightsRepository(IDbConnection _connection) : IRightsRepository
     {
-        private readonly IDbConnection _connection;
-        public RightsRepository(IDbConnection connection)
-        {
-                _connection = connection;
-        }
         public async Task<EmployeeRights> RightsOverEmp(int emp, int user)
         {
             var query = @"select audoen_no as AuthType ,

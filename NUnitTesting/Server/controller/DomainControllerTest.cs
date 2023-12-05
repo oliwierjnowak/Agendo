@@ -1,6 +1,7 @@
 ﻿using Agendo.Server.Models;
 using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
+using NUnit.Framework.Legacy;
 using NUnitTesting.Server.ApplicationFactories;
 using System.Text.Json;
 
@@ -46,7 +47,7 @@ namespace NUnitTesting.Server.controller
             var request = await Request.GetAsync("string");
 
 
-            Assert.True(request.Ok);
+            ClassicAssert.True(request.Ok);
         }
 
         [Test]
@@ -55,14 +56,14 @@ namespace NUnitTesting.Server.controller
             var request = await Request.GetAsync("api/domain");
 
 
-            Assert.True(request.Ok);
+           ClassicAssert.True(request.Ok);
 
             var issuesJsonResponse = await request.JsonAsync();
 
-           Assert.NotNull(issuesJsonResponse);
+            ClassicAssert.NotNull(issuesJsonResponse);
 
             var list = ConvertJsonElementToList(issuesJsonResponse.Value);
-            Assert.AreEqual(list, new List<Agendo.Server.Models.DomainDTO>() {
+            ClassicAssert.AreEqual(list, new List<Agendo.Server.Models.DomainDTO>() {
                new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
                new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
                new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },

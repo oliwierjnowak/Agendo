@@ -9,14 +9,8 @@ namespace Agendo.Server.Services
         Task<List<DomainDTO>> GetListAsync(int superior, IEnumerable<int> domains);
     }
 
-    public class DomainService : IDomainService
+    public class DomainService(IDomainRepository _domainRepository) : IDomainService
     {
-        private readonly IDomainRepository _domainRepository;
-
-        public DomainService(IDomainRepository domainRepository)
-        {
-            _domainRepository = domainRepository;
-        }
 
         public async Task<List<DomainDTO>> GetAllAsync(int superior)
         {

@@ -13,16 +13,8 @@ namespace Agendo.Server.Services
     }
     
     
-    public class EmployeeShiftService : IEmployeeShiftService
+    public class EmployeeShiftService(IEmployeeShiftRepository _employeeShiftRepository, IDomainService _domainService) : IEmployeeShiftService
     {
-        private readonly IEmployeeShiftRepository _employeeShiftRepository;
-        private readonly IDomainService _domainService;
-
-        public EmployeeShiftService(IEmployeeShiftRepository employeeShiftRepository, IDomainService domainService)
-        {
-            _employeeShiftRepository = employeeShiftRepository;
-            _domainService = domainService;
-        }
 
         public async Task<int> CreateShift(CreateEmployeeShift empshift)
         {

@@ -3,6 +3,7 @@ using Agendo.Server.Persistance;
 using Dapper;
 using Moq;
 using Moq.Dapper;
+using NUnit.Framework.Legacy;
 using System.Data;
 using System.Data.Common;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -42,8 +43,8 @@ namespace Testing.Server.Persistance
             var x = repository.GetAllAsync(1).Result;
 
             //assert
-            Assert.IsNotNull(x);
-            Assert.AreEqual(x.Count, 3);
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 3);
 
         }
     }
