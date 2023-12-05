@@ -15,14 +15,8 @@ namespace Agendo.Server.Persistance
         
     }
 
-    public class DailyScheduleRepository : IDailyScheduleRepository
+    public class DailyScheduleRepository(IDbConnection _connection) : IDailyScheduleRepository
     {
-        private IDbConnection _connection;
-
-        public DailyScheduleRepository(IDbConnection connection)
-        {
-            _connection = connection;
-        }
         public async Task<List<DailyScheduleDTO>> GetAllAsync()
         {
             _connection.Open();

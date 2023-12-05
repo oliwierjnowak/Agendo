@@ -8,13 +8,8 @@ namespace Agendo.Server.Services
         Task<bool> RightsOverEmps(IEnumerable<int> emps, int user);
     }
 
-    public class RightsService : IRightsService
+    public class RightsService(IRightsRepository _repository) : IRightsService
     {
-        private readonly IRightsRepository _repository;
-        public RightsService(IRightsRepository repository)
-        {
-            _repository = repository;
-        }
 
         public async Task<bool> RightsOverEmp(int emp, int user)
         {

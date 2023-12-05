@@ -10,16 +10,8 @@ namespace Agendo.Server.Persistance
         Task<List<DomainDTO>> GetListAsync(int superior, IEnumerable<int> domains);
     }
 
-    public class DomainRepository : IDomainRepository
+    public class DomainRepository(IDbConnection _connection) : IDomainRepository
     {
-
-        private  IDbConnection _connection;
-
-        public DomainRepository(IDbConnection connection)
-        {
-            _connection = connection;
-
-        }
         
         public async Task<List<DomainDTO>> GetAllAsync(int superior)
         {

@@ -13,17 +13,8 @@ namespace Agendo.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(IConfiguration _configuration, IAuthService _authService) : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly IAuthService _authService;
-
-        public AuthController(IConfiguration configuration, IAuthService authService)
-        {
-            _configuration = configuration;
-            _authService = authService;
-        }
-
         [HttpPost("login")]
         public ActionResult<User> Login(UserLoginDto request)
         {

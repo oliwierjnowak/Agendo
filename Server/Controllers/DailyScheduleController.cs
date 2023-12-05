@@ -8,14 +8,8 @@ namespace Agendo.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "719,1000")]
-    public class DailyScheduleController : ControllerBase
+    public class DailyScheduleController(IDailyScheduleService _dailyScheduleService) : ControllerBase
     {
-        private readonly IDailyScheduleService _dailyScheduleService;
-
-        public DailyScheduleController(IDailyScheduleService dailyScheduleService)
-        {
-            _dailyScheduleService = dailyScheduleService;
-        }
 
         [HttpGet]
         [Authorize(Roles = "719,1000")]
