@@ -5,8 +5,7 @@ using Moq;
 using Moq.Dapper;
 using NUnit.Framework.Legacy;
 using System.Data;
-using System.Data.Common;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace Testing.Server.Persistance
 {
@@ -46,6 +45,24 @@ namespace Testing.Server.Persistance
             ClassicAssert.IsNotNull(x);
             ClassicAssert.AreEqual(x.Count, 3);
 
+        } 
+        [Test]
+        public void GetListAsync()
+        {
+            //arrange
+            var connection = ArrangeDb();
+            var repository = new DomainRepository(connection.Object);
+
+            //act
+            var x = repository.GetListAsync(1, new int[] { 1, 2, 3 }).Result;
+
+            //assert
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 3);
         }
+
+        // write here hello world and
+  
+
     }
 }

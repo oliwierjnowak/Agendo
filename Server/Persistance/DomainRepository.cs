@@ -27,7 +27,6 @@ namespace Agendo.Server.Persistance
             return (List<DomainDTO>)data;
             
         }
-
         public async Task<List<DomainDTO>> GetListAsync(int superior, IEnumerable<int> domains)
         {
             _connection.Open();
