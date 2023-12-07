@@ -58,8 +58,9 @@ else
 --drop table [dbo].[csti_do_shift];
 --drop table [dbo].[csmd_domain];
 --drop table [dbo].[csti_daily_schedule];
-
-
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'csmd_domain')
+BEGIN
+ 
 CREATE TABLE [dbo].[csmd_domain](
 
        [do_no] [bigint] PRIMARY KEY IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
@@ -176,9 +177,9 @@ REFERENCES [dbo].[csmd_domain]([do_no]);
  
 ALTER TABLE [dbo].[csmd_authorizations_domain_entity]
 ADD CONSTRAINT FK_audoen_en_no_csmd_domain FOREIGN KEY ([audoen_en_no])
-REFERENCES [dbo].[csmd_domain]([do_no]);";
+REFERENCES [dbo].[csmd_domain]([do_no]);
 
-    var datamock = $@"
+
 -- domain
 insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Emmett','$2a$11$2GhIw4g1hqztupAeq1u1L.tU1tcNwSWGIe2m/Kz0HRRAvgI4Q5pLC'); --password
 insert into [dbo].[csmd_domain] ([do_name],[do_password]) values ('Kettel','$2a$11$jXTOhzTvZo6CphJnV73xgO2g5ELaM2cvzKmOojEc4Y1B0H670IGda');
@@ -261,7 +262,13 @@ insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no
 insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,7);
 insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,8);
 insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,9);
-insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,10);";
+insert into [dbo].[csmd_authorizations_domain_entity] ([audoen_no],[audoen_do_no], [audoen_en_no]) values (1000,6,10);
+
+
+END;
+";
+
+    var datamock = $@"";
 
    
     await connection.ExecuteAsync(struc+datamock);
