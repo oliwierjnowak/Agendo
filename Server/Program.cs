@@ -52,8 +52,10 @@ else
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;"));
     SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
     connection.Open();
-    string structure = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"/db/create_tables.sql");
-    string data = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"/db/insert_script.sql");
+
+    string filePath = "/home/runner/work/Agendo/Agendo/Server";
+    string structure = File.ReadAllText(Path.GetDirectoryName(filePath + @"/db/create_tables.sql"));
+    string data = File.ReadAllText(Path.GetDirectoryName(filePath + @"/db/insert_script.sql"));
     await connection.ExecuteAsync(structure+data);
     connection.Close();
 }
