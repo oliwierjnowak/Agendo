@@ -51,6 +51,7 @@ else
     string structure = File.ReadAllText(@"/Server/db/create_tables.sql");
     string data = File.ReadAllText(@"/Server/db/insert_script.sql");
     await connection.ExecuteAsync(structure+data);
+    connection.Close();
 }
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
