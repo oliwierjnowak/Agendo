@@ -42,7 +42,11 @@ if (File.Exists(@"/Server/AppSettings.Development.json"))
      .Build().GetSection("ConnectionString").Value!;
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
 }
+else
+{
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection());
 
+}
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
