@@ -7,6 +7,7 @@ using Agendo.AuthAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +46,11 @@ if (File.Exists(@"/Server/AppSettings.Development.json"))
 else
 {
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Data Source=localhost,1433;Database=agendoDB;User Id=SA;Password=@Agendooo;"));
-
+    SqlConnection connection = new SqlConnection("Data Source=localhost,1433;Database=agendoDB;User Id=SA;Password=@Agendooo;");
+    connection.Open();
+    string structure = File.ReadAllText(@"/Server/db/create_tables.sql");
+    string data = File.ReadAllText(@"/Server/db/insert_script.sql");
+    await connection.ExecuteAsync(structure+data);
 }
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
