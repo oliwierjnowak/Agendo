@@ -67,7 +67,7 @@ CREATE TABLE [dbo].[csmd_domain](
        [do_name] [nvarchar](1024) NOT NULL, --Angezeigter Name des MA)
 	   [do_password] [nvarchar](1024) --password des MA)
 	   )
-GO
+
   
 CREATE TABLE [dbo].[csti_do_shift](
 
@@ -96,7 +96,7 @@ CREATE TABLE [dbo].[csti_do_shift](
        [dosh_ws_no] [int] NULL
 
 )
-GO
+
 CREATE TABLE [dbo].[csti_daily_schedule](
 
        [ds_no] [bigint] PRIMARY KEY IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
@@ -109,13 +109,12 @@ CREATE TABLE [dbo].[csti_daily_schedule](
 
 
 )
-GO
+
 CREATE TABLE [dbo].[csmd_authorizations_domain_entity](
        [audoen_no] [int] NOT NULL, --Fortlaufende Nummer aus csmd_authorizations
        [audoen_do_no] [bigint] NOT NULL, --Eindeutige Nummer vom Vorgesetzten
        [audoen_en_no] [bigint] NOT NULL, --Eindeutige Nummer vom Mitarbeiter
 )
-GO
 
 CREATE TABLE [dbo].[csmd_authorizations](
        [au_no] [int] IDENTITY(1,1) NOT NULL, --Fortlaufende Nummer
@@ -124,7 +123,6 @@ CREATE TABLE [dbo].[csmd_authorizations](
        [au_from] [date] NOT NULL, --Ab Wann ist dieser Eintrag g�ltig (bei uns meistens 01.01.1900)
        [au_to] [date] NOT NULL    --Bis wann ist dieser Eintrag g�ltig (bei uns meistens 31.12.3000)
 )
-GO
 
 
 ALTER TABLE [dbo].[csti_do_shift]
