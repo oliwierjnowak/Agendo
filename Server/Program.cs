@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Dapper;
+using Microsoft.AspNetCore.Hosting.Server;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,19 +36,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-
-if (File.Exists(@"/Server/AppSettings.Development.json"))
+var x =Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); 
+if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+@"\appsettings.json"))
 {
     var constring = new ConfigurationBuilder()
      .SetBasePath(builder.Environment.ContentRootPath)
      .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
      .Build().GetSection("ConnectionString").Value!;
+  
+    //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=@Agendooo$1;Trusted_Connection=False;Encrypt=False;"));
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
 }
 else
 {
-    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=Agendooo!§;Trusted_Connection=False;Encrypt=True;"));
-    SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=Agendooo!§;Trusted_Connection=False;Encrypt=True;");
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=Agendooo!§;Trusted_Connection=False;Encrypt=False;"));
+    SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=Agendooo!§;Trusted_Connection=False;Encrypt=False;");
     connection.Open();
     string structure = File.ReadAllText(@"/Server/db/create_tables.sql");
     string data = File.ReadAllText(@"/Server/db/insert_script.sql");
