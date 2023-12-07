@@ -33,7 +33,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
+
+if (File.Exists(@"/Server/AppSettings.Development.json"))
+{
+    var constring = new ConfigurationBuilder()
+     .SetBasePath(builder.Environment.ContentRootPath)
+     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+     .Build().GetSection("ConnectionString").Value!;
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
+}
+
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
