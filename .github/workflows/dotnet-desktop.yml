@@ -76,8 +76,6 @@ jobs:
         dotnet-version: 8.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
 
     - name: start db container
       run: docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=@Agendooo$1" -e "MSSQL_PID=Developer" -p 1433:1433 -d mcr.microsoft.com/azure-sql-edge
