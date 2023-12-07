@@ -44,7 +44,7 @@ if (File.Exists(@"/Server/AppSettings.Development.json"))
 }
 else
 {
-    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection());
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Data Source=localhost,1433;Database=agendoDB;User Id=SA;Password=@Agendooo;"));
 
 }
 
