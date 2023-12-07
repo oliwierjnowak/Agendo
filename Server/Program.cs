@@ -46,7 +46,7 @@ if (File.Exists(@"/Server/AppSettings.Development.json"))
 else
 {
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Data Source=localhost,1433;Database=agendoDB;User Id=SA;Password=Agendooo!§;"));
-    SqlConnection connection = new SqlConnection("Data Source=localhost,1433;Database=agendoDB;User Id=SA;Password=@Agendooo;");
+    SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=Agendooo!§;Trusted_Connection=False;Encrypt=True;");
     connection.Open();
     string structure = File.ReadAllText(@"/Server/db/create_tables.sql");
     string data = File.ReadAllText(@"/Server/db/insert_script.sql");

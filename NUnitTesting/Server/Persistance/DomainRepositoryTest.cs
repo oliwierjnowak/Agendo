@@ -5,6 +5,7 @@ using Moq;
 using Moq.Dapper;
 using NUnit.Framework.Legacy;
 using System.Data;
+using System.Net.WebSockets;
 
 
 namespace Testing.Server.Persistance
@@ -30,6 +31,7 @@ namespace Testing.Server.Persistance
 
             return mockRepository;
         }
+        
 
         [Test]
         public void GetAllAsync()
