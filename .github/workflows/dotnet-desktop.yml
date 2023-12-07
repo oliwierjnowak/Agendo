@@ -77,9 +77,7 @@ jobs:
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
 
-    - name: start db container
-      run: docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=@Agendooo$1" -e "MSSQL_PID=Developer" -p 1433:1433 -d mcr.microsoft.com/azure-sql-edge
-    # Execute all unit tests in the solution
+   # Execute all unit tests in the solution
     - name: Install NUnit.ConsoleRunner
       run: nuget install NUnit.ConsoleRunner -Version 3.13.0 -DirectDownload -OutputDirectory .
   
