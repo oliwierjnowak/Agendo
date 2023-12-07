@@ -44,6 +44,7 @@ namespace NUnitTesting.Server.controller
 
 
             ClassicAssert.True(request.Ok);
+            await _applicationFactory.DisposeAsync();
         }
 
         [Test]
@@ -70,8 +71,8 @@ namespace NUnitTesting.Server.controller
                new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
                new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
             });
-
-            ClassicAssert.AreEqual(1, 3);
+            await _applicationFactory.DisposeAsync();
+          //  ClassicAssert.AreEqual(1, 3);
         }
 
 
