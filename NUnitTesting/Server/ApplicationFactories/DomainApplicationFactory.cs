@@ -8,6 +8,7 @@ using Agendo.AuthAPI.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Hosting.Server;
+using Castle.Core.Configuration;
 
 namespace NUnitTesting.Server.ApplicationFactories
 {
@@ -36,7 +37,7 @@ namespace NUnitTesting.Server.ApplicationFactories
             builder.ConfigureServices(services => {
                 services.RemoveAll(typeof(IDomainService));
                 services.RemoveAll(typeof(IAuthService));
-
+                services.RemoveAll(typeof(IConfiguration));
 
                 var service = ArrangeRepository();
                 services.AddSingleton(typeof(IDomainService), service.Object);
