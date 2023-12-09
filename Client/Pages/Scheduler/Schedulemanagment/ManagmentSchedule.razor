@@ -13,9 +13,8 @@
 @inject IScheduleManagementClient ApiShiftManagment;
 @inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Schdule</PageTitle>
+<PageTitle>Schdule Role 719</PageTitle>
 
-<PageTitle>Counter</PageTitle>
 
 <div class="w-full mb-3">
     <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
@@ -164,13 +163,14 @@
             EmployeeShiftDTO copy = new EmployeeShiftDTO
                 {
                     Start = args.Data.Start,
-                    End = args.Data.End
+                    End = args.Data.End,
+                    ShiftNR = args.Data.ShiftNR
                 };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-{ "Shift", copy },
-{"EmpNR", EmpNr}
-});
+                { "Shift", copy },
+                {"EmpNR", EmpNr}
+            });
 
             FetchEmpShifts();
         }

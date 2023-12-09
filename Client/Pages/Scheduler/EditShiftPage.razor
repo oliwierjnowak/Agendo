@@ -13,7 +13,7 @@
         <div class="col">
 
             <RadzenDropDown TItem="DailyScheduleDTO"
-            @bind-Value=@shiftnr
+                            @bind-Value=@shiftnr
                             Data=@shifts
                             TextProperty="Name"
                             ValueProperty="Nr"
@@ -44,8 +44,11 @@
     public EmployeeShiftDTO Shift { get; set; }
     [Parameter]
     public int EmpNR { get; set; }
-
+    [Parameter]
     public int shiftnr { get; set; }
+
+
+
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
@@ -55,6 +58,7 @@
     protected override void OnParametersSet()
     {
         model = Shift;
+        shiftnr = Shift.ShiftNR;
     }
 
     protected override async Task OnInitializedAsync()
@@ -67,11 +71,11 @@
     {
 
         var body = new CreateEmployeeShift
-            {
-                EmpNr = EmpNR,
-                ShiftDate = model.Start,
-                ShiftNr = shiftnr
-            };
+        {
+            EmpNr = EmpNR,
+            ShiftDate = model.Start,
+            ShiftNr = shiftnr
+        };
 
 
 
