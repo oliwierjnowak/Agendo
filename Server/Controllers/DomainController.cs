@@ -24,5 +24,14 @@ namespace Agendo.Server.Controllers
         {
             return "Hello World";
         }
+
+        [HttpGet("shiftemployees")]
+        [Authorize(Roles = "719")]
+        public async Task<ActionResult<IEnumerable<DomainDTO>>> GetShiftEmployees([FromQuery] DateTime Start, [FromQuery] int shiftNR)
+        {
+            var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
+            return Ok(await _domainService.GetShiftEmployees(int.Parse(userid), Start, shiftNR));
+        }
+
     }
 }

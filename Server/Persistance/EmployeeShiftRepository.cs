@@ -11,7 +11,7 @@ namespace Agendo.Server.Persistance
         Task<List<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
     }
     public class EmployeeShiftRepository(IDbConnection _connection) : IEmployeeShiftRepository
-    {
+    {		
         public async Task<int> CreateShift(EmployeeShift employeeShift)
         {
 			var dow = "";
@@ -160,9 +160,11 @@ values (@EmpNr, @ISOWeek, @ISOYear, {(day == 1 ? "@ShiftNR" : "1")},
 								where dosh_do_no = @emp and dosh_monday !=  1 {authwhere}
 								union all
 
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 2) as 'DOW',dosh_tuesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
+								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 2) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_tuesday = EmpShift.ds_no where dosh_do_no = {emp} and dosh_tuesday !=  1
+								join [dbo].[csti_daily_schedule] as EmpShift on dosh_wednesday = EmpShift.ds_no 
+								{authjoins}
+								where dosh_do_no = @emp and dosh_tuesday !=  1 {authwhere}
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 3) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'

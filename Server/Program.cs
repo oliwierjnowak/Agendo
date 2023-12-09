@@ -1,4 +1,4 @@
-using Agendo.Server.Persistance;
+﻿using Agendo.Server.Persistance;
 using Agendo.Server.Services;
 using Radzen;
 using System.Data;
@@ -7,6 +7,10 @@ using Agendo.AuthAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Dapper;
+using Microsoft.AspNetCore.Hosting.Server;
+using System.Reflection;
+using Agendo.Server.db;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +37,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(configuration.GetSection("ConnectionString").Value!));
+var x =Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); 
+if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+@"\appsettings.json"))
+{
+    var constring = new ConfigurationBuilder()
+     .SetBasePath(builder.Environment.ContentRootPath)
+     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+     .Build().GetSection("ConnectionString").Value!;
+  
+    //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=@Agendooo$1;Trusted_Connection=False;Encrypt=False;"));
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
+}
+else
+{
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;"));
+    SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
+    connection.Open();
+
+
+    var mock = new TestDBMockData { };
+    await connection.ExecuteAsync(mock.mockData);
+    connection.Close();
+}
 
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
