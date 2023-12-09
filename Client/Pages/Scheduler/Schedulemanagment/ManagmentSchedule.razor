@@ -122,11 +122,11 @@
 
         // Initialize the dictionary with the common data for all selected employees
         var dict = new Dictionary<string, object>
-{
-{ "Start", args.Start },
-{ "End", args.End },
-// Add other common data if needed
-};
+        {
+        { "Start", args.Start },
+        { "End", args.End },
+        // Add other common data if needed
+        };
 
         foreach (var empNr in EmpNrs)
         {
@@ -164,7 +164,8 @@
                 {
                     Start = args.Data.Start,
                     End = args.Data.End,
-                    ShiftNR = args.Data.ShiftNR
+                    ShiftNR = args.Data.ShiftNR,
+                    DomainDTO = args.Data.DomainDTO
                 };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {

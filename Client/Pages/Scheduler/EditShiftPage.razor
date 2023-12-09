@@ -32,6 +32,17 @@
         </div>
     </div>
 
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Employees" />
+           <div>@domainDTO?.Name</div>
+
+        </div>
+        <div class="col">
+           
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col">
@@ -46,9 +57,8 @@
     public int EmpNR { get; set; }
     [Parameter]
     public int shiftnr { get; set; }
-
-
-
+    [Parameter]
+    public DomainDTO? domainDTO { get; set; }
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
@@ -59,12 +69,12 @@
     {
         model = Shift;
         shiftnr = Shift.ShiftNR;
+        domainDTO = Shift.DomainDTO;
     }
 
     protected override async Task OnInitializedAsync()
     {
         shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
-
     }
 
     async void OnSubmit()
