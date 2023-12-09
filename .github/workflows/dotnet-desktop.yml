@@ -47,18 +47,27 @@ on:
 jobs:
 
   build:
-
+    
     strategy:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest  # For a list of available runner types, refer to
+    runs-on: ubuntu-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
       Solution_Name: Agendo                         # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: NUnitTesting\NUnitTesting.csproj         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-    
+    services:
+      mssql:
+        image: mcr.microsoft.com/azure-sql-edge
+        ports: 
+        - 1433:1433  
+        env: 
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: A@123!23sda
+          MSSQL_PID: Developer
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -72,15 +81,13 @@ jobs:
         dotnet-version: 8.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
 
-    # Execute all unit tests in the solution
+   # Execute all unit tests in the solution
     - name: Install NUnit.ConsoleRunner
       run: nuget install NUnit.ConsoleRunner -Version 3.13.0 -DirectDownload -OutputDirectory .
   
     - name: Run UnitTests
-      run: ./NUnit.ConsoleRunner.3.13.0/tools/nunit3-console.exe  path/to/test.dll
+      run: dotnet test NUnitTesting
 
   
 
