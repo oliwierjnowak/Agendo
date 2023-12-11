@@ -21,15 +21,15 @@
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
-                Style="width: 100%; max-width: 400px;" />
+                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
+                            Style="width: 100%; max-width: 400px;" />
 
 
         </div>
 
         <div>
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
-                DateFormat="HH:mm" />
+                              DateFormat="HH:mm" />
         </div>
     </div>
 </div>
@@ -62,6 +62,19 @@
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
     private IEnumerable<EmployeeShiftDTO>? employeeShiftManagement;
 
+
+    private int _dailyShiftDTONr = 0;
+    public int DailyShiftDTONr
+    {
+        get { return _empNr; }
+        set
+        {
+            _dailyShiftDTONr = value;
+            FetchEmpShifts();
+        }
+    }
+
+
     private int _empNr = 0;
     public int EmpNr
     {
@@ -72,7 +85,6 @@
             FetchEmpShifts();
         }
     }
-
 
     private List<int> _empNrs = new List<int>();
     public List<int> EmpNrs
@@ -161,12 +173,11 @@
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = new EmployeeShiftDTO
-                {
-                    Start = args.Data.Start,
-                    End = args.Data.End,
-                    ShiftNR = args.Data.ShiftNR,
-                    DomainDTO = args.Data.DomainDTO
-                };
+            {
+                Start = args.Data.Start,
+                End = args.Data.End,
+                ShiftNR = args.Data.ShiftNR
+            };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy },
@@ -202,6 +213,7 @@
     }
 
 
+
     async void FetchEmpShifts()
     {
         try
@@ -221,6 +233,9 @@
                 }
 
                 employeeShiftDTOs = employeeShifts;
+                
+               
+                
                 StateHasChanged();
                 await scheduler.Reload();
             }
