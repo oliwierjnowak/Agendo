@@ -7,186 +7,122 @@ using Moq.Dapper;
 using NUnit.Framework.Legacy;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 
 namespace NUnitTesting.Server.Persistance
 {
     internal class EmployeeShiftRepositoryTest
     {
   
-        private Mock<IDbConnection> ArrangeDb()
-        {
-            var mockRepository = new Mock<IDbConnection>();
-           
-            // create mock data list of type EmployeeShift here 
-            List<Agendo.Server.Models.EmployeeShift> data =
-            [
-                new Agendo.Server.Models.EmployeeShift { EmpNr = 1, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 1, ShiftName = "Shift1", ShiftHours = 8},
-                new Agendo.Server.Models.EmployeeShift { EmpNr = 2, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 1, ShiftName = "Shift2", ShiftHours = 8},
-                new Agendo.Server.Models.EmployeeShift { EmpNr = 3, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 1, ShiftName = "Shift3", ShiftHours = 8}
 
-            ];
-
-            string authjoins = $@"
-								join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
-								join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no";
-            string authwhere = $@" and authdomain.audoen_en_no = @emp and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1";
-
-
-            string selectQuery1 = @$"
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 1) as 'DOW',dosh_monday as 'ShiftNR'  , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_monday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_monday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 2) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_wednesday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_tuesday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 3) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_wednesday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_wednesday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 4) as 'DOW',dosh_thursday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_thursday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_thursday !=  1 {authwhere}
-								union all
-
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 5) as 'DOW',dosh_friday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours' 	
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_friday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_friday !=  1	{authwhere}	
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 6) as 'DOW',dosh_saturday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_saturday = EmpShift.ds_no	
-								{authjoins}
-								where dosh_do_no = @emp and dosh_saturday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 7) as 'DOW',dosh_sunday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_sunday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no = @emp and dosh_sunday !=  1 {authwhere}";
-
-            string selectQuery2 = @$"
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 1) as 'DOW',dosh_monday as 'ShiftNR'  , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_monday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_monday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 2) as 'DOW',dosh_tuesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_tuesday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_tuesday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 3) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_wednesday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_wednesday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 4) as 'DOW',dosh_thursday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_thursday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_thursday !=  1 {authwhere}
-								union all
-
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 5) as 'DOW',dosh_friday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours' 	
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_friday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_friday !=  1	{authwhere}	
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 6) as 'DOW',dosh_saturday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_saturday = EmpShift.ds_no	
-								{authjoins}
-								where dosh_do_no in @emps and dosh_saturday !=  1 {authwhere}
-								union all
-
-								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 7) as 'DOW',dosh_sunday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
-								from [dbo].[csti_do_shift] 
-								join [dbo].[csti_daily_schedule] as EmpShift on dosh_sunday = EmpShift.ds_no 
-								{authjoins}
-								where dosh_do_no in @emps and dosh_sunday !=  1 {authwhere}";
-
-            mockRepository.SetupDapperAsync(c => c.QueryAsync<Agendo.Server.Models.EmployeeShift>(selectQuery1, new { emp = 1, superior = 1 },null,null,null)).ReturnsAsync(data.Where(x => x.EmpNr == 1).ToList());
-
-			mockRepository.SetupDapperAsync(c => c.QueryAsync<Agendo.Server.Models.EmployeeShift>(selectQuery2, new { emps = new int[] { 1, 2, 3 }, superior = 1 },null,null,null)).ReturnsAsync(data.Where(x => x.EmpNr == 1 || x.EmpNr == 2 || x.EmpNr == 3).ToList());
-
-
-            return mockRepository;
-        }
 
 		//write test for GetSingleEmpAsync here
 		[Test]
 		public void GetSingleEmpAsync()
 		{
-			   //arrange
-			   var connection = ArrangeDb();
-            var repository = new EmployeeShiftRepository(connection.Object);
+            //arrange
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
+
+            var repository = new EmployeeShiftRepository(connection);
 
             //act
             var x = repository.GetSingleEmpAsync(1, 1).Result;
-
+            var only1 = x.FindAll(x => x.EmpNr == 1);
+            var not1 = x.FindAll(x => x.EmpNr != 1);
+            var weekk32 = only1.FindAll(x => x.ISOWeek == 32 && x.ISOYear == 2022 && x.DOW == 4);
             //assert
             ClassicAssert.IsNotNull(x);
-            ClassicAssert.AreEqual(x.Count, 3);
-			//assert that the first element in the list has the name "Oliwier Nowak"    
-			ClassicAssert.AreEqual(x[0].ShiftName, "Shift1");
-		}
+
+            Assert.That(not1.Count, Is.EqualTo(0));
+            Assert.That(weekk32.Count, Is.EqualTo(1));
+
+            Assert.That(weekk32[0].ShiftName, Is.EqualTo("part time shift"));
+            Assert.That(weekk32[0].ShiftHours, Is.EqualTo(4));
+
+            //6 is not superior of 2
+
+            // act 
+            var notSuperior = repository.GetSingleEmpAsync(6, 2).Result;
+
+            ClassicAssert.IsNotNull(x);
+
+            Assert.That(notSuperior.Count, Is.EqualTo(0));
+
+
+        }
 
 		//write test for GetMultipleEmpsAsync here
 		[Test]
 		public void GetMultipleEmpsAsync()
 		{
-               //arrange
-               var connection = ArrangeDb();
-            var repository = new EmployeeShiftRepository(connection.Object);
+            //arrange
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
+
+
+
+            var repository = new EmployeeShiftRepository(connection);
 
             //act
             var x = repository.GetMultipleEmpsAsync(1,new int[] { 1, 2, 3 }).Result;
 
             //assert
             ClassicAssert.IsNotNull(x);
-            ClassicAssert.AreEqual(x.Count, 3);
-		}
-        //write test for  public async Task<int> CreateShift(EmployeeShift employeeShift) from EmployeeShiftRepository here
+            var not123 = x.FindAll(x => x.EmpNr != 1 && x.EmpNr != 2 && x.EmpNr != 3);
+
+            ClassicAssert.AreEqual(not123.Count, 0);
+            var only1 = x.FindAll(x => x.EmpNr == 1);
+
+            var weekk32 = only1.FindAll(x => x.ISOWeek == 32 && x.ISOYear == 2022 && x.DOW == 4);
+            Assert.That(weekk32.Count, Is.EqualTo(1));
+
+            Assert.That(weekk32[0].ShiftName, Is.EqualTo("part time shift"));
+            Assert.That(weekk32[0].ShiftHours, Is.EqualTo(4));
+
+
+            // not superior
+            var notSuperior = repository.GetMultipleEmpsAsync(6, new int[] { 1, 2, 3 }).Result;
+            ClassicAssert.IsNotNull(x);
+
+            Assert.That(notSuperior.Count, Is.EqualTo(0));
+
+        }
         [Test]
         public void CreateShift()
         {
             //arrange
-            var connection = ArrangeDb();
-            var repository = new EmployeeShiftRepository(connection.Object);
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
 
+            var repository = new EmployeeShiftRepository(connection);
+
+            //not exsisting week
+            var shift = new EmployeeShift { EmpNr = 2, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 4, ShiftName = "babymonat", ShiftHours = 3 };
             //act
-          //  var x = repository.CreateShift(new EmployeeShift { EmpNr = 1, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 1, ShiftName = "Shift1", ShiftHours = 8 }).Result;
 
-            //assert
-          //  ClassicAssert.IsNotNull(x);
-            ClassicAssert.AreEqual("not implemented", "not implemented");
+          repository.CreateShift(shift).Wait();
+
+          //  Assert.That(result, Is.EqualTo(1));
+            var find2 = repository.GetSingleEmpAsync(2, 2).Result;
+            var week1year2021Monday = find2.FindAll(x => x.ISOWeek == 1 && x.ISOYear == 2021 && x.DOW == 1).ToList();
+            Assert.That(week1year2021Monday.Count, Is.EqualTo(1));
+            Assert.That(week1year2021Monday[0].ShiftNR, Is.EqualTo(4));
+            Assert.That(week1year2021Monday[0].ShiftName, Is.EqualTo("babymonat"));
+            Assert.That(week1year2021Monday[0].EmpNr, Is.EqualTo(2));
+
+
+            //exsisting week for update
+
+
+            var findWeek452023 = find2.FindAll(x => x.ISOWeek == 45 && x.ISOYear == 2023 ).ToList();
+            var updateshift = new EmployeeShift { EmpNr = 2, ISOWeek = 45, ISOYear = 2023, DOW = 5, ShiftNR = 4, ShiftName = "babymonat", ShiftHours = 4 };
+
+            repository.CreateShift(updateshift).Wait();
+
+            var findAfterUpdate = repository.GetSingleEmpAsync(2, 2).Result;
+            var week452023 = findAfterUpdate.FindAll(x => x.ISOWeek == 45 && x.ISOYear == 2023 && x.DOW == 5).ToList();
+            Assert.That(week452023.Count, Is.EqualTo(1));
+            Assert.That(week452023[0].ShiftNR, Is.EqualTo(4));
+            Assert.That(week452023[0].ShiftName, Is.EqualTo("babymonat"));
+            Assert.That(week452023[0].EmpNr, Is.EqualTo(2));
         }
     }
 
