@@ -18,7 +18,7 @@ namespace NUnitTesting.Server.Persistance
 
 		//write test for GetSingleEmpAsync here
 		[Test]
-		public void GetSingleEmpAsync()
+		public async Task GetSingleEmpAsync()
 		{
             //arrange
             SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
@@ -47,13 +47,14 @@ namespace NUnitTesting.Server.Persistance
             ClassicAssert.IsNotNull(x);
 
             Assert.That(notSuperior.Count, Is.EqualTo(0));
+            await connection.CloseAsync();
 
 
         }
 
 		//write test for GetMultipleEmpsAsync here
 		[Test]
-		public void GetMultipleEmpsAsync()
+		public async Task GetMultipleEmpsAsync()
 		{
             //arrange
             SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
@@ -84,10 +85,10 @@ namespace NUnitTesting.Server.Persistance
             ClassicAssert.IsNotNull(x);
 
             Assert.That(notSuperior.Count, Is.EqualTo(0));
-
+            await connection.CloseAsync();
         }
         [Test]
-        public void CreateShift()
+        public async Task CreateShift()
         {
             //arrange
             SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
@@ -123,6 +124,8 @@ namespace NUnitTesting.Server.Persistance
             Assert.That(week452023[0].ShiftNR, Is.EqualTo(4));
             Assert.That(week452023[0].ShiftName, Is.EqualTo("babymonat"));
             Assert.That(week452023[0].EmpNr, Is.EqualTo(2));
+
+            await connection.CloseAsync();
         }
     }
 
