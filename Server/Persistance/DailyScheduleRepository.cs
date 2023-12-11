@@ -38,11 +38,11 @@ namespace Agendo.Server.Persistance
 
         public async Task<int> AddNewShift(string Name, int Hrs, string Color)
         {
-            string shiftAdd = $@"insert into [dbo].[csti_daily_schedule] ([ds_name], [ds_hours], [ds_color])  values ( @name, @hrs, @color)";
+            string shiftAdd = $@"insert into [dbo].[csti_daily_schedule] ([ds_name], [ds_hours], [ds_color]) OUTPUT Inserted.ds_no values ( @name, @hrs, @color)";
 
             string insertQuery = shiftAdd;
 
-            int data = await _connection.ExecuteAsync(insertQuery, new
+            int data = await _connection.QuerySingleAsync<int>(insertQuery, new
             {
                 name = Name,
                 hrs = Hrs,
