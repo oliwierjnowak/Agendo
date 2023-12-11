@@ -45,7 +45,7 @@
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
 
 
-    private int _empNr = 2;
+    private int _empNr = 0;
     public int EmpNr
     {
         get { return _empNr; }
@@ -59,7 +59,7 @@
     protected override async Task OnInitializedAsync()
     {
         var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
-
+        EmpNr = int.Parse( (await AuthStateProvider.GetAuthenticationStateAsync()).User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
         shifts = (List<EmployeeShiftDTO>)x;
         StateHasChanged();
         await scheduler.Reload();
