@@ -35,7 +35,7 @@ namespace Agendo.Server.Controllers
 
         [HttpGet("shiftmanagment")]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromBody] IEnumerable<int> Emps)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps)
         {
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
             return Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
