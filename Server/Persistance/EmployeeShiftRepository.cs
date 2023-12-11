@@ -149,7 +149,7 @@ values (@EmpNr, @ISOWeek, @ISOYear, {(day == 1 ? "@ShiftNR" : "1")},
             string authjoins = $@"
 								join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
 								join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no";
-            string authwhere = $@" and authdomain.audoen_en_no = @emp and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1";
+            string authwhere = $@" and ((authdomain.audoen_en_no = @emp and audoen_do_no = @superior ) or @superior = @emp) and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1";
 
 
             string shiftOverview = @$"
