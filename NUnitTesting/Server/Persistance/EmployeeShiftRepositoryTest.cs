@@ -21,7 +21,7 @@ namespace NUnitTesting.Server.Persistance
 		public async Task GetSingleEmpAsync()
 		{
             //arrange
-            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
 
             var repository = new EmployeeShiftRepository(connection);
 
@@ -57,7 +57,7 @@ namespace NUnitTesting.Server.Persistance
 		public async Task GetMultipleEmpsAsync()
 		{
             //arrange
-            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
 
 
 
@@ -91,7 +91,7 @@ namespace NUnitTesting.Server.Persistance
         public async Task CreateShift()
         {
             //arrange
-            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=\r\n@Agendooo$1;Trusted_Connection=False;Encrypt=False;");
+            SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
 
             var repository = new EmployeeShiftRepository(connection);
 
