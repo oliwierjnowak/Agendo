@@ -13,7 +13,7 @@
         <div class="col">
 
             <RadzenDropDown TItem="DailyScheduleDTO"
-            @bind-Value=@shiftnr
+                            @bind-Value=@shiftnr
                             Data=@shifts
                             TextProperty="Name"
                             ValueProperty="Nr"
@@ -32,8 +32,29 @@
         </div>
     </div>
 
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3 mt-4">
+            <RadzenLabel class="text-lg" Text="Employees"/>
+            @if (domainDTOs != null)
+            {
+                @foreach (var x in domainDTOs)
+                {
+                    <div>
+                        @x.Name
+
+                    </div>
+                }
+            }
+        <div class="mt-4 flex w-max">
+            <RadzenButton Text="Add" Icon="add_circle_outline" Click="@AddDomainDTO" />
+            <RadzenButton Icon="delete" Text="Delete" Click="@RemoveDomainDTO" Style="margin-left: 10px;" />
+        </div>
+
+
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-md-3"></div>
         <div class="col">
             <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
         </div>
@@ -44,8 +65,13 @@
     public EmployeeShiftDTO Shift { get; set; }
     [Parameter]
     public int EmpNR { get; set; }
-
+    [Parameter]
     public int shiftnr { get; set; }
+
+    [Parameter]
+    public DateTime Start { get; set; }
+
+    public IEnumerable<DomainDTO>? domainDTOs;
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
@@ -54,24 +80,38 @@
 
     protected override void OnParametersSet()
     {
-        model = Shift;
+
     }
 
     protected override async Task OnInitializedAsync()
     {
-        shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+        model = Shift;
+        shiftnr = Shift.ShiftNR;
+        Start = Shift.Start;
 
+        // Format the Start date
+        string formattedStartDate = Start.ToString("yyyy-MM-ddTHH:mm:ss");
+
+        // Build the query string
+        string queryString = $"api/domain/shiftemployees?Start={formattedStartDate}&shiftNR={shiftnr}";
+
+        // Make the API calls
+        shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+        domainDTOs = await _http.GetFromJsonAsync<IEnumerable<DomainDTO>>(queryString);
     }
+
+
+
 
     async void OnSubmit()
     {
 
         var body = new CreateEmployeeShift
-            {
-                EmpNr = EmpNR,
-                ShiftDate = model.Start,
-                ShiftNr = shiftnr
-            };
+        {
+            EmpNr = EmpNR,
+            ShiftDate = model.Start,
+            ShiftNr = shiftnr
+        };
 
 
 
@@ -79,4 +119,18 @@
         Console.WriteLine(x);
         DialogService.Close(model);
     }
-}
+
+    private void AddDomainDTO()
+    {
+        // Code to add a new DomainDTO
+        // This might involve showing a dialog to select an employee, or directly adding a default new DomainDTO instance
+        //var newDomainDTO = new DomainDTO(); // Modify as needed
+        //domainDTOs = domainDTOs.Append(newDomainDTO); // Append the new DTO
+    }
+
+    private void RemoveDomainDTO()
+    {
+        // Code to remove the specified DomainDTO
+        //domainDTOs = domainDTOs.Where(d => d != dto);
+    }
+    }
