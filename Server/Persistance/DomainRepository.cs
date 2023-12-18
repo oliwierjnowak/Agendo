@@ -68,7 +68,7 @@ namespace Agendo.Server.Persistance
                 case 6:
                     dow = "dosh_saturday";
                     break;
-                case 7:
+                case 0:
                     dow = "dosh_sunday";
                     break;
             }

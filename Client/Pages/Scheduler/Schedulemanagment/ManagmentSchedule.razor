@@ -13,24 +13,23 @@
 @inject IScheduleManagementClient ApiShiftManagment;
 @inject AuthenticationStateProvider AuthStateProvider;
 
-<PageTitle>Schdule</PageTitle>
+<PageTitle>Schdule Role 719</PageTitle>
 
-<PageTitle>Counter</PageTitle>
 
 <div class="w-full mb-3">
     <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
-                Style="width: 100%; max-width: 400px;" />
+                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
+                            Style="width: 100%; max-width: 400px;" />
 
 
         </div>
 
         <div>
             <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
-                DateFormat="HH:mm" />
+                              DateFormat="HH:mm" />
         </div>
     </div>
 </div>
@@ -63,6 +62,19 @@
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
     private IEnumerable<EmployeeShiftDTO>? employeeShiftManagement;
 
+
+    private int _dailyShiftDTONr = 0;
+    public int DailyShiftDTONr
+    {
+        get { return _empNr; }
+        set
+        {
+            _dailyShiftDTONr = value;
+            FetchEmpShifts();
+        }
+    }
+
+
     private int _empNr = 0;
     public int EmpNr
     {
@@ -73,7 +85,6 @@
             FetchEmpShifts();
         }
     }
-
 
     private List<int> _empNrs = new List<int>();
     public List<int> EmpNrs
@@ -123,11 +134,11 @@
 
         // Initialize the dictionary with the common data for all selected employees
         var dict = new Dictionary<string, object>
-            {
-            { "Start", args.Start },
-            { "End", args.End },
-            // Add other common data if needed
-            };
+        {
+        { "Start", args.Start },
+        { "End", args.End },
+        // Add other common data if needed
+        };
 
         foreach (var empNr in EmpNrs)
         {
@@ -164,7 +175,8 @@
             EmployeeShiftDTO copy = new EmployeeShiftDTO
             {
                 Start = args.Data.Start,
-                End = args.Data.End
+                End = args.Data.End,
+                ShiftNR = args.Data.ShiftNR
             };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
@@ -201,6 +213,7 @@
     }
 
 
+
     async void FetchEmpShifts()
     {
         try
@@ -221,6 +234,9 @@
                 }
 
                 employeeShiftDTOs = employeeShifts;
+                
+               
+                
                 StateHasChanged();
                 await scheduler.Reload();
             }

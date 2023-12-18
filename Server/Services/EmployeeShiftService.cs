@@ -58,7 +58,7 @@ namespace Agendo.Server.Services
                         ShiftNR = group.Key.ShiftNR,
                         ShiftName = group.Key.ShiftName,
                         ShiftHours = group.Key.ShiftHours
-                    }); ;
+                    }); 
                 }
                
             }
