@@ -39,7 +39,7 @@ namespace Agendo.Server.Services
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
             var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps);
-            List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
+            var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
             {
