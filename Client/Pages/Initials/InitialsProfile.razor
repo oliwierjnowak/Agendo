@@ -1,0 +1,19 @@
+﻿@code {
+    [Parameter] public string EmployeeName { get; set; }
+
+    private string GetInitials()
+    {
+        var names = EmployeeName?.Split(' ');
+        if (names?.Length >= 2)
+        {
+            return $"{names[0].FirstOrDefault()}{names[1].FirstOrDefault()}".ToUpper();
+        }
+        return EmployeeName?.FirstOrDefault().ToString().ToUpper() ?? "";
+    }
+}
+
+<div class="w-24 h-24 gradient-bg text-white rounded-full flex justify-center items-center text-2xl font-bold">
+    @GetInitials()
+</div>
+
+
