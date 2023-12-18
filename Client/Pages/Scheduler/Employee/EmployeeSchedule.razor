@@ -9,26 +9,8 @@
 
 @inject DialogService DialogService
 @inject HttpClient Http
-
-<PageTitle>Schdule Role 1000</PageTitle>
-
-
-<div class="w-full mb-3">
-    <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
-    <div class="flex justify-between items-center">
-        <div>
-            <RadzenDropDown TItem="DomainDTO"
-            @bind-Value=@EmpNr
-                            Data=@employees
-                            TextProperty="Name"
-                            ValueProperty="Nr"
-                            Style="width: 100%; max-width: 400px;" />
-        </div>
-        <div>
-            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true" DateFormat="HH:mm" />
-        </div>
-    </div>
-</div>
+@inject AuthenticationStateProvider AuthStateProvider
+<PageTitle>Schdule</PageTitle>
 
 
 
@@ -40,7 +22,7 @@
                  SlotSelect=@OnSlotSelect
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
-                 TextProperty="ShiftName" SelectedIndex="3"
+                 TextProperty="ShiftName" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
 
 
@@ -73,12 +55,10 @@
         }
     }
 
-    private IEnumerable<DomainDTO>? employees;
-
     protected override async Task OnInitializedAsync()
     {
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift");
-
+        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
+        EmpNr = int.Parse( (await AuthStateProvider.GetAuthenticationStateAsync()).User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
         shifts = (List<EmployeeShiftDTO>)x;
         StateHasChanged();
         await scheduler.Reload();

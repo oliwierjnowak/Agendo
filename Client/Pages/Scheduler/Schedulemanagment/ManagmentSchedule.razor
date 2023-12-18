@@ -11,7 +11,7 @@
 @inject DialogService DialogService
 @inject HttpClient Http
 @inject IScheduleManagementClient ApiShiftManagment;
-@inject AuthenticationStateProvider AuthStateProvider
+@inject AuthenticationStateProvider AuthStateProvider;
 
 <PageTitle>Schdule Role 719</PageTitle>
 
@@ -222,14 +222,15 @@
             {
                 var employeeShifts = new List<EmployeeShiftDTO>();
 
-                foreach (var empNr in EmpNrs)
-                {
-                    var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + empNr);
+                // Building the query string dynamically
+                var queryString = string.Join("&", EmpNrs.Select(empNr => $"Emps={empNr}"));
+                var url = $"/api/EmployeeShift/shiftmanagment?{queryString}";
 
-                    if (x != null)
-                    {
-                        employeeShifts.AddRange(x);
-                    }
+                // Make the API call with the dynamically constructed URL
+                var shifts = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>(url);
+                if (shifts != null)
+                {
+                    employeeShifts.AddRange(shifts);
                 }
 
                 employeeShiftDTOs = employeeShifts;

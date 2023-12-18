@@ -4,9 +4,11 @@ using Dapper;
 using Moq;
 using Moq.Dapper;
 using NUnit.Framework.Legacy;
+using NUnitTesting;
 using System.Data;
-using System.Data.Common;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Data.SqlClient;
+using System.Net.WebSockets;
+
 
 namespace Testing.Server.Persistance
 {
@@ -14,38 +16,68 @@ namespace Testing.Server.Persistance
     internal class DomainRepositoryTest
     {
         
-        private Mock<IDbConnection> ArrangeDb()
-        {
-            var mockRepository = new Mock<IDbConnection>();
-            string selectQuery = "select do_no AS 'Nr',do_name AS 'Name'   from [dbo].[csmd_domain]";
-            List<Agendo.Server.Models.DomainDTO> data = new List<Agendo.Server.Models.DomainDTO>() {
-               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
-            };
-
-
-            mockRepository.SetupDapperAsync(c => c.QueryAsync<Agendo.Server.Models.DomainDTO>(selectQuery, null, null, null, null))
-            .ReturnsAsync(data);
-
-
-            return mockRepository;
-        }
+       
 
         [Test]
-        public void GetAllAsync()
+        public async Task GetAllAsync()
         {
             //arrange
-            var connection = ArrangeDb();
-            var repository = new DomainRepository(connection.Object);
+            SqlConnection connection = new TestDbConnection().Connection;
+            var repository = new DomainRepository(connection);
 
             //act
             var x = repository.GetAllAsync(1).Result;
 
             //assert
             ClassicAssert.IsNotNull(x);
-            ClassicAssert.AreEqual(x.Count, 3);
+            ClassicAssert.AreEqual(x.Count, 5);
+            var kettel = x[1];
+            Assert.That(kettel.Nr, Is.EqualTo(2));
+            Assert.That(kettel.Name, Is.EqualTo("Kettel"));
+            await connection.CloseAsync();
 
+        } 
+        [Test]
+        public async Task GetListAsync()
+        {
+            //arrange
+            SqlConnection connection = new TestDbConnection().Connection;
+            var repository = new DomainRepository(connection);
+
+            //act
+            var x = repository.GetListAsync(1, new int[] { 1, 2, 3 }).Result;
+
+            //assert
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 3);
+            var kettel = x[1];
+            Assert.That(kettel.Nr, Is.EqualTo(2));
+            Assert.That(kettel.Name, Is.EqualTo("Kettel"));
+            await connection.CloseAsync();
         }
+
+        [Test]
+        public async Task GetShiftEmployees()
+        {
+            //arrange
+            SqlConnection connection = new TestDbConnection().Connection;
+            var repository = new DomainRepository(connection);
+
+            //act
+            var x = repository.GetShiftEmployees(1, 2023,1,(DayOfWeek)1,3).Result.ToList();
+
+            //assert
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 1);
+            var kettel = x[0];
+            Assert.That(kettel.Nr, Is.EqualTo(2));
+            Assert.That(kettel.Name, Is.EqualTo("Kettel"));
+
+            await connection.CloseAsync();
+        }
+
+        // write here hello world and
+
+
     }
 }

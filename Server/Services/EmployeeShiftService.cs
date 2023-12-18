@@ -39,7 +39,7 @@ namespace Agendo.Server.Services
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
             var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps);
-            List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
+            var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
             {
@@ -48,7 +48,7 @@ namespace Agendo.Server.Services
                 // because of that if statement we only select empshift where all of the emps are working and not just only one  
                 if ((domainIds.All(emps.Contains) && domainIds.Count() == emps.Count()))
                 {
-                    var domains = await _domainService.GetListAsync(sup, domainIds);
+                    var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8), group.Key.ShiftNR);
 
                     employeeShiftDTOs.Add(new EmployeeShiftDTO
                     {

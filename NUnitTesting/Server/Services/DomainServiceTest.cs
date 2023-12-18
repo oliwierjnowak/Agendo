@@ -28,6 +28,7 @@ namespace NUnitTesting.Server.Services
 
             mockRepository.Setup(r => r.GetAllAsync(1)).ReturnsAsync(data);
 
+            mockRepository.Setup(r => r.GetListAsync(1, new List<int> { 1, 2 })).ReturnsAsync(data.Where(x => x.Nr == 1 || x.Nr == 2).ToList());
 
             return mockRepository;
         }
@@ -48,5 +49,26 @@ namespace NUnitTesting.Server.Services
             ClassicAssert.AreEqual(x.Count, 3);
 
         }
+
+        //write test for GetListAsync here 
+        [Test]
+        public void GetListAsync()
+        {
+            //ArrangeRepository
+            var repo = ArrangeRepository();
+            var service = new DomainService(repo.Object);
+
+            //act
+            var x = service.GetListAsync(1, new List<int> { 1, 2 }).Result;
+
+            //assert
+            ClassicAssert.IsNotNull(x);
+            ClassicAssert.AreEqual(x.Count, 2);
+            //assert that the first element in the list has the name "Oliwier Nowak"    
+            ClassicAssert.AreEqual(x[0].Name, "Oliwier Nowak");
+
+        }   
+
+
     }
 }
