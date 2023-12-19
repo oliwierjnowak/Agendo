@@ -106,8 +106,9 @@
 
 
 
-    DomainDTO domainToRemove;
+    List<DomainDTO> domainsToRemove = new List<DomainDTO>();
 
+    List<DomainDTO> domainsSelected = new List<DomainDTO>();
 
 
 
@@ -141,17 +142,22 @@
     async void OnSubmit()
     {
         Console.WriteLine("aaa");
-        var body = new CreateEmployeeShift
+
+        if(domainsToRemove != null)
         {
-            EmpNr = domainToRemove.Nr,
-            ShiftDate = model.Start,
-            ShiftNr = 1
-        };
+            foreach(var x in domainsToRemove)
+            {
+                var body = new CreateEmployeeShift
+                {
+                    EmpNr = x.Nr,
+                    ShiftDate = model.Start,
+                    ShiftNr = 1
+                };
+                await _http.PutAsJsonAsync("api/EmployeeShift", body);
+            }
 
-        await _http.PutAsJsonAsync("api/EmployeeShift", body);
+        }
 
-
-        Console.Write(body);
 
         foreach (var x in domainDTOs)
         {
@@ -162,7 +168,7 @@
                 ShiftNr = model.ShiftNR
             };
 
-            await _http.PutAsJsonAsync("api/EmployeeShift", x);
+            await _http.PutAsJsonAsync("api/EmployeeShift", body2);
 
         }
 
@@ -202,7 +208,7 @@
                     existingDomains.Add(domain);
                 }
             }
-            domainDTOs = existingDomains;
+            domainsSelected = existingDomains;
         }
 
         // Update UI or perform other necessary operations
@@ -213,8 +219,9 @@
     private void RemoveDomainDTO(DomainDTO x)
     {
         // Code to remove the specified DomainDTO
-        domainToRemove = x;
+        domainsToRemove.Add(x);
         domainDTOs = domainDTOs.Where(d => d != x);
+
     }
 
     private void CloseEditWindow()
