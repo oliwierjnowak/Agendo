@@ -149,13 +149,14 @@
             try
             {
                 EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
+
                 if (data != null)
                 {
                     employeeShiftDTOs.Add(data);
                     console.Log(data);
-
                     // Fetch shifts for each employee
-                    FetchEmpShiftsNr(empNr);
+                    //FetchEmpShiftsNr(empNr);
+
                 }
             }
             catch (Exception ex)
@@ -164,6 +165,8 @@
                 console.Log($"Error: {ex.Message}");
             }
         }
+        StateHasChanged();
+        await scheduler.Reload();
     }
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
@@ -234,9 +237,9 @@
                 }
 
                 employeeShiftDTOs = employeeShifts;
-                
-               
-                
+
+
+
                 StateHasChanged();
                 await scheduler.Reload();
             }
