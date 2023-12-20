@@ -27,4 +27,15 @@
   <ItemGroup>
     <Content Remove="wwwroot\agendo_logo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Pages\Initials\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Pages\Initials\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Pages\Initials\InitialsProfile.razor.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </None>
+  </ItemGroup>
 </Project>

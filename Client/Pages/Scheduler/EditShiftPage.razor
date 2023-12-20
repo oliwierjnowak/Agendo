@@ -32,34 +32,47 @@
         </div>
     </div>
 
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3 mt-4">
-            <RadzenLabel class="text-lg" Text="Employees"/>
+    <div class="row mb-4">
+        <div class="mt-4">
+            <RadzenText TextStyle="TextStyle.Body1"><b>Employees:</b></RadzenText>
             @if (domainDTOs != null)
             {
-                @foreach (var x in domainDTOs)
-                {
-                    <div>
-                        @x.Name
-
-                    </div>
-                }
+                <div class="divide-y divide-gray-200">
+                    @foreach (var x in domainDTOs)
+                    {
+                        <div class="flex justify-between py-2">
+                            <div>@x.Name</div>
+                            <RadzenButton Icon="delete" Click="@( () => RemoveDomainDTO(x) )" />
+                        </div>
+                    }
+                </div>
             }
-        <div class="mt-4 flex w-max">
+        <div class="mt-4 flex space-x-2">
             <RadzenButton Text="Add" Icon="add_circle_outline" Click="@AddDomainDTO" />
-            <RadzenButton Icon="delete" Text="Delete" Click="@RemoveDomainDTO" Style="margin-left: 10px;" />
+
+            <RadzenDropDown TItem="DomainDTO"
+                            @bind-Value=@EmpNrs
+                            Data=@domainsNotSelected
+                            TextProperty="Name"
+                            Multiple=true
+                            Placeholder="Not selected Employees"
+                            AllowClear="true"
+                            Chips="true"
+                            ValueProperty="Nr"
+                            Style="width: 100%; max-width: 400px;" />
         </div>
-
-
         </div>
     </div>
 
     <div class="row">
         <div class="col">
             <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+            <RadzenButton ButtonType="ButtonType.Reset" Click="@CloseEditWindow" Text="Cancel" />
+
         </div>
     </div>
 </RadzenTemplateForm>
+
 @code {
     [Parameter]
     public EmployeeShiftDTO Shift { get; set; }
@@ -73,15 +86,31 @@
 
     public IEnumerable<DomainDTO>? domainDTOs;
 
-    public IEnumerable<DailyScheduleDTO>? shifts;
 
+    public IEnumerable<DailyScheduleDTO>? shifts;
 
     private EmployeeShiftDTO model = new EmployeeShiftDTO();
 
-    protected override void OnParametersSet()
-    {
+    public IEnumerable<DomainDTO>? domainsNotSelected;
 
+    private List<int> _empNrs = new List<int>();
+
+    public List<int> EmpNrs
+    {
+        get { return _empNrs; }
+        set
+        {
+            _empNrs = value;
+        }
     }
+
+
+
+    List<DomainDTO> domainsToRemove = new List<DomainDTO>();
+
+    List<DomainDTO> domainsSelected = new List<DomainDTO>();
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,39 +127,112 @@
         // Make the API calls
         shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
         domainDTOs = await _http.GetFromJsonAsync<IEnumerable<DomainDTO>>(queryString);
+
+        domainsNotSelected = await _http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+
+        var domainDTOsSet = new HashSet<int>(domainDTOs.Select(d => d.Nr));
+        domainsNotSelected = domainsNotSelected?.Where(domain => !domainDTOsSet.Contains(domain.Nr));
+
     }
+
 
 
 
 
     async void OnSubmit()
     {
+        Console.WriteLine("aaa");
 
-        var body = new CreateEmployeeShift
+        if(domainsToRemove != null)
         {
-            EmpNr = EmpNR,
-            ShiftDate = model.Start,
-            ShiftNr = shiftnr
-        };
+            foreach(var x in domainsToRemove)
+            {
+                var body = new CreateEmployeeShift
+                {
+                    EmpNr = x.Nr,
+                    ShiftDate = model.Start,
+                    ShiftNr = 1
+                };
+                await _http.PutAsJsonAsync("api/EmployeeShift", body);
+            }
+
+        }
+
+
+        foreach (var x in domainDTOs)
+        {
+            var body2 = new CreateEmployeeShift
+            {
+                EmpNr = x.Nr,
+                ShiftDate = model.Start,
+                ShiftNr = model.ShiftNR
+            };
+
+            await _http.PutAsJsonAsync("api/EmployeeShift", body2);
+
+        }
 
 
 
-        var x = await _http.PutAsJsonAsync("api/EmployeeShift", body);
-        Console.WriteLine(x);
         DialogService.Close(model);
     }
 
     private void AddDomainDTO()
     {
-        // Code to add a new DomainDTO
-        // This might involve showing a dialog to select an employee, or directly adding a default new DomainDTO instance
-        //var newDomainDTO = new DomainDTO(); // Modify as needed
-        //domainDTOs = domainDTOs.Append(newDomainDTO); // Append the new DTO
+        if (domainDTOs == null)
+        {
+            domainDTOs = new List<DomainDTO>();
+        }
+
+        // Assuming domainsNotSelected is IEnumerable<DomainDTO>
+        var selectedDomains = domainsNotSelected.Where(d => EmpNrs.Contains(d.Nr));
+
+        // If domainDTOs is a List
+        if (domainDTOs is List<DomainDTO> list)
+        {
+            foreach (var domain in selectedDomains)
+            {
+                if (!list.Any(d => d.Nr == domain.Nr))
+                {
+                    list.Add(domain);
+                }
+            }
+        }
+        else // If domainDTOs is IEnumerable but not a list
+        {
+            var existingDomains = domainDTOs.ToList();
+            foreach (var domain in selectedDomains)
+            {
+                if (!existingDomains.Any(d => d.Nr == domain.Nr))
+                {
+                    existingDomains.Add(domain);
+                }
+            }
+            domainsSelected = existingDomains;
+        }
+
+        // Update UI or perform other necessary operations
     }
 
-    private void RemoveDomainDTO()
+
+
+    private void RemoveDomainDTO(DomainDTO x)
     {
         // Code to remove the specified DomainDTO
-        //domainDTOs = domainDTOs.Where(d => d != dto);
+        domainsToRemove.Add(x);
+        domainDTOs = domainDTOs.Where(d => d != x);
+
+    }
+
+    private void CloseEditWindow()
+    {
+        DialogService.Close(model);
+
+    }
+
+    private void Save()
+    {
+
+        DialogService.Close(model);
     }
     }

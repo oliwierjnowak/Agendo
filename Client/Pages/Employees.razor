@@ -2,6 +2,8 @@
 @using Agendo.Server.Models;
 @using Agendo.Shared
 @using System.Security.Claims;
+@using Agendo.Client.Pages.Initials
+
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthStateProvider
 <PageTitle>Employees</PageTitle>
@@ -16,23 +18,26 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Number</th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var employee in employees)
-            {
-                <tr>
-                    <td>@employee.Nr</td>
-                    <td>@employee.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+    <div>
+        @foreach (var employee in employees)
+        {
+            <RadzenCard Variant="Variant.Filled" Style="width:max-content" class="mt-3">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+                    <InitialsProfile EmployeeName="@employee.Name" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Employee</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@employee?.Name</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">ID</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@employee?.Nr</b></RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        }
+
+    </div>
+
+
 }
 
 @code {
@@ -41,6 +46,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
-        
+
     }
 }
