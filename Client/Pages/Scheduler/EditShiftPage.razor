@@ -165,7 +165,7 @@
             {
                 EmpNr = x.Nr,
                 ShiftDate = model.Start,
-                ShiftNr = model.ShiftNR
+                ShiftNr = shiftnr
             };
 
             await _http.PutAsJsonAsync("api/EmployeeShift", body2);
