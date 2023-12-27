@@ -1,10 +1,11 @@
-﻿@using Agendo.Server.Models;
+﻿@using Agendo.Client.HttpClients
+@using Agendo.Server.Models;
 @using Agendo.Shared.Form.CreateShift;
 @using Radzen.Blazor;
 @using Radzen
 @using System.Text.Json;
 @using System.Text;
-@inject HttpClient _http;
+@inject IApiClient ApiClient
 @inject DialogService DialogService
 
 
@@ -67,8 +68,8 @@
             Hours = model.Hours,
             Color = model.Color
         };
-        var x = await _http.PostAsJsonAsync("api/dailySchedule", body);
-        Console.WriteLine(x);
+        await ApiClient.PostDailySchedule(body);
+
         DialogService.Close(model);
     }
 

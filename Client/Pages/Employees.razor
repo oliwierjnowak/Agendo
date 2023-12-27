@@ -1,10 +1,11 @@
 ﻿@page "/employees"
+@using Agendo.Client.HttpClients
 @using Agendo.Server.Models;
 @using Agendo.Shared
 @using System.Security.Claims;
 @using Agendo.Client.Pages.Initials
 
-@inject HttpClient Http
+@inject IApiClient ApiClient
 @inject AuthenticationStateProvider AuthStateProvider
 <PageTitle>Employees</PageTitle>
 
@@ -45,7 +46,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        employees = await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        employees = await ApiClient.GetDomains();
 
     }
 }

@@ -9,8 +9,7 @@
 @attribute [Authorize(Roles = "719")]
 
 @inject DialogService DialogService
-@inject HttpClient Http
-@inject IScheduleManagementClient ApiShiftManagment;
+@inject IApiClient ApiClient;
 @inject AuthenticationStateProvider AuthStateProvider;
 
 <PageTitle>Schdule Role 719</PageTitle>
@@ -101,8 +100,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        employees = (List<DomainDTO>)await Http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
-        DailyShifts = await Http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+        employees = (List<DomainDTO>)await ApiClient.GetDomains();
+        DailyShifts = await ApiClient.GetDailySchedule();
     }
 
 
@@ -223,23 +222,7 @@
         {
             if (EmpNrs != null && EmpNrs.Any())
             {
-                var employeeShifts = new List<EmployeeShiftDTO>();
-
-                // Building the query string dynamically
-                var queryString = string.Join("&", EmpNrs.Select(empNr => $"Emps={empNr}"));
-                var url = $"/api/EmployeeShift/shiftmanagment?{queryString}";
-
-                // Make the API call with the dynamically constructed URL
-                var shifts = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>(url);
-                if (shifts != null)
-                {
-                    employeeShifts.AddRange(shifts);
-                }
-
-                employeeShiftDTOs = employeeShifts;
-
-
-
+                employeeShiftDTOs = (List<EmployeeShiftDTO>)await ApiClient.GetEmployeeShifts(EmpNrs);
                 StateHasChanged();
                 await scheduler.Reload();
             }
@@ -263,8 +246,7 @@
     {
         try
         {
-            var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
-
+            var x = await ApiClient.GetSingleEmployeeShift(nr);
             if (x != null)
             {
                 employeeShiftDTOs = (List<EmployeeShiftDTO>)x;

@@ -1,9 +1,12 @@
 ﻿@inject DialogService DialogService
+@using Agendo.Client.HttpClients
 @using Agendo.Server.Models;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen;
-@inject HttpClient _http;
+@inject IApiClient ApiClient;
+
+
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
     <div class="row" style="margin-bottom: 16px">
@@ -118,17 +121,10 @@
         shiftnr = Shift.ShiftNR;
         Start = Shift.Start;
 
-        // Format the Start date
-        string formattedStartDate = Start.ToString("yyyy-MM-ddTHH:mm:ss");
+        shifts = await ApiClient.GetDailySchedule();
+        domainDTOs = await ApiClient.GetDomainOfShift(Start,shiftnr);
 
-        // Build the query string
-        string queryString = $"api/domain/shiftemployees?Start={formattedStartDate}&shiftNR={shiftnr}";
-
-        // Make the API calls
-        shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
-        domainDTOs = await _http.GetFromJsonAsync<IEnumerable<DomainDTO>>(queryString);
-
-        domainsNotSelected = await _http.GetFromJsonAsync<IEnumerable<DomainDTO>>("api/domain");
+        domainsNotSelected = await ApiClient.GetDomains();
 
         var domainDTOsSet = new HashSet<int>(domainDTOs.Select(d => d.Nr));
         domainsNotSelected = domainsNotSelected?.Where(domain => !domainDTOsSet.Contains(domain.Nr));
@@ -140,8 +136,7 @@
 
 
     async void OnSubmit()
-    {
-        Console.WriteLine("aaa");
+    {   
 
         if(domainsToRemove != null)
         {
@@ -153,7 +148,7 @@
                     ShiftDate = model.Start,
                     ShiftNr = 1
                 };
-                await _http.PutAsJsonAsync("api/EmployeeShift", body);
+                await ApiClient.PutShift(body);
             }
 
         }
@@ -168,7 +163,7 @@
                 ShiftNr = shiftnr
             };
 
-            await _http.PutAsJsonAsync("api/EmployeeShift", body2);
+            await ApiClient.PutShift(body2);
 
         }
 
