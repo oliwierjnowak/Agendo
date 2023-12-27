@@ -1,11 +1,12 @@
 ﻿@inject DialogService DialogService
+@using Agendo.Client.HttpClients
 @using Agendo.Server.Models;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen
 @using System.Text.Json;
 @using System.Text;
-@inject HttpClient _http;
+@inject IApiClient ApiClient
 
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
@@ -61,7 +62,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
+        shifts = await ApiClient.GetDailySchedule();
 
     }
 
@@ -71,8 +72,6 @@
         model.Start = Start;
         model.End = End;
         model.EmpNr = EmpNR;
-
-        shifts = await _http.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/dailySchedule");
 
     }
 
@@ -88,7 +87,7 @@
 
 
 
-        var x = await _http.PutAsJsonAsync("api/EmployeeShift", body);
+        var x = await ApiClient.CreateEmployeeShift(body);
         DialogService.Close(model);
     }
 }

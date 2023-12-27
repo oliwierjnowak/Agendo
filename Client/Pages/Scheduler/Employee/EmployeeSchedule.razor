@@ -1,4 +1,5 @@
 ﻿@using System.Collections;
+@using Agendo.Client.HttpClients
 @using Agendo.Server.Models;
 @using Agendo.Shared;
 @using Radzen.Blazor;
@@ -8,7 +9,7 @@
 @attribute [Authorize(Roles = "1000")]
 
 @inject DialogService DialogService
-@inject HttpClient Http
+@inject IApiClient ApiClient
 @inject AuthenticationStateProvider AuthStateProvider
 <PageTitle>Schdule</PageTitle>
 
@@ -19,7 +20,6 @@
                  TItem="EmployeeShiftDTO"
                  Data=@shifts
                  SlotRender=@OnSlotRender
-                 SlotSelect=@OnSlotSelect
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
                  TextProperty="ShiftName" SelectedIndex="1"
@@ -42,24 +42,17 @@
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
-
+    private IEnumerable<DailyScheduleDTO>? DailyShifts;
 
     private int _empNr = 0;
-    public int EmpNr
-    {
-        get { return _empNr; }
-        set
-        {
-            _empNr = value;
-            FetchEmpShifts();
-        }
-    }
+
 
     protected override async Task OnInitializedAsync()
     {
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
-        EmpNr = int.Parse( (await AuthStateProvider.GetAuthenticationStateAsync()).User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
-        shifts = (List<EmployeeShiftDTO>)x;
+        
+        _empNr = int.Parse((await AuthStateProvider.GetAuthenticationStateAsync()).User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+        shifts = (List<EmployeeShiftDTO>)await ApiClient.GetSingleEmployeeShift(_empNr);
+        DailyShifts = await ApiClient.GetDailySchedule();
         StateHasChanged();
         await scheduler.Reload();
     }
@@ -88,37 +81,7 @@
         }
     }
 
-    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
-    {
-        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
-
-        // Initialize the dictionary
-        var dict = new Dictionary<string, object>
-        {
-            { "Start", args.Start },
-            { "End", args.End },
-            {"EmpNR", EmpNr}
-        };
-
-        // Open the dialog and handle exceptions
-        try
-        {
-            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", dict);
-            if (data != null)
-            {
-                shifts.Add(data);
-                console.Log(data);
-
-                FetchEmpShifts();
-
-            }
-        }
-        catch (Exception ex)
-        {
-            // Handle the exception (e.g., log it or show an error message)
-            console.Log($"Error: {ex.Message}");
-        }
-    }
+ 
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
     {
@@ -134,10 +97,10 @@
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy },
-                {"EmpNR", EmpNr}
+                {"EmpNR", _empNr}
             });
 
-            FetchEmpShifts();
+        
         }
         catch (Exception ex)
         {
@@ -148,10 +111,13 @@
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
     {
-        // if (args.Data.ShiftName == "Birthday")
-        // {
-        //     args.Attributes["style"] = "background: red";
-        // }
+        var matchingShift = DailyShifts.FirstOrDefault(shift => shift.Name == args.Data.ShiftName);
+
+        if (matchingShift != null)
+        {
+            args.Attributes["style"] = $"background: {matchingShift.Color}";
+            args.Attributes["title"] = $"EmpNr: {args.Data.EmpNr}, ShiftName: {args.Data.ShiftName}";
+        }
     }
 
     void ChangeStartTime()
@@ -159,14 +125,4 @@
         Starttime = new TimeSpan(valstart1.Value.Hour, valstart1.Value.Minute, valstart1.Value.Second);
     }
 
-
-    async void FetchEmpShifts()
-    {
-        var x = await Http.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("api/EmployeeShift?Emp=" + EmpNr);
-
-        shifts = (List<EmployeeShiftDTO>)x;
-        StateHasChanged();
-        await scheduler.Reload();
-
-    }
 }
