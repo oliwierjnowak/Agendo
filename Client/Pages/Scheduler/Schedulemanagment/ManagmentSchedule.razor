@@ -203,7 +203,7 @@
         if (matchingShift != null)
         {
             args.Attributes["style"] = $"background: {matchingShift.Color}";
-            args.Attributes["title"] = $"EmpNr: {args.Data.EmpNr}, ShiftName: {args.Data.ShiftName}";
+            args.Attributes["title"] = $"ShiftName-{args.Data.ShiftName}";
         }
     }
 
@@ -233,30 +233,6 @@
                 employeeShiftDTOs.Clear();
                 StateHasChanged();
                 await scheduler.Reload();
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log or handle the exception
-            console.Log($"Error fetching employee shifts: {ex.Message}");
-        }
-    }
-
-    async void FetchEmpShiftsNr(int nr)
-    {
-        try
-        {
-            var x = await ApiClient.GetSingleEmployeeShift(nr);
-            if (x != null)
-            {
-                employeeShiftDTOs = (List<EmployeeShiftDTO>)x;
-                StateHasChanged();
-                await scheduler.Reload();
-            }
-            else
-            {
-                // Log or handle the case where the data is null
-                console.Log("Error: Received null data from the server.");
             }
         }
         catch (Exception ex)

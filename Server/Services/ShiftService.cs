@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace Agendo.Server.Services
 {
-    public interface IEmployeeShiftService 
+    public interface IShiftService 
     {
         Task<int> CreateShift(CreateEmployeeShift empshift);
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
@@ -13,7 +13,7 @@ namespace Agendo.Server.Services
     }
     
     
-    public class EmployeeShiftService(IEmployeeShiftRepository _employeeShiftRepository, IDomainService _domainService) : IEmployeeShiftService
+    public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
     {
 
         public async Task<int> CreateShift(CreateEmployeeShift empshift)

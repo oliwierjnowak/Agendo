@@ -63,8 +63,8 @@ else
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
 
-builder.Services.AddSingleton<IEmployeeShiftRepository, EmployeeShiftRepository>();
-builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
+builder.Services.AddSingleton<IShiftRepository, ShiftRepository>();
+builder.Services.AddSingleton<IShiftService, ShiftService>();
 
 builder.Services.AddSingleton<IDailyScheduleRepository, DailyScheduleRepository>();
 builder.Services.AddSingleton<IDailyScheduleService, DailyScheduleService>();

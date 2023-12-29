@@ -4,13 +4,13 @@ using System.Data;
 
 namespace Agendo.Server.Persistance
 {
-    public interface IEmployeeShiftRepository
+    public interface IShiftRepository
     {
         Task<int> CreateShift(EmployeeShift employeeShift);
         Task<List<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps);
         Task<List<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
     }
-    public class EmployeeShiftRepository(IDbConnection _connection) : IEmployeeShiftRepository
+    public class ShiftRepository(IDbConnection _connection) : IShiftRepository
     {		
         public async Task<int> CreateShift(EmployeeShift employeeShift)
         {

@@ -19,12 +19,6 @@ namespace Agendo.Server.Controllers
             return Ok( await _domainService.GetAllAsync(userid));
         }
 
-        [HttpGet("string")]
-        public string GetString()
-        {
-            return "Hello World";
-        }
-
         [HttpGet("shiftemployees")]
         [Authorize(Roles = "719")]
         public async Task<ActionResult<IEnumerable<DomainDTO>>> GetShiftEmployees([FromQuery] DateTime Start, [FromQuery] int shiftNR)

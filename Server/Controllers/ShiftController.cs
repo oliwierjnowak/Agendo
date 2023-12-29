@@ -10,11 +10,13 @@ namespace Agendo.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "719,1000")]
-    public class EmployeeShiftController(IEmployeeShiftService _employeeShiftService) : ControllerBase
+    public class ShiftController(IShiftService _employeeShiftService) : ControllerBase
     {
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle([FromQuery] int? Emp)
+        [Authorize(Roles = "1000")]
+        [Route("{Emp:int}")]
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle( int Emp)
         {
           
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
@@ -25,15 +27,7 @@ namespace Agendo.Server.Controllers
            
         }
 
-        [HttpPut]
-        [Authorize(Roles = "719")]
-        public async Task<int> Create([FromBody] CreateEmployeeShift empshift )
-        {
-            var x = await _employeeShiftService.CreateShift(empshift);
-            return x;
-        }
-
-        [HttpGet("shiftmanagment")]
+        [HttpGet]
         [Authorize(Roles ="719")]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps)
         {
@@ -41,5 +35,11 @@ namespace Agendo.Server.Controllers
             return Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
         }
 
+        [HttpPut]
+        [Authorize(Roles = "719")]
+        public async Task<int> Create([FromBody] CreateEmployeeShift empshift)
+        {
+            return await _employeeShiftService.CreateShift(empshift);
+        }
     }
 }

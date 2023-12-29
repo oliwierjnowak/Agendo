@@ -1,4 +1,6 @@
-﻿namespace Agendo.Server.Models
+﻿using Agendo.Server.Models;
+
+namespace Agendo.Shared.DTOs
 {
     public record EmployeeShiftDTO
     {

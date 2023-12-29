@@ -23,7 +23,7 @@ namespace NUnitTesting.Server.Persistance
             //arrange
             SqlConnection connection = new TestDbConnection().Connection;
 
-            var repository = new EmployeeShiftRepository(connection);
+            var repository = new ShiftRepository(connection);
 
             //act
             var x = repository.GetSingleEmpAsync(1, 1).Result;
@@ -61,7 +61,7 @@ namespace NUnitTesting.Server.Persistance
 
 
 
-            var repository = new EmployeeShiftRepository(connection);
+            var repository = new ShiftRepository(connection);
 
             //act
             var x = repository.GetMultipleEmpsAsync(1,new int[] { 1, 2, 3 }).Result;
@@ -93,7 +93,7 @@ namespace NUnitTesting.Server.Persistance
             //arrange
             SqlConnection connection = new TestDbConnection().Connection;
 
-            var repository = new EmployeeShiftRepository(connection);
+            var repository = new ShiftRepository(connection);
 
             //not exsisting week
             var shift = new EmployeeShift { EmpNr = 2, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 4, ShiftName = "babymonat", ShiftHours = 3 };
