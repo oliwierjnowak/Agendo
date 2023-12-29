@@ -1,6 +1,6 @@
 ﻿@inject DialogService DialogService
 @using Agendo.Client.HttpClients
-@using Agendo.Server.Models
+@using Agendo.Shared.DTOs
 @using Agendo.Shared.DTOs;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
@@ -8,8 +8,9 @@
 @using System.Text.Json;
 @using System.Text;
 @inject IApiClient ApiClient
+@attribute [Authorize(Roles = "719")]
 
-<RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+<RadzenTemplateForm TItem="AddEmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
     <div class="row" style="margin-bottom: 16px">
 
@@ -59,7 +60,7 @@
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
-    private EmployeeShiftDTO model = new EmployeeShiftDTO();
+    private AddEmployeeShiftDTO model = new AddEmployeeShiftDTO();
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,6 +90,6 @@
 
 
         var x = await ApiClient.CreateEmployeeShift(body);
-        DialogService.Close(model);
+        DialogService.Close(x);
     }
 }

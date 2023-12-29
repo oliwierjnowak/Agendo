@@ -99,7 +99,7 @@ namespace NUnitTesting.Server.Persistance
             var shift = new EmployeeShift { EmpNr = 2, ISOWeek = 1, ISOYear = 2021, DOW = 1, ShiftNR = 4, ShiftName = "babymonat", ShiftHours = 3 };
             //act
 
-          repository.CreateShift(shift).Wait();
+          repository.ManageShift(shift).Wait();
 
           //  Assert.That(result, Is.EqualTo(1));
             var find2 = repository.GetSingleEmpAsync(2, 2).Result;
@@ -116,7 +116,7 @@ namespace NUnitTesting.Server.Persistance
             var findWeek452023 = find2.FindAll(x => x.ISOWeek == 45 && x.ISOYear == 2023 ).ToList();
             var updateshift = new EmployeeShift { EmpNr = 2, ISOWeek = 45, ISOYear = 2023, DOW = 5, ShiftNR = 4, ShiftName = "babymonat", ShiftHours = 4 };
 
-            repository.CreateShift(updateshift).Wait();
+            repository.ManageShift(updateshift).Wait();
 
             var findAfterUpdate = repository.GetSingleEmpAsync(2, 2).Result;
             var week452023 = findAfterUpdate.FindAll(x => x.ISOWeek == 45 && x.ISOYear == 2023 && x.DOW == 5).ToList();

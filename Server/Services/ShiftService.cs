@@ -1,13 +1,17 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Shared.DTOs;
 using Agendo.Server.Persistance;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using System.Globalization;
+using Agendo.Server.Models;
+using Agendo.Server.Services.enums;
 
 namespace Agendo.Server.Services
 {
+    using ResultMangeShift = (ShiftPutCode code, EmployeeShiftDTO? value);
+
     public interface IShiftService 
     {
-        Task<int> CreateShift(CreateEmployeeShift empshift);
+        Task<ResultMangeShift> ManageShift(int sup,CreateEmployeeShift empshift);
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
     }
@@ -16,7 +20,7 @@ namespace Agendo.Server.Services
     public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
     {
 
-        public async Task<int> CreateShift(CreateEmployeeShift empshift)
+        public async Task<ResultMangeShift> ManageShift(int sup,CreateEmployeeShift empshift)
         {
             // out of datetime generate iso week iso year and day
             var isoweek =  ISOWeek.GetWeekOfYear(empshift.ShiftDate);
@@ -33,7 +37,25 @@ namespace Agendo.Server.Services
                  DOW = (int)dayOfWeek,
                  ShiftNR = shiftNR
              };
-            return await _employeeShiftRepository.CreateShift(employeeShift);
+            var result = await _employeeShiftRepository.ManageShift(employeeShift);
+            if(result.ShiftNR == 1){
+                return (ShiftPutCode.Deleted, null);
+            }
+            else
+            {
+                var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(result.ISOYear, result.ISOWeek, (DayOfWeek)result.DOW).AddHours(8), result.ShiftNR);
+
+                var dto = new EmployeeShiftDTO
+                {
+                    Domains = domains.ToList(),
+                    Start = ISOWeek.ToDateTime(result.ISOYear, result.ISOWeek, (DayOfWeek)result.DOW).AddHours(8),
+                    End = ISOWeek.ToDateTime(result.ISOYear, result.ISOWeek, (DayOfWeek)result.DOW).AddHours(8 + result.ShiftHours),
+                    ShiftNR = result.ShiftNR,
+                    ShiftName = result.ShiftName,
+                    ShiftHours = result.ShiftHours
+                };
+                return (ShiftPutCode.Updated, dto);
+            }
         }
 
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
@@ -52,7 +74,7 @@ namespace Agendo.Server.Services
 
                     employeeShiftDTOs.Add(new EmployeeShiftDTO
                     {
-                        Domains = domains,
+                        Domains = domains.ToList(),
                         Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
                         End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8 + group.Key.ShiftHours),
                         ShiftNR = group.Key.ShiftNR,

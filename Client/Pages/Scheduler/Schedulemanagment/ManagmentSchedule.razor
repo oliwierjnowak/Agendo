@@ -1,7 +1,7 @@
 ﻿@using System.Collections;
 @using Agendo.Client.HttpClients;
-@using Agendo.Server.Models;
 @using Agendo.Shared;
+@using Agendo.Shared.DTOs
 @using Radzen.Blazor;
 @using Radzen;
 @using System.Security.Claims;
@@ -37,7 +37,7 @@
 
 <RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
-    TextProperty="ShiftAndDomainName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
+                 TextProperty="ShiftName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
     Style="width: auto; height: 700px;">
 
 
@@ -60,30 +60,6 @@
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
     private IEnumerable<EmployeeShiftDTO>? employeeShiftManagement;
-
-
-    private int _dailyShiftDTONr = 0;
-    public int DailyShiftDTONr
-    {
-        get { return _empNr; }
-        set
-        {
-            _dailyShiftDTONr = value;
-            FetchEmpShifts();
-        }
-    }
-
-
-    private int _empNr = 0;
-    public int EmpNr
-    {
-        get { return _empNr; }
-        set
-        {
-            _empNr = value;
-            FetchEmpShifts();
-        }
-    }
 
     private List<int> _empNrs = new List<int>();
     public List<int> EmpNrs
@@ -144,23 +120,22 @@
             // Add employee-specific data to the dictionary
             dict["EmpNR"] = empNr;
 
-            // Open the dialog and handle exceptions
             try
             {
                 EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
 
                 if (data != null)
                 {
+                    var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
+                    data.ShiftHours = shiftInfo.Hours;
+                    data.ShiftName = shiftInfo.Name;
+                    
                     employeeShiftDTOs.Add(data);
-                    console.Log(data);
-                    // Fetch shifts for each employee
-                    //FetchEmpShiftsNr(empNr);
 
                 }
             }
             catch (Exception ex)
             {
-                // Handle the exception (e.g., log it or show an error message)
                 console.Log($"Error: {ex.Message}");
             }
         }
@@ -174,19 +149,13 @@
         {
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
-            EmployeeShiftDTO copy = new EmployeeShiftDTO
-            {
-                Start = args.Data.Start,
-                End = args.Data.End,
-                ShiftNR = args.Data.ShiftNR
-            };
+            EmployeeShiftDTO copy = args.Data;
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-                { "Shift", copy },
-                {"EmpNR", EmpNr}
+                { "Shift", copy }
             });
 
-            FetchEmpShifts();
+            //FetchEmpShifts();
         }
         catch (Exception ex)
         {
@@ -214,7 +183,7 @@
         Starttime = new TimeSpan(valstart1.Value.Hour, valstart1.Value.Minute, valstart1.Value.Second);
     }
 
-
+   
 
     async void FetchEmpShifts()
     {

@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using System.Data;
-using Agendo.Server.Models;
+using Agendo.Shared.DTOs;
 
 namespace Agendo.Server.Persistance
 {

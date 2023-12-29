@@ -6,13 +6,13 @@ namespace Agendo.Server.Persistance
 {
     public interface IShiftRepository
     {
-        Task<int> CreateShift(EmployeeShift employeeShift);
+        Task<EmployeeShift> ManageShift(EmployeeShift employeeShift);
         Task<List<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps);
         Task<List<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
     }
     public class ShiftRepository(IDbConnection _connection) : IShiftRepository
     {		
-        public async Task<int> CreateShift(EmployeeShift employeeShift)
+        public async Task<EmployeeShift> ManageShift(EmployeeShift employeeShift)
         {
 			var dow = "";
 
@@ -51,6 +51,7 @@ namespace Agendo.Server.Persistance
                 // insert
                 string insert = @$"
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday] ) 
+OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.{dow} as 'ShiftNR'
 values (@EmpNr, @ISOWeek, @ISOYear, {(day == 1 ? "@ShiftNR" : "1")},
 									{(day == 2 ? "@ShiftNR" : "1")},
 									{(day == 3 ? "@ShiftNR" : "1")},
@@ -59,20 +60,22 @@ values (@EmpNr, @ISOWeek, @ISOYear, {(day == 1 ? "@ShiftNR" : "1")},
 									{(day == 6 ? "@ShiftNR" : "1")},
 									{(day == 7 ? "@ShiftNR" : "1")});";
                
-                var x = await _connection.ExecuteAsync(insert,employeeShift);
-               
-                return x;
+                var inserted = await _connection.QueryFirstAsync<EmployeeShift>(insert,employeeShift);
+                inserted.DOW=employeeShift.DOW;
+                return inserted;
             }
 			else
 			{
                 //update
                 string insert = @$"update [dbo].[csti_do_shift] 
 									set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = @ShiftNR
+									OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.{dow} as 'ShiftNR'
 									where
 									dosh_do_no = @EmpNr and dosh_week_number = @ISOWeek and dosh_year = @ISOYear";
 
-                var x = await _connection.ExecuteAsync(insert, employeeShift);
-				return x;
+                var updated = await _connection.QueryFirstAsync<EmployeeShift>(insert, employeeShift);
+                updated.DOW = employeeShift.DOW;
+                return updated;
             }
 
         }

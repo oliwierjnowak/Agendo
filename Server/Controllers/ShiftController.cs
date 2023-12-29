@@ -1,9 +1,10 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Shared.DTOs;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Agendo.Server.Services.enums;
 
 namespace Agendo.Server.Controllers
 {
@@ -32,14 +33,25 @@ namespace Agendo.Server.Controllers
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps)
         {
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-            return Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
+            var x = Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
+            return x;
         }
 
         [HttpPut]
         [Authorize(Roles = "719")]
-        public async Task<int> Create([FromBody] CreateEmployeeShift empshift)
+        public async Task<ActionResult<EmployeeShiftDTO?>> ManageShift([FromBody] CreateEmployeeShift empshift)
         {
-            return await _employeeShiftService.CreateShift(empshift);
+            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+            var managed =  await _employeeShiftService.ManageShift(userid,empshift);
+            switch(managed.code)
+            {
+                case ShiftPutCode.Updated: 
+                    return Ok(managed.value);
+                case ShiftPutCode.Deleted:
+                    return StatusCode(204);
+                default:
+                    return BadRequest();
+            }
         }
     }
 }
