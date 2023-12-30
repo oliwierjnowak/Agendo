@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Dapper;
-using Microsoft.AspNetCore.Hosting.Server;
 using System.Reflection;
 using Agendo.Server.db;
 

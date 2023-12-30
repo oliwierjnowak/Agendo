@@ -7,8 +7,6 @@ using Agendo.Server.Services.enums;
 
 namespace Agendo.Server.Services
 {
-    using ResultMangeShift = (ShiftPutCode code, EmployeeShiftDTO? value);
-
     public interface IShiftService 
     {
         Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);

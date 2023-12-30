@@ -22,7 +22,7 @@ namespace NUnitTesting.Server.Persistance
 		public async Task GetSingleEmpAsync()
 		{
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
 
             var rightsRepository = new RightsRepository(connection);
             var repository = new ShiftRepository(connection, rightsRepository);
@@ -59,7 +59,7 @@ namespace NUnitTesting.Server.Persistance
 		public async Task GetMultipleEmpsAsync()
 		{
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
 
 
             var rightsRepository = new RightsRepository(connection);
@@ -93,7 +93,7 @@ namespace NUnitTesting.Server.Persistance
         public async Task CreateShift()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var rightsRepository = new RightsRepository(connection);
             var repository = new ShiftRepository(connection, rightsRepository);
 

@@ -1,9 +1,6 @@
 ﻿using Agendo.Server.Models;
 using Dapper;
 using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Agendo.Server.Persistance
 {

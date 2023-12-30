@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Agendo.Server.Models
+﻿namespace Agendo.Server.Models
 {
     public record Shift
     {
