@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 
 namespace NUnitTesting.Server.Persistance
 {
-    internal class EmployeeShiftRepositoryTest
+    internal class ShiftRepositoryTest
     {
   
 

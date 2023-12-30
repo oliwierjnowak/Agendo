@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Hosting.Server;
 using Castle.Core.Configuration;
+using Agendo.Shared.DTOs;
 
 namespace NUnitTesting.Server.ApplicationFactories
 {
@@ -77,11 +78,11 @@ namespace NUnitTesting.Server.ApplicationFactories
         {
             var mockService = new Mock<IDomainService>();
 
-            List<Agendo.Server.Models.DomainDTO> data = new List<Agendo.Server.Models.DomainDTO>() {
-               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
-            };
+            List<DomainDTO> data = [
+               new DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
+               new DomainDTO{Nr = 2, Name ="Anton Schubhart" },
+               new DomainDTO{Nr = 3, Name ="Philipp Schaffer" }
+            ];
 
             mockService.Setup(r => r.GetAllAsync(1)).ReturnsAsync(data);
 

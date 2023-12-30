@@ -58,6 +58,7 @@ namespace Agendo.Server.Services
             }
         }
 
+
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
             var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps);
@@ -87,6 +88,7 @@ namespace Agendo.Server.Services
 
             return employeeShiftDTOs;
         }
+
 
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp)
         {
