@@ -39,28 +39,11 @@ namespace Agendo.Server.Controllers
 
         [HttpPut]
         [Authorize(Roles = "719")]
-        public async Task<ActionResult<EmployeeShiftDTO?>> ManageShift([FromBody] CreateEmployeeShift empshift)
-        {
-            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
-            var managed =  await _employeeShiftService.ManageShift(userid,empshift);
-            switch(managed.code)
-            {
-                case ShiftPutCode.Updated: 
-                    return Ok(managed.value);
-                case ShiftPutCode.Deleted:
-                    return StatusCode(204);
-                default:
-                    return BadRequest();
-            }
-        }
-
-        [HttpPut("a")]
-        [Authorize(Roles = "719")]
         public async Task<ActionResult<EmployeeShiftDTO?>> ManageEmployeesShift([FromBody] CreateMultipleEmpShift empshift)
         {
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
             var managed = await _employeeShiftService.ManageMultipleEmpShift(userid, empshift);
-            return managed;
+            return Ok(managed);
 
         }
     }
