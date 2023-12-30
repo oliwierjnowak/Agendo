@@ -12,6 +12,7 @@ namespace Agendo.Server.Services
     public interface IShiftService 
     {
         Task<ResultMangeShift> ManageShift(int sup,CreateEmployeeShift empshift);
+        Task ManageMultipleEmpShift(int sup,CreateMultipleEmpShift details);
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
     }
@@ -115,8 +116,18 @@ namespace Agendo.Server.Services
                 return ShiftsDTO;
         }
 
+        public Task ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details)
+        {
 
+            Shift shift = new Shift
+            {
+                ISOWeek = ISOWeek.GetWeekOfYear(details.ShiftDate),
+                ISOYear = details.ShiftDate.Year,
+                ShiftNR = details.ShiftNr,
+                DOW = (int)details.ShiftDate.DayOfWeek
+            };
 
-
+            var result = await _employeeShiftRepository.DeleteEmployeesShift(details.RemovedDomains,shift);
+        }
     }
 }
