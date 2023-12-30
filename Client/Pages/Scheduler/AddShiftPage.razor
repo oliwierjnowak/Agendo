@@ -54,7 +54,7 @@
     [Parameter]
     public DateTime End { get; set; }
     [Parameter]
-    public int EmpNR { get; set; }
+    public IEnumerable<int> Domains { get; set; }
 
     public int shiftnr { get; set; }
 
@@ -72,24 +72,23 @@
     protected async override void OnParametersSet()
     {
         model.Start = Start;
-        model.End = End;
-        model.EmpNr = EmpNR;
+        model.Domains= Domains;
 
     }
 
     async void OnSubmit()
     {
 
-        var body = new CreateEmployeeShift
+        var body = new CreateMultipleEmpShift
             {
-                EmpNr = model.EmpNr,
+                AddedDomains = model.Domains,
                 ShiftDate = model.Start,
                 ShiftNr = shiftnr
             };
 
 
 
-        var x = await ApiClient.CreateEmployeeShift(body);
+        var x = await ApiClient.ManageEmployeesShift(body);
         DialogService.Close(x);
     }
 }

@@ -17,6 +17,7 @@ namespace Agendo.Client.HttpClients
        Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr);
        Task<HttpResponseMessage> PutShift(CreateEmployeeShift body);
        Task<HttpResponseMessage> PostDailySchedule(CreateShift body);
+       Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);
     }
 
     public class ApiClientProvider : IApiClient
@@ -58,7 +59,12 @@ namespace Agendo.Client.HttpClients
 
             return response.StatusCode == System.Net.HttpStatusCode.OK ? await response.Content.ReadFromJsonAsync<EmployeeShiftDTO>() : null;
         }
+        public async Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body)
+        {
+            var response = await _httpClient.PutAsJsonAsync("api/shift/a", body);
 
+            return await response.Content.ReadFromJsonAsync<EmployeeShiftDTO>();
+        }
 
         public async Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr) =>
             await _httpClient.GetFromJsonAsync<IEnumerable<DomainDTO>>($"api/domain/shiftemployees?Start={dateOfShift.ToString("yyyy-MM-ddTHH:mm:ss")}&shiftNR={shiftNr}");

@@ -12,9 +12,10 @@ namespace Agendo.Server.Services
     public interface IShiftService 
     {
         Task<ResultMangeShift> ManageShift(int sup,CreateEmployeeShift empshift);
-        Task ManageMultipleEmpShift(int sup,CreateMultipleEmpShift details);
+        Task<ResultMangeShift> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
+        
     }
     
     
@@ -116,7 +117,7 @@ namespace Agendo.Server.Services
                 return ShiftsDTO;
         }
 
-        public Task ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details)
+        public async Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details)
         {
 
             Shift shift = new Shift
@@ -126,8 +127,26 @@ namespace Agendo.Server.Services
                 ShiftNR = details.ShiftNr,
                 DOW = (int)details.ShiftDate.DayOfWeek
             };
+            if (details.RemovedDomains != null)
+            {
+                var deletionResult = await _employeeShiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
+            }
+ 
+            
+            var updateResult = await _employeeShiftRepository.ManageEmployeesShift(sup,details.AddedDomains,shift);
 
-            var result = await _employeeShiftRepository.DeleteEmployeesShift(details.RemovedDomains,shift);
+
+            var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8), shift.ShiftNR);
+
+            var dto = new EmployeeShiftDTO
+            {
+                Domains = domains.ToList(),
+                Start = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8),
+                End = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8 + 4),
+                ShiftNR = shift.ShiftNR,
+            };
+
+            return dto;
         }
     }
 }

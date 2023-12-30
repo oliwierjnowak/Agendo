@@ -115,30 +115,30 @@
         // Add other common data if needed
         };
 
-        foreach (var empNr in EmpNrs)
+
+        // Add employee-specific data to the dictionary
+        dict["Domains"] = EmpNrs;
+
+        try
         {
-            // Add employee-specific data to the dictionary
-            dict["EmpNR"] = empNr;
+            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
 
-            try
+            if (data != null)
             {
-                EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
+                var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
+                data.ShiftHours = shiftInfo.Hours;
+                data.ShiftName = shiftInfo.Name;
 
-                if (data != null)
-                {
-                    var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
-                    data.ShiftHours = shiftInfo.Hours;
-                    data.ShiftName = shiftInfo.Name;
-                    
-                    employeeShiftDTOs.Add(data);
+                employeeShiftDTOs.RemoveAll(x => x.Start.Equals(data.Start));
+                employeeShiftDTOs.Add(data);
 
-                }
-            }
-            catch (Exception ex)
-            {
-                console.Log($"Error: {ex.Message}");
             }
         }
+        catch (Exception ex)
+        {
+            console.Log($"Error: {ex.Message}");
+        }
+
         StateHasChanged();
         await scheduler.Reload();
     }

@@ -30,7 +30,7 @@ namespace Agendo.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] bool Together)
         {
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
             var x = Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
@@ -52,6 +52,16 @@ namespace Agendo.Server.Controllers
                 default:
                     return BadRequest();
             }
+        }
+
+        [HttpPut("a")]
+        [Authorize(Roles = "719")]
+        public async Task<ActionResult<EmployeeShiftDTO?>> ManageEmployeesShift([FromBody] CreateMultipleEmpShift empshift)
+        {
+            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+            var managed = await _employeeShiftService.ManageMultipleEmpShift(userid, empshift);
+            return managed;
+
         }
     }
 }
