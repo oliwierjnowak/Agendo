@@ -20,7 +20,7 @@
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
+                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"  Change="@DropdownChanged"
                             Style="width: 100%; max-width: 400px;" />
 
 
@@ -36,7 +36,7 @@
 
 
 <RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
+                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender LoadData=@FetchEmpShifts
                  TextProperty="ShiftName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
     Style="width: auto; height: 700px;">
 
@@ -68,9 +68,10 @@
         set
         {
             _empNrs = value;
-            FetchEmpShifts();
+
         }
     }
+    public bool SelectionChanged{ get; set; } = false;
 
     private IEnumerable<DomainDTO>? employees;
 
@@ -155,7 +156,6 @@
                 { "Shift", copy }
             });
 
-            //FetchEmpShifts();
         }
         catch (Exception ex)
         {
@@ -183,26 +183,22 @@
         Starttime = new TimeSpan(valstart1.Value.Hour, valstart1.Value.Minute, valstart1.Value.Second);
     }
 
-   
 
-    async void FetchEmpShifts()
+
+    async Task FetchEmpShifts(SchedulerLoadDataEventArgs? args)
     {
+       
+        var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
+        var end = args != null ? args.End : scheduler.SelectedView.EndDate;
+        var between = employeeShiftDTOs.Where(x => start < x.Start && x.Start < end).ToList();
         try
         {
-            if (EmpNrs != null && EmpNrs.Any())
+            if ( (between.Count() ==0  || SelectionChanged ))
             {
+                Console.WriteLine("fetching");
                 employeeShiftDTOs = (List<EmployeeShiftDTO>)await ApiClient.GetEmployeeShifts(EmpNrs);
-                StateHasChanged();
-                await scheduler.Reload();
             }
-            else
-            {
-                // Handle the case where no employees are selected
-                // Clear the scheduler data and reload
-                employeeShiftDTOs.Clear();
-                StateHasChanged();
-                await scheduler.Reload();
-            }
+
         }
         catch (Exception ex)
         {
@@ -210,6 +206,12 @@
             console.Log($"Error fetching employee shifts: {ex.Message}");
         }
     }
+    async Task DropdownChanged()
+    {
+        SelectionChanged = true;
+        await FetchEmpShifts(null);
+        SelectionChanged = false;
 
+    }
 
 }
