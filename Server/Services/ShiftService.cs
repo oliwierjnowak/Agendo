@@ -10,16 +10,16 @@ namespace Agendo.Server.Services
     public interface IShiftService 
     {
         Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);
-        Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
+        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
-        Task<List<EmployeeShiftDTO>> GetShiftsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
+        
     }
     
     
     public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
     {
 
-        public async Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
+        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
         {
             var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
@@ -48,34 +48,7 @@ namespace Agendo.Server.Services
 
             return employeeShiftDTOs;
         }
-        public async Task<List<EmployeeShiftDTO>> GetShiftsAsync(int sup, IEnumerable<int> emps, DateTime selectedDate)
-        {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup, emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
-            var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
-            foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
-            {
-                var domainIds = group.Select(g => g.EmpNr);
-
-                // because of that if statement we only select empshift where all of the emps are working and not just only one  
-                
-               var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8), group.Key.ShiftNR);
-
-               employeeShiftDTOs.Add(new EmployeeShiftDTO
-               {
-                   Domains = domains.ToList(),
-                   Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
-                   End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8 + group.Key.ShiftHours),
-                   ShiftNR = group.Key.ShiftNR,
-                   ShiftName = group.Key.ShiftName,
-                   ShiftHours = group.Key.ShiftHours
-               });
-                
-
-            }
-
-            return employeeShiftDTOs;
-        }
 
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp)
         {

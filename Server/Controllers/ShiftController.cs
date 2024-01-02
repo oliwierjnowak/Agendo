@@ -32,7 +32,7 @@ namespace Agendo.Server.Controllers
         {
             //asads
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-            var x = Together ? await _employeeShiftService.GetShiftsAsync(int.Parse(userid), Emps, ViewFirstDay) : await _employeeShiftService.GetShiftsGroupedAsync(int.Parse(userid), Emps, ViewFirstDay);
+            var x = await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps, ViewFirstDay);
             return Ok(x);
         }
 
