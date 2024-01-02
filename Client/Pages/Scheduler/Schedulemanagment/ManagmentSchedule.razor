@@ -187,8 +187,6 @@
             var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
             var end = args != null ? args.End : scheduler.SelectedView.EndDate;
             var firstSelectedDay = scheduler.CurrentDate;
-
-            await Task.Delay(1000);
             var result = await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
             employeeShiftDTOs = result;
             Console.WriteLine("Fetched");

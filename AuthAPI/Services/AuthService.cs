@@ -1,8 +1,6 @@
 ﻿using Agendo.AuthAPI.Model;
-using Agendo.Shared;
 using Dapper;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace Agendo.AuthAPI.Services
 {
@@ -12,16 +10,16 @@ namespace Agendo.AuthAPI.Services
         Task<User> Login(string username);
     }
 
-    public class AuthService(SqlConnection _connection) : IAuthService
+    public class AuthService(IDbConnection _connection) : IAuthService
     {
 
         public async Task<int> Register(User user)
         {
-            await _connection.OpenAsync();
+            _connection.Open();
             var insert = @"insert into csmd_domain (do_name,do_password) values
                             (@Username,@PasswordHash)  ";
             var x = await _connection.ExecuteAsync(insert, user);
-            await _connection.CloseAsync();
+            _connection.Close();
             return x;
         }
 
@@ -34,9 +32,9 @@ namespace Agendo.AuthAPI.Services
                             from csmd_domain 
                             join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no 
                             where do_name = '{username}'";
-            await _connection.OpenAsync();
+            _connection.Open();
             var x = await _connection.QuerySingleAsync<User>(query);
-           await  _connection.CloseAsync();
+            _connection.Close();
             return x;
 
         }

@@ -11,7 +11,7 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<EmployeeRights>> RightsOverEmps(IEnumerable<int> emp, int user);
     }
 
-    public class RightsRepository(SqlConnection _connection) : IRightsRepository
+    public class RightsRepository(IDbConnection _connection) : IRightsRepository
     {
         public async Task<EmployeeRights> RightsOverEmp(int emp, int user)
         {
@@ -26,13 +26,13 @@ namespace Agendo.Server.Persistance
                             join csmd_authorizations auth on audoen_no = au_ri_no 
                             where auth.au_enabled = 1 and GETDATE() BETWEEN auth.au_from AND auth.au_to and
                             ((audoen_en_no = @emp and audoen_en_no = @user )or (audoen_do_no = @user and audoen_en_no = @emp) );";
-            await _connection.OpenAsync();
+            _connection.Open();
             var result = await _connection.QueryFirstOrDefaultAsync<EmployeeRights>(query,new
             {
                 emp = emp,
                 user = user 
             });
-            await _connection.CloseAsync();
+            _connection.Close();
             return result;
         }
 
@@ -49,13 +49,13 @@ namespace Agendo.Server.Persistance
                             join csmd_authorizations auth on audoen_no = au_ri_no 
                             where auth.au_enabled = 1 and GETDATE() BETWEEN auth.au_from AND auth.au_to
                             and (audoen_do_no = @user and audoen_en_no IN @emps)";
-            await _connection.OpenAsync();
+            _connection.Open();
             var result = await _connection.QueryAsync<EmployeeRights>(query, new
             {
                 emps = emps,
                 user = user
             });
-            await _connection.CloseAsync();
+            _connection.Close();
             return result;
         }
     }

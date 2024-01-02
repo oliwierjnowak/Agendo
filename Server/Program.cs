@@ -45,12 +45,12 @@ if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+
      .Build().GetSection("ConnectionString").Value!;
   
     //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=@Agendooo$1;Trusted_Connection=False;Encrypt=False;"));
-    builder.Services.AddSingleton<SqlConnection>((sp) => new SqlConnection(constring));
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
     //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
 }
 else
 {
-    builder.Services.AddSingleton<SqlConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;"));
+    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;"));
     SqlConnection connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
     connection.Open();
 

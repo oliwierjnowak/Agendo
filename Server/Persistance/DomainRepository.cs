@@ -12,12 +12,12 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<DomainDTO>> GetShiftEmployees(int user, int year, int isoWeekNumber, DayOfWeek dayOfWeek, int shiftNR);
     }
 
-    public class DomainRepository(SqlConnection _connection) : IDomainRepository
+    public class DomainRepository(IDbConnection _connection) : IDomainRepository
     {
         
         public async Task<List<DomainDTO>> GetAllAsync(int superior)
         {
-            await _connection.OpenAsync();
+            _connection.Open();
             string selectQuery = @"select do_no AS 'Nr',do_name AS 'Name'   from [dbo].[csmd_domain]
                                     join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no
                                     where audoen_do_no = @superior;";
@@ -25,13 +25,13 @@ namespace Agendo.Server.Persistance
             {
                 superior = superior
             });
-            await _connection.CloseAsync();
+            _connection.Close();
             return (List<DomainDTO>)data;
             
         }
         public async Task<List<DomainDTO>> GetListAsync(int superior, IEnumerable<int> domains)
         {
-            await _connection.OpenAsync();
+            _connection.Open();
             string selectQuery = @"select do_no AS 'Nr',do_name AS 'Name'   from [dbo].[csmd_domain]
                                     join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no
                                     where audoen_do_no = @superior and do_no in @domains ;";
@@ -40,7 +40,7 @@ namespace Agendo.Server.Persistance
                 superior = superior,
                 domains = domains
             });
-            await _connection.CloseAsync();
+            _connection.Close();
             return (List<DomainDTO>)data;
         }
 
@@ -79,7 +79,7 @@ namespace Agendo.Server.Persistance
                                     join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
                                     where dosh_year = @dyear AND {dow} = @shift AND dosh_week_number = @dwn  
                                     and  audoen_do_no = @user and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1";
-            await _connection.OpenAsync();
+            _connection.Open();
             IEnumerable<DomainDTO> data = await _connection.QueryAsync<DomainDTO>(selectquery, new
             {
                 dyear = year,
@@ -87,7 +87,7 @@ namespace Agendo.Server.Persistance
                 dwn = isoWeekNumber,
                 user = user
             });
-            await _connection.CloseAsync();
+            _connection.Close();
             return data;
 
 
