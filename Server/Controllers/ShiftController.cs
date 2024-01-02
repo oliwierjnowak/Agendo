@@ -5,6 +5,7 @@ using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Agendo.Server.Services.enums;
+using System.Globalization;
 
 namespace Agendo.Server.Controllers
 {
@@ -19,7 +20,6 @@ namespace Agendo.Server.Controllers
         [Route("{Emp:int}")]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle( int Emp)
         {
-          
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
            
             var emp = Emp == null ? userid : (int) Emp;
@@ -30,11 +30,13 @@ namespace Agendo.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] bool Together)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] DateTime FirstDayOfMonth, [FromQuery] bool Together = false)
         {
+            //asads
+            var x1 = ShiftService.GetISOWeekNumbers(FirstDayOfMonth);
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-            var x = Ok(await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps));
-            return x;
+            var x = await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps, FirstDayOfMonth);
+            return Ok(x);
         }
 
         [HttpPut]
@@ -46,5 +48,14 @@ namespace Agendo.Server.Controllers
             return Ok(managed);
 
         }
+
+
+        private int GetISOWeeksFromMonth(DateTime day)
+        {
+            CultureInfo ciCurr = CultureInfo.CurrentCulture;
+            int weekNum = ciCurr.Calendar.GetWeekOfYear(new DateTime(day.Year, day.Month, 1), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            return weekNum;
+        }
     }
 }
+

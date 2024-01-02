@@ -7,7 +7,7 @@ namespace Agendo.Server.Persistance
     public interface IShiftRepository
     {
 
-        Task<IEnumerable<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps);
+        Task<IEnumerable<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps, List<int> weeks);
         Task<IEnumerable<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
         Task<IEnumerable<EmployeeShift>> ManageEmployeesShift(int superior,IEnumerable<int> domains, Shift shift);
 		Task<int> DeleteEmployeesShift(int superior, IEnumerable<int> remove, Shift shift);
@@ -15,7 +15,7 @@ namespace Agendo.Server.Persistance
     public class ShiftRepository(IDbConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
     {		
 
-        public async Task<IEnumerable<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps)
+        public async Task<IEnumerable<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps, List<int> weeks)
         {
 			string authjoins = $@"
 								join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
@@ -27,28 +27,28 @@ namespace Agendo.Server.Persistance
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_monday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_monday !=  1 {authwhere}
+								where dosh_do_no in @emps and dosh_monday !=  1 and dosh_week_number in @weeks {authwhere} 
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 2) as 'DOW',dosh_tuesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_tuesday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_tuesday !=  1 {authwhere}
+								where dosh_do_no in @emps and dosh_tuesday !=  1 and dosh_week_number in @weeks {authwhere}
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 3) as 'DOW',dosh_wednesday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_wednesday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_wednesday !=  1 {authwhere}
+								where dosh_do_no in @emps and dosh_wednesday !=  1 and dosh_week_number in @weeks {authwhere}
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 4) as 'DOW',dosh_thursday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_thursday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_thursday !=  1 {authwhere}
+								where dosh_do_no in @emps and dosh_thursday !=  1 and dosh_week_number in @weeks {authwhere}
 								union all
 
 
@@ -56,21 +56,21 @@ namespace Agendo.Server.Persistance
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_friday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_friday !=  1	{authwhere}	
+								where dosh_do_no in @emps and dosh_friday !=  1 and dosh_week_number in @weeks	{authwhere}	
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 6) as 'DOW',dosh_saturday as 'ShiftNR' , EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_saturday = EmpShift.ds_no	
 								{authjoins}
-								where dosh_do_no in @emps and dosh_saturday !=  1 {authwhere}
+								where dosh_do_no in @emps and dosh_saturday !=  1 and dosh_week_number in @weeks {authwhere}
 								union all
 
 								select dosh_do_no as 'EmpNR', dosh_week_number as 'ISOWeek', dosh_year as 'ISOYear', (Select 7) as 'DOW',dosh_sunday as 'ShiftNR', EmpShift.ds_name as 'ShiftName' , EmpShift.ds_hours as 'ShiftHours'
 								from [dbo].[csti_do_shift] 
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_sunday = EmpShift.ds_no 
 								{authjoins}
-								where dosh_do_no in @emps and dosh_sunday !=  1 {authwhere}";
+								where dosh_do_no in @emps and dosh_sunday !=  1 and dosh_week_number in @weeks {authwhere}";
             _connection.Open();
             string selectQuery = shiftOverview;
             IEnumerable<EmployeeShift> data = await _connection.QueryAsync<EmployeeShift>(selectQuery, new

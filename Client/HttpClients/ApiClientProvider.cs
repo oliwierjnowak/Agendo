@@ -12,7 +12,7 @@ namespace Agendo.Client.HttpClients
        Task<IEnumerable<EmployeeShiftDTO>> GetSingleEmployeeShift(int EmpNr);
        Task<IEnumerable<DomainDTO>> GetDomains();
        Task<IEnumerable<DailyScheduleDTO>> GetDailySchedule();
-       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs);
+       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime FirstDayOfMonth);
        Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr);
        Task<HttpResponseMessage> PostDailySchedule(CreateShift body);
        Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);
@@ -37,8 +37,8 @@ namespace Agendo.Client.HttpClients
         public async Task<IEnumerable<DailyScheduleDTO>> GetDailySchedule() =>
             await _httpClient.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/DailySchedule");
 
-        public async Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs) =>
-            await _httpClient.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("/api/Shift?" +EmpArrayQuery(EmpNrs));
+        public async Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime FirstDayOfMonth) =>
+            await _httpClient.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("/api/Shift?" +EmpArrayQuery(EmpNrs)+$"&FirstDayOfMonth={FirstDayOfMonth.ToString("yyyy-MM-ddTHH:mm:ss")}");
 
 
         Func<List<int>, string> EmpArrayQuery = (a) =>

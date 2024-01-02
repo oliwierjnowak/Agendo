@@ -187,16 +187,17 @@
 
     async Task FetchEmpShifts(SchedulerLoadDataEventArgs? args)
     {
-       
+
         var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
         var end = args != null ? args.End : scheduler.SelectedView.EndDate;
+        var firstDayOfMonth = scheduler.CurrentDate;
         var between = employeeShiftDTOs.Where(x => start < x.Start && x.Start < end).ToList();
         try
         {
             if ( (between.Count() ==0  || SelectionChanged ))
             {
                 Console.WriteLine("fetching");
-                employeeShiftDTOs = (List<EmployeeShiftDTO>)await ApiClient.GetEmployeeShifts(EmpNrs);
+                employeeShiftDTOs = (List<EmployeeShiftDTO>)await ApiClient.GetEmployeeShifts(EmpNrs, firstDayOfMonth);
             }
 
         }
