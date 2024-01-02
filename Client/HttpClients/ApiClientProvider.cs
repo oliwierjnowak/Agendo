@@ -12,7 +12,7 @@ namespace Agendo.Client.HttpClients
        Task<IEnumerable<EmployeeShiftDTO>> GetSingleEmployeeShift(int EmpNr);
        Task<IEnumerable<DomainDTO>> GetDomains();
        Task<IEnumerable<DailyScheduleDTO>> GetDailySchedule();
-       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime ViewFirstDay);
+       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int>? EmpNrs, DateTime ViewFirstDay);
        Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr);
        Task<HttpResponseMessage> PostDailySchedule(CreateShift body);
        Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);
@@ -37,18 +37,22 @@ namespace Agendo.Client.HttpClients
         public async Task<IEnumerable<DailyScheduleDTO>> GetDailySchedule() =>
             await _httpClient.GetFromJsonAsync<IEnumerable<DailyScheduleDTO>>("api/DailySchedule");
 
-        public async Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime ViewFirstDay) =>
-            await _httpClient.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("/api/Shift?" +EmpArrayQuery(EmpNrs)+$"&ViewFirstDay={ViewFirstDay.ToString("yyyy-MM-ddTHH:mm:ss")}");
+        public async Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int>? EmpNrs, DateTime ViewFirstDay) =>
+            await _httpClient.GetFromJsonAsync<IEnumerable<EmployeeShiftDTO>>("/api/Shift?" +EmpArrayQuery(EmpNrs)+$"ViewFirstDay={ViewFirstDay.ToString("yyyy-MM-ddTHH:mm:ss")}&Grouped=false");
 
 
-        Func<List<int>, string> EmpArrayQuery = (a) =>
+        Func<List<int>?, string> EmpArrayQuery = (a) =>
         {
+            if (a == null)
+            {
+                return "";
+            }
             string query = "";
             foreach (int i in a)
             {
                 query += "Emps=" + i + "&";
             }
-            return query[..^1];
+            return query[..^1]+ "&";
         };
         
         public async Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body)

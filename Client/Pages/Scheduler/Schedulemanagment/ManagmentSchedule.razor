@@ -62,31 +62,23 @@
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
 
-    private List<int> _empNrs = new List<int>();
-    public List<int> EmpNrs
-    {
-        get { return _empNrs; }
-        set
-        {
-            _empNrs = value;
+    private List<int> _empNrs = [];
+    public List<int> EmpNrs { get; set; }
 
-        }
-    }
     public bool SelectionChanged{ get; set; } = false;
 
     private IEnumerable<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
     {
-        employees = (List<DomainDTO>)await ApiClient.GetDomains();
-        DailyShifts = await ApiClient.GetDailySchedule();
+       
     }
 
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
     EventConsole console;
 
-    IEnumerable<EmployeeShiftDTO> employeeShiftDTOs = Enumerable.Empty<EmployeeShiftDTO>();
+    IEnumerable<EmployeeShiftDTO> employeeShiftDTOs;
     public bool Adding = false;
 
 
@@ -184,24 +176,25 @@
 
     async Task FetchEmpShifts(SchedulerLoadDataEventArgs? args)
     {
+        if (employees == null || DailyShifts == null)
+        {
+            employees = (List<DomainDTO>)await ApiClient.GetDomains();
+            DailyShifts = await ApiClient.GetDailySchedule();
+        }
+
         if (!Adding)
         {
             var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
             var end = args != null ? args.End : scheduler.SelectedView.EndDate;
             var firstSelectedDay = scheduler.CurrentDate;
 
-            try
-            {
+            await Task.Delay(1000);
+            var result = await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
+            employeeShiftDTOs = result;
+            Console.WriteLine("Fetched");
 
-                var result = await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
-                employeeShiftDTOs = result;
-                Console.WriteLine("Fetched");
+          
 
-            }
-            catch (Exception ex)
-            {
-                console.Log($"Error fetching employee shifts: {ex.Message}");
-            }
             Adding = false;
         }
       

@@ -1,6 +1,7 @@
 ﻿using Agendo.Server.Models;
 using Dapper;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace Agendo.Server.Persistance
 {
@@ -12,7 +13,7 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<EmployeeShift>> ManageEmployeesShift(int superior,IEnumerable<int> domains, Shift shift);
 		Task<int> DeleteEmployeesShift(int superior, IEnumerable<int> remove, Shift shift);
     }
-    public class ShiftRepository(IDbConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
+    public class ShiftRepository(SqlConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
     {		
 
         public async Task<IEnumerable<EmployeeShift>> GetMultipleEmpsAsync(int superior,IEnumerable<int> emps, List<int> weeks, int year)
@@ -71,7 +72,7 @@ namespace Agendo.Server.Persistance
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_sunday = EmpShift.ds_no 
 								{authjoins}
 								where dosh_do_no in @emps and dosh_sunday !=  1 and dosh_week_number in @weeks and dosh_year = @year {authwhere}";
-            _connection.Open();
+            await _connection.OpenAsync();
             string selectQuery = shiftOverview;
             IEnumerable<EmployeeShift> data = await _connection.QueryAsync<EmployeeShift>(selectQuery, new
 			{
@@ -80,7 +81,7 @@ namespace Agendo.Server.Persistance
                 weeks = weeks,
                 year = year
 			});
-            _connection.Close();
+            await _connection.CloseAsync();
             return data;
         }
 
@@ -141,14 +142,14 @@ namespace Agendo.Server.Persistance
 								join [dbo].[csti_daily_schedule] as EmpShift on dosh_sunday = EmpShift.ds_no 
 								{authjoins}
 								where dosh_do_no = @emp and dosh_sunday !=  1 {authwhere}";
-            _connection.Open();
+            await _connection.OpenAsync();
             string selectQuery = shiftOverview;
             IEnumerable<EmployeeShift> data = await _connection.QueryAsync<EmployeeShift>(selectQuery, new
             {
                 emp = emp,
                 superior = superior
             });
-            _connection.Close();
+            await _connection.CloseAsync();
             return data;
         }
 
@@ -197,7 +198,7 @@ join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
 where dosh_week_number = @ISOWeek and dosh_year = @ISOYear
 and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
 ";
-            _connection.Open();
+            await _connection.OpenAsync();
             var existence = await _connection.QueryAsync<int>(checkExistence, new
             {
                 emps = domains,
@@ -205,7 +206,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 				ISOYear = shift.ISOYear,
 				ISOWeek = shift.ISOWeek
             });
-            _connection.Close();
+            await _connection.CloseAsync();
 
             var updatedResult = Enumerable.Empty<EmployeeShift>();
             if (existence.Count() > 0)
@@ -221,7 +222,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 			 dosh_week_number = @ISOWeek and dosh_year = @ISOYear
 			 and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
 			";
-                _connection.Open();
+                await _connection.OpenAsync();
                  updatedResult = await _connection.QueryAsync<EmployeeShift>(update, new
                 {
                     existence = existence,
@@ -230,7 +231,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
                     ShiftNR = shift.ShiftNR,
                     ISOWeek = shift.ISOWeek
                 });
-                _connection.Close();
+                await _connection.CloseAsync();
             }
 
             IEnumerable<int> haveToBeCreated = domains.Except(existence);
@@ -260,7 +261,7 @@ values
                 }
 
                 insert += values[..^1];
-                _connection.Open();
+                await _connection.OpenAsync();
                 var insertResult = await _connection.QueryAsync<EmployeeShift>(insert, new
                 {
                     ISOYear = shift.ISOYear,
@@ -269,7 +270,7 @@ values
 
                 }
                  );
-                _connection.Close();
+                await _connection.CloseAsync();
                 return insertResult.Concat(updatedResult);
 			}
 			else
@@ -317,7 +318,7 @@ join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = d
 join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
 where dosh_week_number = @ISOWeek and dosh_year = @ISOYear and {dow} = @ShiftNR
 and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
-";			_connection.Open();
+";			await _connection.OpenAsync();
             var existence = await _connection.QueryAsync<int>(checkExistence, new
             {
                 emps = remove,
@@ -326,7 +327,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
                 ShiftNR = shift.ShiftNR,
                 ISOWeek = shift.ISOWeek
             });
-            _connection.Close();
+            await _connection.CloseAsync();
             string update = $@"
 			update s
 			set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = 1
@@ -338,7 +339,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 			 dosh_week_number = @ISOWeek and dosh_year = @ISOYear
 			 and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
 			";
-            _connection.Open();
+            await _connection.OpenAsync();
             var updatedResult = await _connection.ExecuteAsync(update, new
             {
                 existence = existence,
@@ -347,7 +348,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
                 ShiftNR = shift.ShiftNR,
                 ISOWeek = shift.ISOWeek
             });
-            _connection.Close();
+            await _connection.CloseAsync();
             return updatedResult;
 
         

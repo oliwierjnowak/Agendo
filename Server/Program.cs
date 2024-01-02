@@ -45,7 +45,8 @@ if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+
      .Build().GetSection("ConnectionString").Value!;
   
     //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=@Agendooo$1;Trusted_Connection=False;Encrypt=False;"));
-    builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
+    builder.Services.AddSingleton<SqlConnection>((sp) => new SqlConnection(constring));
+    //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
 }
 else
 {
