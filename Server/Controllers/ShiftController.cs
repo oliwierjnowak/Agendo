@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using Agendo.Server.Services.enums;
-using System.Globalization;
 
 namespace Agendo.Server.Controllers
 {
@@ -46,14 +44,6 @@ namespace Agendo.Server.Controllers
             var managed = await _employeeShiftService.ManageMultipleEmpShift(userid, empshift);
             return Ok(managed);
 
-        }
-
-
-        private int GetISOWeeksFromMonth(DateTime day)
-        {
-            CultureInfo ciCurr = CultureInfo.CurrentCulture;
-            int weekNum = ciCurr.Calendar.GetWeekOfYear(new DateTime(day.Year, day.Month, 1), CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-            return weekNum;
         }
     }
 }
