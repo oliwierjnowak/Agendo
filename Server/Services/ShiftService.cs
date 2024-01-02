@@ -10,7 +10,7 @@ namespace Agendo.Server.Services
     public interface IShiftService 
     {
         Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);
-        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps, DateTime selectedDate);
+        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         
     }
@@ -21,7 +21,7 @@ namespace Agendo.Server.Services
 
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate));
+            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))

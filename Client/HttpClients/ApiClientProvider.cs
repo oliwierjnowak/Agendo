@@ -12,7 +12,7 @@ namespace Agendo.Client.HttpClients
        Task<IEnumerable<EmployeeShiftDTO>> GetSingleEmployeeShift(int EmpNr);
        Task<IEnumerable<DomainDTO>> GetDomains();
        Task<IEnumerable<DailyScheduleDTO>> GetDailySchedule();
-       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime FirstDayOfMonth);
+       Task<IEnumerable<EmployeeShiftDTO>> GetEmployeeShifts(List<int> EmpNrs, DateTime ViewFirstDay);
        Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr);
        Task<HttpResponseMessage> PostDailySchedule(CreateShift body);
        Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);

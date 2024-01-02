@@ -30,12 +30,11 @@ namespace Agendo.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles ="719")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] DateTime FirstDayOfMonth, [FromQuery] bool Together = false)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] DateTime ViewFirstDay, [FromQuery] bool Together = false)
         {
             //asads
-            var x1 = ShiftService.GetISOWeekNumbers(FirstDayOfMonth);
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-            var x = await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps, FirstDayOfMonth);
+            var x = await _employeeShiftService.GetMultipleEmpsAsync(int.Parse(userid), Emps, ViewFirstDay);
             return Ok(x);
         }
 

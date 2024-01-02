@@ -66,15 +66,17 @@ namespace NUnitTesting.Server.Persistance
             var repository = new ShiftRepository(connection, rightsRepository);
 
             //act
-            var x = repository.GetMultipleEmpsAsync(1,new int[] { 1, 2, 3 }).Result;
+            var x = repository.GetMultipleEmpsAsync(1,new int[] { 1, 2, 3 }, [1,2,3,4,5,6,7,32],2023).Result;
 
             //assert
             ClassicAssert.IsNotNull(x);
             var not123 = x.Where(x => x.EmpNr != 1 && x.EmpNr != 2 && x.EmpNr != 3).ToList();
 
             ClassicAssert.AreEqual(not123.Count, 0);
-            var only1 = x.Where(x => x.EmpNr == 1).ToList();
+            var x2 = repository.GetMultipleEmpsAsync(1, new int[] { 1, 2, 3 }, [1, 2, 3, 4, 5, 6, 7, 32], 2022).Result;
+            var only1 = x2.Where(x => x.EmpNr == 1).ToList();
 
+           
             var weekk32 = only1.FindAll(x => x.ISOWeek == 32 && x.ISOYear == 2022 && x.DOW == 4);
             Assert.That(weekk32.Count, Is.EqualTo(1));
 
@@ -83,7 +85,7 @@ namespace NUnitTesting.Server.Persistance
 
 
             // not superior
-            var notSuperior = repository.GetMultipleEmpsAsync(6, new int[] { 1, 2, 3 }).Result;
+            var notSuperior = repository.GetMultipleEmpsAsync(6, new int[] { 1, 2, 3 }, [1,2,3,4,5,6,7,8,9],2023).Result;
             ClassicAssert.IsNotNull(x);
 
             Assert.That(notSuperior.Count, Is.EqualTo(0));
