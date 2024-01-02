@@ -35,9 +35,8 @@ namespace Agendo.Server.Controllers
             
             if ( Emps.Count() == 0)
             {
-                // var nrs = await _domainService.GetAllAsync(int.Parse(userid));
-                //Emps = nrs.Select(x => x.Nr);
-                Emps = [2, 3, 4];
+                var nrs = await _domainService.GetAllAsync(int.Parse(userid));
+                Emps = nrs.Select(x => x.Nr);
             }
 
             var x = !Grouped ? await _shiftService.GetShiftsAsync(int.Parse(userid), Emps, ViewFirstDay) : await _shiftService.GetShiftsGroupedAsync(int.Parse(userid), Emps, ViewFirstDay);
