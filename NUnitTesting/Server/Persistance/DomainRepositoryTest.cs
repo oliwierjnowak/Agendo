@@ -22,7 +22,7 @@ namespace Testing.Server.Persistance
         public async Task GetAllAsync()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var repository = new DomainRepository(connection);
 
             //act
@@ -41,7 +41,7 @@ namespace Testing.Server.Persistance
         public async Task GetListAsync()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var repository = new DomainRepository(connection);
 
             //act
@@ -60,7 +60,7 @@ namespace Testing.Server.Persistance
         public async Task GetShiftEmployees()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var repository = new DomainRepository(connection);
 
             //act

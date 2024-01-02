@@ -8,14 +8,26 @@ using System.Threading.Tasks;
 
 namespace NUnitTesting
 {
+    // Singleton 
     internal class TestDbConnection 
     {
-        public TestDbConnection()
+        private static TestDbConnection _instance;
+        private TestDbConnection()
         {
             //A@123!23sda
-            Connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
+            _connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
         }
 
-        public SqlConnection Connection { get; set; }
+        private SqlConnection _connection;
+        public  SqlConnection Connection {  get { return _connection; } }
+
+        public static TestDbConnection GetInstance()
+        {
+            if (_instance == null)
+            {
+                _instance = new TestDbConnection();
+            }
+            return _instance;
+        }
     }
 }

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Dapper;
-using Microsoft.AspNetCore.Hosting.Server;
 using System.Reflection;
 using Agendo.Server.db;
 
@@ -63,8 +62,8 @@ else
 builder.Services.AddSingleton<IDomainRepository, DomainRepository>();
 builder.Services.AddSingleton<IDomainService, DomainService>();
 
-builder.Services.AddSingleton<IEmployeeShiftRepository, EmployeeShiftRepository>();
-builder.Services.AddSingleton<IEmployeeShiftService, EmployeeShiftService>();
+builder.Services.AddSingleton<IShiftRepository, ShiftRepository>();
+builder.Services.AddSingleton<IShiftService, ShiftService>();
 
 builder.Services.AddSingleton<IDailyScheduleRepository, DailyScheduleRepository>();
 builder.Services.AddSingleton<IDailyScheduleService, DailyScheduleService>();

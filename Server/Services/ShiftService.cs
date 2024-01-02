@@ -1,40 +1,23 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Shared.DTOs;
 using Agendo.Server.Persistance;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using System.Globalization;
+using Agendo.Server.Models;
+using Agendo.Server.Services.enums;
 
 namespace Agendo.Server.Services
 {
-    public interface IEmployeeShiftService 
+    public interface IShiftService 
     {
-        Task<int> CreateShift(CreateEmployeeShift empshift);
+        Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);
         Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
+        
     }
     
     
-    public class EmployeeShiftService(IEmployeeShiftRepository _employeeShiftRepository, IDomainService _domainService) : IEmployeeShiftService
+    public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
     {
-
-        public async Task<int> CreateShift(CreateEmployeeShift empshift)
-        {
-            // out of datetime generate iso week iso year and day
-            var isoweek =  ISOWeek.GetWeekOfYear(empshift.ShiftDate);
-            var isoyear = empshift.ShiftDate.Year;
-            DayOfWeek dayOfWeek = empshift.ShiftDate.DayOfWeek;
-            var empNR = empshift.EmpNr;
-            var shiftNR = empshift.ShiftNr;
-
-             EmployeeShift employeeShift = new EmployeeShift()
-             {
-                 EmpNr = empshift.EmpNr,
-                 ISOWeek = isoweek,
-                 ISOYear = isoyear,
-                 DOW = (int)dayOfWeek,
-                 ShiftNR = shiftNR
-             };
-            return await _employeeShiftRepository.CreateShift(employeeShift);
-        }
 
         public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
         {
@@ -52,7 +35,7 @@ namespace Agendo.Server.Services
 
                     employeeShiftDTOs.Add(new EmployeeShiftDTO
                     {
-                        Domains = domains,
+                        Domains = domains.ToList(),
                         Start = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8),
                         End = ISOWeek.ToDateTime(group.Key.ISOYear, group.Key.ISOWeek, (DayOfWeek)group.Key.DOW).AddHours(8 + group.Key.ShiftHours),
                         ShiftNR = group.Key.ShiftNR,
@@ -65,6 +48,7 @@ namespace Agendo.Server.Services
 
             return employeeShiftDTOs;
         }
+
 
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp)
         {
@@ -91,8 +75,36 @@ namespace Agendo.Server.Services
                 return ShiftsDTO;
         }
 
+        public async Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details)
+        {
+
+            Shift shift = new Shift
+            {
+                ISOWeek = ISOWeek.GetWeekOfYear(details.ShiftDate),
+                ISOYear = details.ShiftDate.Year,
+                ShiftNR = details.ShiftNr,
+                DOW = (int)details.ShiftDate.DayOfWeek
+            };
+            if (details.RemovedDomains != null)
+            {
+                var deletionResult = await _employeeShiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
+            }
+ 
+
+            var updateResult = await _employeeShiftRepository.ManageEmployeesShift(sup,details.AddedDomains,shift);
 
 
+            var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8), shift.ShiftNR);
 
+            var dto = new EmployeeShiftDTO
+            {
+                Domains = domains.ToList(),
+                Start = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8),
+                End = ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8 + 4),
+                ShiftNR = shift.ShiftNR,
+            };
+
+            return dto;
+        }
     }
 }
