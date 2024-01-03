@@ -10,7 +10,7 @@ namespace Agendo.Server.Services
     public interface IShiftService 
     {
         Task<EmployeeShiftDTO> ManageMultipleEmpShift(int sup, CreateMultipleEmpShift details);
-        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps);
+        Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         
     }
@@ -19,9 +19,9 @@ namespace Agendo.Server.Services
     public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
     {
 
-        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps)
+        public async Task<List<EmployeeShiftDTO>> GetMultipleEmpsAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps);
+            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -105,6 +105,35 @@ namespace Agendo.Server.Services
             };
 
             return dto;
+        }
+
+
+        public static List<int> GetISOWeekNumbers(DateTime firstSelected)
+        {
+            List<int> isoWeekNumbers = new List<int>();
+            DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
+            Calendar cal = dfi.Calendar;
+
+            DateTime firstDayOfMonth = new DateTime(firstSelected.Year, firstSelected.Month, 1);
+
+            int firstWeekOfMonth = cal.GetWeekOfYear(firstDayOfMonth, dfi.CalendarWeekRule, DayOfWeek.Monday);
+
+            for (int i = 0; i < 5; i++) 
+            {
+                int currentWeekNumber = firstWeekOfMonth + i;
+
+                DateTime firstDayOfWeek = cal.AddWeeks(firstDayOfMonth, i);
+                if (firstDayOfWeek.Month == firstSelected.Month)
+                {
+                    isoWeekNumbers.Add(currentWeekNumber);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return isoWeekNumbers;
         }
     }
 }

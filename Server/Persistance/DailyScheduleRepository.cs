@@ -41,7 +41,7 @@ namespace Agendo.Server.Persistance
             string shiftAdd = $@"insert into [dbo].[csti_daily_schedule] ([ds_name], [ds_hours], [ds_color]) OUTPUT Inserted.ds_no values ( @name, @hrs, @color)";
 
             string insertQuery = shiftAdd;
-
+            _connection.Open();
             int data = await _connection.QuerySingleAsync<int>(insertQuery, new
             {
                 name = Name,
