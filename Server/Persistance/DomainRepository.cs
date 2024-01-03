@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System.Data;
 using Agendo.Shared.DTOs;
+using System.Data.SqlClient;
 
 namespace Agendo.Server.Persistance
 {

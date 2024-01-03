@@ -1,5 +1,4 @@
 ﻿using Agendo.AuthAPI.Model;
-using Agendo.Shared;
 using Dapper;
 using System.Data;
 
