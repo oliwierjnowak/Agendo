@@ -21,8 +21,10 @@
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
                             Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
+                                                        AllowFiltering="true"
                             Style="width: 100%; max-width: 400px;" />
 
+        
 
         </div>
 
@@ -143,7 +145,7 @@
         {
             // Add employee-specific data to the dictionary
             dict["EmpNR"] = empNr;
-
+    
             // Open the dialog and handle exceptions
             try
             {
