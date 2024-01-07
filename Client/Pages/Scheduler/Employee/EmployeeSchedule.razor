@@ -1,6 +1,6 @@
 ﻿@using System.Collections;
 @using Agendo.Client.HttpClients
-@using Agendo.Shared.DTOs;
+@using Agendo.Server.Models;
 @using Agendo.Shared;
 @using Radzen.Blazor;
 @using Radzen;
@@ -14,6 +14,8 @@
 <PageTitle>Schdule</PageTitle>
 
 
+
+
 <RadzenScheduler @ref=@scheduler
                  TItem="EmployeeShiftDTO"
                  Data=@shifts
@@ -21,7 +23,7 @@
                  AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
                  TextProperty="ShiftName" SelectedIndex="1"
-                 StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;" >
+                 StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;">
 
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
@@ -40,21 +42,28 @@
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
-    EventConsole console;
-
-    public List<EmployeeShiftDTO> shifts = new List<EmployeeShiftDTO>();
+    private IEnumerable<DailyScheduleDTO>? DailyShifts;
 
     private int _empNr = 0;
-    private IEnumerable<DailyScheduleDTO>? DailyShifts;
+
 
     protected override async Task OnInitializedAsync()
     {
+        
         _empNr = int.Parse((await AuthStateProvider.GetAuthenticationStateAsync()).User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
         shifts = (List<EmployeeShiftDTO>)await ApiClient.GetSingleEmployeeShift(_empNr);
         DailyShifts = await ApiClient.GetDailySchedule();
         StateHasChanged();
         await scheduler.Reload();
     }
+
+
+    public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
+    EventConsole console;
+
+    public IList<EmployeeShiftDTO> shifts = new List<EmployeeShiftDTO>()
+    {
+    };
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
@@ -72,7 +81,7 @@
         }
     }
 
-
+ 
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
     {
@@ -80,10 +89,15 @@
         {
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
-            EmployeeShiftDTO copy = args.Data;
+            EmployeeShiftDTO copy = new EmployeeShiftDTO
+                {
+                    Start = args.Data.Start,
+                    End = args.Data.End
+                };
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-                { "Shift", copy }
+                { "Shift", copy },
+                {"EmpNR", _empNr}
             });
 
         
@@ -102,7 +116,7 @@
         if (matchingShift != null)
         {
             args.Attributes["style"] = $"background: {matchingShift.Color}";
-            args.Attributes["title"] = $"ShiftName-{args.Data.ShiftName}";
+            args.Attributes["title"] = $"EmpNr: {args.Data.EmpNr}, ShiftName: {args.Data.ShiftName}";
         }
     }
 

@@ -1,9 +1,9 @@
-﻿using Microsoft.Playwright;
+﻿using Agendo.Server.Models;
+using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
 using NUnit.Framework.Legacy;
 using NUnitTesting.Server.ApplicationFactories;
 using System.Text.Json;
-using Agendo.Shared.DTOs;
 
 namespace NUnitTesting.Server.controller
 {
@@ -66,10 +66,10 @@ namespace NUnitTesting.Server.controller
             ClassicAssert.NotNull(issuesJsonResponse);
 
             var list = ConvertJsonElementToList(issuesJsonResponse.Value);
-            ClassicAssert.AreEqual(list, new List<DomainDTO>() {
-               new DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
+            ClassicAssert.AreEqual(list, new List<Agendo.Server.Models.DomainDTO>() {
+               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
+               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
+               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
             });
             await _applicationFactory.DisposeAsync();
           //  ClassicAssert.AreEqual(1, 3);

@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using System.Data;
-using Agendo.Shared.DTOs;
-using System.Data.SqlClient;
+using Agendo.Server.Models;
 
 namespace Agendo.Server.Persistance
 {
@@ -79,7 +78,7 @@ namespace Agendo.Server.Persistance
                                     join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
                                     where dosh_year = @dyear AND {dow} = @shift AND dosh_week_number = @dwn  
                                     and  audoen_do_no = @user and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1";
-            _connection.Open();
+
             IEnumerable<DomainDTO> data = await _connection.QueryAsync<DomainDTO>(selectquery, new
             {
                 dyear = year,
@@ -87,7 +86,6 @@ namespace Agendo.Server.Persistance
                 dwn = isoWeekNumber,
                 user = user
             });
-            _connection.Close();
             return data;
 
 

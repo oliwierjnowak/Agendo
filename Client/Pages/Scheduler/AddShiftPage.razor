@@ -1,16 +1,14 @@
 ﻿@inject DialogService DialogService
 @using Agendo.Client.HttpClients
-@using Agendo.Shared.DTOs
-@using Agendo.Shared.DTOs;
+@using Agendo.Server.Models;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen
 @using System.Text.Json;
 @using System.Text;
 @inject IApiClient ApiClient
-@attribute [Authorize(Roles = "719")]
 
-<RadzenTemplateForm TItem="AddEmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+<RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
     <div class="row" style="margin-bottom: 16px">
 
@@ -54,13 +52,13 @@
     [Parameter]
     public DateTime End { get; set; }
     [Parameter]
-    public IEnumerable<int> Domains { get; set; }
+    public int EmpNR { get; set; }
 
     public int shiftnr { get; set; }
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
-    private AddEmployeeShiftDTO model = new AddEmployeeShiftDTO();
+    private EmployeeShiftDTO model = new EmployeeShiftDTO();
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,23 +70,24 @@
     protected async override void OnParametersSet()
     {
         model.Start = Start;
-        model.Domains= Domains;
+        model.End = End;
+        model.EmpNr = EmpNR;
 
     }
 
     async void OnSubmit()
     {
 
-        var body = new CreateMultipleEmpShift
+        var body = new CreateEmployeeShift
             {
-                AddedDomains = model.Domains,
+                EmpNr = model.EmpNr,
                 ShiftDate = model.Start,
                 ShiftNr = shiftnr
             };
 
 
 
-        var x = await ApiClient.ManageEmployeesShift(body);
-        DialogService.Close(x);
+        var x = await ApiClient.CreateEmployeeShift(body);
+        DialogService.Close(model);
     }
 }

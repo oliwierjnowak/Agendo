@@ -1,4 +1,4 @@
-﻿using Agendo.Shared.DTOs;
+﻿using Agendo.Server.Models;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

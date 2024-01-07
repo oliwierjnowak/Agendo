@@ -1,11 +1,11 @@
 ﻿@inject DialogService DialogService
 @using Agendo.Client.HttpClients
-@using Agendo.Shared.DTOs;
+@using Agendo.Server.Models;
 @using Agendo.Shared.Form.CreateEmployeeShift;
 @using Radzen.Blazor;
 @using Radzen;
 @inject IApiClient ApiClient;
-@attribute [Authorize(Roles = "719")]
+
 
 <RadzenTemplateForm TItem="EmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
 
@@ -16,7 +16,7 @@
         <div class="col">
 
             <RadzenDropDown TItem="DailyScheduleDTO"
-                            @bind-Value=@model.ShiftNR
+                            @bind-Value=@shiftnr
                             Data=@shifts
                             TextProperty="Name"
                             ValueProperty="Nr"
@@ -30,7 +30,7 @@
             <RadzenLabel Text="Start" />
         </div>
         <div class="col">
-            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" Disabled="true" />
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" />
             <RadzenRequiredValidator Text="Start is required" Component="Start" />
         </div>
     </div>
@@ -38,14 +38,14 @@
     <div class="row mb-4">
         <div class="mt-4">
             <RadzenText TextStyle="TextStyle.Body1"><b>Employees:</b></RadzenText>
-            @if (model.Domains != null)
+            @if (domainDTOs != null)
             {
                 <div class="divide-y divide-gray-200">
-                    @foreach (var domain in model.Domains)
+                    @foreach (var x in domainDTOs)
                     {
                         <div class="flex justify-between py-2">
-                            <div>@domain.Name</div>
-                            <RadzenButton Icon="delete" Click="@( () => RemoveDomainDTO(domain) )" />
+                            <div>@x.Name</div>
+                            <RadzenButton Icon="delete" Click="@( () => RemoveDomainDTO(x) )" />
                         </div>
                     }
                 </div>
@@ -78,7 +78,17 @@
 
 @code {
     [Parameter]
-    public  EmployeeShiftDTO Shift { get; set; }
+    public EmployeeShiftDTO Shift { get; set; }
+    [Parameter]
+    public int EmpNR { get; set; }
+    [Parameter]
+    public int shiftnr { get; set; }
+
+    [Parameter]
+    public DateTime Start { get; set; }
+
+    public IEnumerable<DomainDTO>? domainDTOs;
+
 
     public IEnumerable<DailyScheduleDTO>? shifts;
 
@@ -99,7 +109,6 @@
 
 
 
-
     List<DomainDTO> domainsToRemove = new List<DomainDTO>();
 
     List<DomainDTO> domainsSelected = new List<DomainDTO>();
@@ -109,11 +118,16 @@
     protected override async Task OnInitializedAsync()
     {
         model = Shift;
+        shiftnr = Shift.ShiftNR;
+        Start = Shift.Start;
 
         shifts = await ApiClient.GetDailySchedule();
-        var alldomains = await ApiClient.GetDomains();
-        domainsNotSelected = alldomains.Except(model.Domains).ToList();
-        domainsSelected = model.Domains.ToList();
+        domainDTOs = await ApiClient.GetDomainOfShift(Start,shiftnr);
+
+        domainsNotSelected = await ApiClient.GetDomains();
+
+        var domainDTOsSet = new HashSet<int>(domainDTOs.Select(d => d.Nr));
+        domainsNotSelected = domainsNotSelected?.Where(domain => !domainDTOsSet.Contains(domain.Nr));
 
     }
 
@@ -122,35 +136,75 @@
 
 
     async void OnSubmit()
-    {
-        var body = new CreateMultipleEmpShift
+    {   
+
+        if(domainsToRemove != null)
+        {
+            foreach(var x in domainsToRemove)
             {
-                RemovedDomains = domainsToRemove.Select(x => x.Nr),
-                AddedDomains = EmpNrs,
+                var body = new CreateEmployeeShift
+                {
+                    EmpNr = x.Nr,
+                    ShiftDate = model.Start,
+                    ShiftNr = 1
+                };
+                await ApiClient.PutShift(body);
+            }
+
+        }
+
+
+        foreach (var x in domainDTOs)
+        {
+            var body2 = new CreateEmployeeShift
+            {
+                EmpNr = x.Nr,
                 ShiftDate = model.Start,
-                ShiftNr = model.ShiftNR
+                ShiftNr = shiftnr
             };
 
-        var x = await ApiClient.ManageEmployeesShift(body);
+            await ApiClient.PutShift(body2);
 
-        CloseEditWindow();
+        }
+
+
+
+        DialogService.Close(model);
     }
 
     private void AddDomainDTO()
     {
-
-        var selectedDomains = domainsNotSelected.Where(d => EmpNrs.Contains(d.Nr)).ToList();
-
-
-        foreach (var domain in selectedDomains)
+        if (domainDTOs == null)
         {
-            if (!model.Domains.Any(d => d.Nr == domain.Nr))
-            {
-               model.Domains= model.Domains.Append(domain);
+            domainDTOs = new List<DomainDTO>();
+        }
 
+        // Assuming domainsNotSelected is IEnumerable<DomainDTO>
+        var selectedDomains = domainsNotSelected.Where(d => EmpNrs.Contains(d.Nr));
+
+        // If domainDTOs is a List
+        if (domainDTOs is List<DomainDTO> list)
+        {
+            foreach (var domain in selectedDomains)
+            {
+                if (!list.Any(d => d.Nr == domain.Nr))
+                {
+                    list.Add(domain);
+                }
             }
         }
-        domainsNotSelected = domainsNotSelected.Except(selectedDomains);
+        else // If domainDTOs is IEnumerable but not a list
+        {
+            var existingDomains = domainDTOs.ToList();
+            foreach (var domain in selectedDomains)
+            {
+                if (!existingDomains.Any(d => d.Nr == domain.Nr))
+                {
+                    existingDomains.Add(domain);
+                }
+            }
+            domainsSelected = existingDomains;
+        }
 
         // Update UI or perform other necessary operations
     }
@@ -161,10 +215,7 @@
     {
         // Code to remove the specified DomainDTO
         domainsToRemove.Add(x);
-        model.Domains = model.Domains.Where(rem => rem.Nr != x.Nr);
-        domainsNotSelected = domainsNotSelected.Append(x);
-        EmpNrs.Remove(x.Nr);
-        //  model.Domains = model.Domains.Where(d => d != x).ToList();
+        domainDTOs = domainDTOs.Where(d => d != x);
 
     }
 
@@ -179,4 +230,4 @@
 
         DialogService.Close(model);
     }
-}
+    }

@@ -1,4 +1,4 @@
-﻿using Agendo.Shared.DTOs;
+﻿using Agendo.Server.Models;
 using Agendo.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +17,12 @@ namespace Agendo.Server.Controllers
         {
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
             return Ok( await _domainService.GetAllAsync(userid));
+        }
+
+        [HttpGet("string")]
+        public string GetString()
+        {
+            return "Hello World";
         }
 
         [HttpGet("shiftemployees")]

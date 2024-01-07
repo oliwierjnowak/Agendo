@@ -1,4 +1,4 @@
-﻿namespace Agendo.Shared.DTOs
+﻿namespace Agendo.Server.Models
 {
     public record DomainDTO
     {
