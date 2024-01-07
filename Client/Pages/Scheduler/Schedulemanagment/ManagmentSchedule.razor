@@ -1,7 +1,7 @@
 ﻿@using System.Collections;
 @using Agendo.Client.HttpClients;
-@using Agendo.Server.Models;
 @using Agendo.Shared;
+@using Agendo.Shared.DTOs
 @using Radzen.Blazor;
 @using Radzen;
 @using System.Security.Claims;
@@ -12,6 +12,8 @@
 @inject IApiClient ApiClient;
 @inject AuthenticationStateProvider AuthStateProvider;
 
+
+
 <PageTitle>Schdule Role 719</PageTitle>
 
 
@@ -20,8 +22,7 @@
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"
-                                                        AllowFiltering="true"
+                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"  Change="@DropdownChanged"   AllowFiltering="true"
                             Style="width: 100%; max-width: 400px;" />
 
         
@@ -38,8 +39,8 @@
 
 
 <RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
-    TextProperty="ShiftAndDomainName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
+                 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender LoadData=@FetchEmpShifts
+                 TextProperty="ShiftName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
     Style="width: auto; height: 700px;">
 
 
@@ -61,56 +62,25 @@
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
-    private IEnumerable<EmployeeShiftDTO>? employeeShiftManagement;
 
+    private List<int> _empNrs = [];
+    public List<int> EmpNrs { get; set; }
 
-    private int _dailyShiftDTONr = 0;
-    public int DailyShiftDTONr
-    {
-        get { return _empNr; }
-        set
-        {
-            _dailyShiftDTONr = value;
-            FetchEmpShifts();
-        }
-    }
-
-
-    private int _empNr = 0;
-    public int EmpNr
-    {
-        get { return _empNr; }
-        set
-        {
-            _empNr = value;
-            FetchEmpShifts();
-        }
-    }
-
-    private List<int> _empNrs = new List<int>();
-    public List<int> EmpNrs
-    {
-        get { return _empNrs; }
-        set
-        {
-            _empNrs = value;
-            FetchEmpShifts();
-        }
-    }
+    public bool SelectionChanged{ get; set; } = false;
 
     private IEnumerable<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
     {
-        employees = (List<DomainDTO>)await ApiClient.GetDomains();
-        DailyShifts = await ApiClient.GetDailySchedule();
+       
     }
 
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
     EventConsole console;
 
-    List<EmployeeShiftDTO> employeeShiftDTOs = new List<EmployeeShiftDTO>();
+    IEnumerable<EmployeeShiftDTO> employeeShiftDTOs;
+    public bool Adding = false;
 
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -131,41 +101,43 @@
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
-
-        // Initialize the dictionary with the common data for all selected employees
         var dict = new Dictionary<string, object>
         {
         { "Start", args.Start },
         { "End", args.End },
-        // Add other common data if needed
         };
 
-        foreach (var empNr in EmpNrs)
+        dict["Domains"] = EmpNrs;
+
+        try
         {
+<<<<<<< HEAD
             // Add employee-specific data to the dictionary
             dict["EmpNR"] = empNr;
     
             // Open the dialog and handle exceptions
             try
-            {
-                EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
+=======
+            Adding = true;
+            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
 
-                if (data != null)
-                {
-                    employeeShiftDTOs.Add(data);
-                    console.Log(data);
-                    // Fetch shifts for each employee
-                    //FetchEmpShiftsNr(empNr);
-
-                }
-            }
-            catch (Exception ex)
+            if (data != null)
+>>>>>>> 8fa47a2541ee65b0c62b9aebf86aa4927b5b9127
             {
-                // Handle the exception (e.g., log it or show an error message)
-                console.Log($"Error: {ex.Message}");
+                var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
+                data.ShiftHours = shiftInfo.Hours;
+                data.ShiftName = shiftInfo.Name;
+
+                employeeShiftDTOs =  employeeShiftDTOs.Where(x => !x.Start.Equals(data.Start));
+                employeeShiftDTOs = employeeShiftDTOs.Append(data);
+
             }
         }
+        catch (Exception ex)
+        {
+            console.Log($"Error: {ex.Message}");
+        }
+
         StateHasChanged();
         await scheduler.Reload();
     }
@@ -176,19 +148,12 @@
         {
             console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
-            EmployeeShiftDTO copy = new EmployeeShiftDTO
-            {
-                Start = args.Data.Start,
-                End = args.Data.End,
-                ShiftNR = args.Data.ShiftNR
-            };
+            EmployeeShiftDTO copy = args.Data;
 
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-                { "Shift", copy },
-                {"EmpNR", EmpNr}
+                { "Shift", copy }
             });
 
-            FetchEmpShifts();
         }
         catch (Exception ex)
         {
@@ -205,7 +170,7 @@
         if (matchingShift != null)
         {
             args.Attributes["style"] = $"background: {matchingShift.Color}";
-            args.Attributes["title"] = $"EmpNr: {args.Data.EmpNr}, ShiftName: {args.Data.ShiftName}";
+            args.Attributes["title"] = $"ShiftName-{args.Data.ShiftName}";
         }
     }
 
@@ -218,55 +183,35 @@
 
 
 
-    async void FetchEmpShifts()
+    async Task FetchEmpShifts(SchedulerLoadDataEventArgs? args)
     {
-        try
+        if (employees == null || DailyShifts == null)
         {
-            if (EmpNrs != null && EmpNrs.Any())
-            {
-                employeeShiftDTOs = (List<EmployeeShiftDTO>)await ApiClient.GetEmployeeShifts(EmpNrs);
-                StateHasChanged();
-                await scheduler.Reload();
-            }
-            else
-            {
-                // Handle the case where no employees are selected
-                // Clear the scheduler data and reload
-                employeeShiftDTOs.Clear();
-                StateHasChanged();
-                await scheduler.Reload();
-            }
+            employees = (List<DomainDTO>)await ApiClient.GetDomains();
+            DailyShifts = await ApiClient.GetDailySchedule();
         }
-        catch (Exception ex)
-        {
-            // Log or handle the exception
-            console.Log($"Error fetching employee shifts: {ex.Message}");
-        }
-    }
 
-    async void FetchEmpShiftsNr(int nr)
+        if (!Adding)
+        {
+            var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
+            var end = args != null ? args.End : scheduler.SelectedView.EndDate;
+            var firstSelectedDay = scheduler.CurrentDate;
+            var result = await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
+            employeeShiftDTOs = result;
+            Console.WriteLine("Fetched");
+
+          
+
+            Adding = false;
+        }
+      
+    }
+    async Task DropdownChanged()
     {
-        try
-        {
-            var x = await ApiClient.GetSingleEmployeeShift(nr);
-            if (x != null)
-            {
-                employeeShiftDTOs = (List<EmployeeShiftDTO>)x;
-                StateHasChanged();
-                await scheduler.Reload();
-            }
-            else
-            {
-                // Log or handle the case where the data is null
-                console.Log("Error: Received null data from the server.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log or handle the exception
-            console.Log($"Error fetching employee shifts: {ex.Message}");
-        }
-    }
+        SelectionChanged = true;
+        await FetchEmpShifts(null);
+        SelectionChanged = false;
 
+    }
 
 }

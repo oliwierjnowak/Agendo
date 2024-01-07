@@ -1,4 +1,4 @@
-﻿namespace Agendo.Server.Models
+﻿namespace Agendo.Shared.DTOs
 {
     public record DailyScheduleDTO
     {

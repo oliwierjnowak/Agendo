@@ -1,6 +1,7 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Shared.DTOs;
 using Dapper;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace Agendo.Server.Persistance
 {
@@ -19,6 +20,8 @@ namespace Agendo.Server.Persistance
     {
         public async Task<List<DailyScheduleDTO>> GetAllAsync()
         {
+             
+            
             _connection.Open();
             string selectQuery = "select ds_no AS 'Nr',ds_name AS 'Name' ,ds_hours AS 'Hours', ds_color AS 'Color'   from [dbo].[csti_daily_schedule]";
             IEnumerable<DailyScheduleDTO> data = await _connection.QueryAsync<DailyScheduleDTO>(selectQuery);
@@ -41,7 +44,7 @@ namespace Agendo.Server.Persistance
             string shiftAdd = $@"insert into [dbo].[csti_daily_schedule] ([ds_name], [ds_hours], [ds_color]) OUTPUT Inserted.ds_no values ( @name, @hrs, @color)";
 
             string insertQuery = shiftAdd;
-
+            _connection.Open();
             int data = await _connection.QuerySingleAsync<int>(insertQuery, new
             {
                 name = Name,

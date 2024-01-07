@@ -2,12 +2,8 @@
 using Agendo.Server.Services;
 using Moq;
 using NUnit.Framework.Legacy;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Agendo.Shared.DTOs;
 
 namespace NUnitTesting.Server.Services
 {
@@ -19,10 +15,10 @@ namespace NUnitTesting.Server.Services
         {
             var mockRepository = new Mock<IDomainRepository>();
 
-            List<Agendo.Server.Models.DomainDTO> data = new List<Agendo.Server.Models.DomainDTO>() {
-               new Agendo.Server.Models.DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new Agendo.Server.Models.DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new Agendo.Server.Models.DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
+            List<DomainDTO> data = new List<DomainDTO>() {
+               new DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
+               new DomainDTO{Nr = 2, Name ="Anton Schubhart" },
+               new DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
             };
 
 
