@@ -1,5 +1,4 @@
 ﻿using Agendo.AuthAPI.Model;
-using Agendo.Shared;
 using Dapper;
 using System.Data;
 
@@ -33,9 +32,9 @@ namespace Agendo.AuthAPI.Services
                             from csmd_domain 
                             join csmd_authorizations_domain_entity auth on auth.audoen_en_no = do_no 
                             where do_name = '{username}'";
-
+            _connection.Open();
             var x = await _connection.QuerySingleAsync<User>(query);
-
+            _connection.Close();
             return x;
 
         }

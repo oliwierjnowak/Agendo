@@ -1,4 +1,4 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Shared.DTOs;
 using Agendo.Server.Persistance;
 
 

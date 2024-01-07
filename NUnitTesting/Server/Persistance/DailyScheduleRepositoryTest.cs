@@ -12,7 +12,7 @@ namespace NUnitTesting.Server.Persistance
         public async Task GetAllAsync()
         {
             //arrange
-            SqlConnection connection =new TestDbConnection().Connection;
+            SqlConnection connection =TestDbConnection.GetInstance().Connection;
             var repository = new DailyScheduleRepository(connection);
 
             //act
@@ -33,7 +33,7 @@ namespace NUnitTesting.Server.Persistance
         public async Task GetSingleShiftAsync()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var repository = new DailyScheduleRepository(connection);
 
             //act
@@ -55,7 +55,7 @@ namespace NUnitTesting.Server.Persistance
         public async Task AddNewShift()
         {
             //arrange
-            SqlConnection connection = new TestDbConnection().Connection;
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
             var repository = new DailyScheduleRepository(connection);
 
             //act
