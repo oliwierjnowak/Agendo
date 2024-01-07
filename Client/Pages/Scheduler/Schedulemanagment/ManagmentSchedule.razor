@@ -23,7 +23,7 @@
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
                             Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true" Change="@DropdownChanged"
-                            Style="width: 100%; max-width: 400px;" />
+                            Style="width: 100%; max-width: 400px;" AllowFiltering="true" />
 
 
         </div>
