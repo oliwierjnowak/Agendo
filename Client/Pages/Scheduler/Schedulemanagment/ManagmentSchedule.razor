@@ -55,7 +55,7 @@
 @code {
     public DateTime? valstart1 = new DateTime(2023, 1, 1, 0, 0, 0);
     public DateTime? valstart2 = new DateTime(2023, 1, 1, 23, 59, 59);
-    public RadzenScheduler<EmployeeShiftDTO> scheduler { get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
+    public RadzenScheduler<EmployeeShiftDTO> scheduler {    get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
     public RadzenHeader header = new RadzenHeader();
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
