@@ -1,35 +1,45 @@
 ﻿<div class="p-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <img src="/agendo_logo.png" alt="Agendo Logo" />
+    <div class="container-fluid ">
+        <a class="navbar-brand w-100" href="">
+            <div class="flex flex-col justify-center items-center">
+                <img src="/agendo-icon.png" class="w-14" alt="Agendo Logo" />
+                <div class="opacity-50 w-40 bg-gray-200 h-px rounded-full mt-4"></div>
+
+            </div>
         </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
+
     </div>
+
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <RadzenIcon Icon="home" />
+                <span class="ml-2" aria-hidden="true">Home</span> 
             </NavLink>
         </div>
        
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="employees">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Employees
+                <RadzenIcon Icon="account_box" />
+                <span class="ml-2" aria-hidden="true"></span> Employees
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="shifts">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Shifts
+                <RadzenIcon Icon="extension" />
+                <span class="ml-2" aria-hidden="true"></span> Shifts
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="schedule">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Schedule
+                <RadzenIcon Icon="assignment" />
+                <span class="ml-2" aria-hidden="true"></span> Schedule
             </NavLink>
         </div>
     </nav>

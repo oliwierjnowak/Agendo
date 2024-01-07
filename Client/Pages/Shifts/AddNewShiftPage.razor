@@ -11,36 +11,30 @@
 
 <RadzenTemplateForm TItem="DailyScheduleDTO" Data="@model" Submit=@OnSubmit>
     <div class="row" style="margin-bottom: 16px">
-        <div class="">
-
-            <RadzenLabel Text="Color:" />
-            <RadzenColorPicker @bind-Value=@model.Color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton Change=@OnChange />
-        </div>
 
         <div class="col-md-3">
             <RadzenLabel Text="Name" />
+            <div class="w-min flex">
+                <div class="mr-2">
+                    <RadzenTextBox @bind-Value="@model.Name" Name="Name" />
+                </div>
 
-        </div>
-        <div class="col">
-            <RadzenTextBox @bind-Value="@model.Name" Name="Name" />
+                <RadzenColorPicker @bind-Value=@model.Color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton Change=@OnChange />
+            </div>
             <RadzenRequiredValidator Text="Enter shift name" Component="Name" />
-        </div>
-    </div>
-        <div class="row" style="margin-bottom: 16px">
-            <div class="col-md-3">
-                <RadzenLabel Text="Hours" />
-            </div>
-            <div class="col">
+            <RadzenLabel Text="Hours:" />
+
+            <div class="w-20 flex">
                 <RadzenNumeric Min="1" @bind-Value="@model.Hours" Name="Hours" />
-                <RadzenRequiredValidator Text="shift hours" Component="Hours" />
             </div>
+            <RadzenRequiredValidator Text="shift hours" Component="Hours" />
         </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col">
-                <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
-            </div>
+        <div class="w-30 mt-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
         </div>
+
+
+    </div>
 </RadzenTemplateForm>
 
 
