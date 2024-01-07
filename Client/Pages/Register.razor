@@ -15,20 +15,20 @@
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
                     <label for="username" class="sr-only">Username</label>
-                    <InputText id="username" @bind-Value="user.Username" placeholder="Username" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
+                    <InputText id="username" @bind-Value="user.Username" placeholder="Username" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:z-10 sm:text-sm"></InputText>
                 </div>
                 <div>
                     <label for="password" class="sr-only">Password</label>
-                    <InputText id="password" @bind-Value="user.Password" type="password" placeholder="Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
+                    <InputText id="password" @bind-Value="user.Password" type="password" placeholder="Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none  focus:z-10 sm:text-sm"></InputText>
                 </div>
                 <div>
                     <label for="confirmPassword" class="sr-only">Confirm Password</label>
-                    <InputText id="confirmPassword" @bind-Value="confirmPassword" type="password" placeholder="Confirm Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
+                    <InputText id="confirmPassword" @bind-Value="confirmPassword" type="password" placeholder="Confirm Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
                 </div>
             </div>
 
             <div>
-                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2">
                     Register
                 </button>
                 <p class="text-center mt-4 text-gray-600">Already have an Account? Log in <NavLink href="/login" class="text-indigo-600 hover:text-indigo-800 underline">here</NavLink>.</p>

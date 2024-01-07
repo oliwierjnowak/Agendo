@@ -1,8 +1,24 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+
+.main-background {
+    background-color: rgb(229 240 255);
+}
+
+.secondary-background {
+    background-color: #223D81;
+}
+
+.sec-comp-background {
+    background-color: #D699F3;
+}
+
 
 h1:focus {
     outline: none;

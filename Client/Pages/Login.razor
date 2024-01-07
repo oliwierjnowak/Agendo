@@ -4,32 +4,34 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ILocalStorageService LocalStorage
 
-<div class="flex justify-center items-center h-screen w-full">
+<div class="flex justify-center items-center h-screen w-full ">
 
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 w-full">
-        <div class="max-w-md w-full space-y-8">
-            <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div class="min-h-screen flex items-center justify-center  main-background py-12 px-4 sm:px-6 lg:px-8 w-full">
+        <div class="max-w-md w-full space-y-8 secondary-background p-10 rounded-2xl shadow-2xl	">
+            <div class="flex justify-center items-center flex-col">
+                <img src="/agendo_logo.png" class="w-50" alt="Agendo Logo" />
+
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
                     Sign in to your account
                 </h2>
             </div>
-            <EditForm Model="user" OnSubmit="LoginUser" class="mt-8 space-y-6">
+            <EditForm Model="user" OnSubmit="LoginUser" class="mt-8 space-y-6 ">
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
                         <label for="username" class="sr-only">Username</label>
-                        <InputText id="username" @bind-Value="user.Username" placeholder="Username" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
+                        <InputText id="username" @bind-Value="user.Username" placeholder="Username" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none  focus:z-10 sm:text-sm"></InputText>
                     </div>
                     <div>
                         <label for="password" class="sr-only">Password</label>
-                        <InputText id="password" @bind-Value="user.Password" type="password" placeholder="Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"></InputText>
+                        <InputText id="password" @bind-Value="user.Password" type="password" placeholder="Password" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:z-10 sm:text-sm"></InputText>
                     </div>
                 </div>
 
                 <div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white sec-comp-background focus:outline-none focus:ring-2 focus:ring-offset-2">
                         Sign in
                     </button>
-                    <p class="text-center mt-4 text-gray-600">Don't have an Account yet? Register <NavLink href="/register" class="text-indigo-600 hover:text-indigo-800 underline">here</NavLink>.</p>
+                    <p class="text-center mt-4 text-gray-200">Don't have an Account yet? Register <NavLink href="/register" class=" underline">here</NavLink>.</p>
                 </div>
             </EditForm>
         </div>

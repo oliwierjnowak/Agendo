@@ -22,8 +22,8 @@
     <div class="flex justify-between items-center">
         <div>
             <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true"  Change="@DropdownChanged"
-                            Style="width: 100%; max-width: 400px;" />
+                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true" Change="@DropdownChanged"
+                            Style="width: 100%; max-width: 400px;" AllowFiltering="true" />
 
 
         </div>
@@ -40,7 +40,7 @@
 <RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender LoadData=@FetchEmpShifts
                  TextProperty="ShiftName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
-    Style="width: auto; height: 700px;">
+                 Style="width: auto; height: 700px;">
 
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
@@ -55,7 +55,7 @@
 @code {
     public DateTime? valstart1 = new DateTime(2023, 1, 1, 0, 0, 0);
     public DateTime? valstart2 = new DateTime(2023, 1, 1, 23, 59, 59);
-    public RadzenScheduler<EmployeeShiftDTO> scheduler { get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
+    public RadzenScheduler<EmployeeShiftDTO> scheduler {    get; set; } = new RadzenScheduler<EmployeeShiftDTO>();
     public RadzenHeader header = new RadzenHeader();
     public TimeSpan Endtime = new TimeSpan(23, 59, 59);
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
@@ -65,13 +65,13 @@
     private List<int> _empNrs = [];
     public List<int> EmpNrs { get; set; }
 
-    public bool SelectionChanged{ get; set; } = false;
+    public bool SelectionChanged { get; set; } = false;
 
     private IEnumerable<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
     {
-       
+
     }
 
 
@@ -119,7 +119,7 @@
                 data.ShiftHours = shiftInfo.Hours;
                 data.ShiftName = shiftInfo.Name;
 
-                employeeShiftDTOs =  employeeShiftDTOs.Where(x => !x.Start.Equals(data.Start));
+                employeeShiftDTOs = employeeShiftDTOs.Where(x => !x.Start.Equals(data.Start));
                 employeeShiftDTOs = employeeShiftDTOs.Append(data);
 
             }
@@ -193,11 +193,11 @@
             employeeShiftDTOs = result;
             Console.WriteLine("Fetched");
 
-          
+
 
             Adding = false;
         }
-      
+
     }
     async Task DropdownChanged()
     {

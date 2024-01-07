@@ -36,14 +36,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
     });
-var x =Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location); 
-if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)+@"\appsettings.json"))
+var x = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\appsettings.json"))
 {
     var constring = new ConfigurationBuilder()
      .SetBasePath(builder.Environment.ContentRootPath)
      .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
      .Build().GetSection("ConnectionString").Value!;
-  
+
     //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection("Server=localhost,1433;User ID=SA;Password=@Agendooo$1;Trusted_Connection=False;Encrypt=False;"));
     builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
     //builder.Services.AddSingleton<IDbConnection>((sp) => new SqlConnection(constring));
