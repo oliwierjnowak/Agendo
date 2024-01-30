@@ -41,12 +41,11 @@ namespace NUnitTesting.Server.Persistance
 
             //assert
             ClassicAssert.IsNotNull(x);
-
-            Assert.That(x.Count, Is.EqualTo(1));
-            Assert.That(x[0].Nr, Is.EqualTo(2));
-            Assert.That(x[0].Name, Is.EqualTo("standard shift"));
-            Assert.That(x[0].Hours, Is.EqualTo(8));
-            Assert.That(x[0].Color, Is.EqualTo("#98f5e1"));
+            
+            Assert.That(x.Nr, Is.EqualTo(2));
+            Assert.That(x.Name, Is.EqualTo("standard shift"));
+            Assert.That(x.Hours, Is.EqualTo(8));
+            Assert.That(x.Color, Is.EqualTo("#98f5e1"));
 
             await connection.CloseAsync();
         }
@@ -64,11 +63,11 @@ namespace NUnitTesting.Server.Persistance
             //assert
             ClassicAssert.IsNotNull(insert);
             var x = repository.GetSingleShiftAsync(insert).Result;
-            Assert.That(x.Count, Is.EqualTo(1));
-            Assert.That(x[0].Nr, Is.EqualTo(insert));
-            Assert.That(x[0].Name, Is.EqualTo("NEW shift"));
-            Assert.That(x[0].Hours, Is.EqualTo(10));
-            Assert.That(x[0].Color, Is.EqualTo("#98f5e1"));
+           
+            Assert.That(x.Nr, Is.EqualTo(insert));
+            Assert.That(x.Name, Is.EqualTo("NEW shift"));
+            Assert.That(x.Hours, Is.EqualTo(10));
+            Assert.That(x.Color, Is.EqualTo("#98f5e1"));
 
             await connection.CloseAsync();
         }
