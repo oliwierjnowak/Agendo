@@ -7,7 +7,7 @@ namespace Agendo.Server.Services
     public interface IDailyScheduleService
     {
         Task<List<DailyScheduleDTO>> GetAllAsync();
-        Task<List<DailyScheduleDTO>> GetSingleShiftAsync(int Shift);
+        Task<DailyScheduleDTO> GetSingleShiftAsync(int Shift);
         Task<int> AddNewShift(string Name, int Hrs, string Color);
 
     }
@@ -18,7 +18,7 @@ namespace Agendo.Server.Services
             return await _dailyScheduleRepository.GetAllAsync();
         }
 
-        public async Task<List<DailyScheduleDTO>> GetSingleShiftAsync(int Shift)
+        public async Task<DailyScheduleDTO> GetSingleShiftAsync(int Shift)
         {
             return await _dailyScheduleRepository.GetSingleShiftAsync(Shift);
      

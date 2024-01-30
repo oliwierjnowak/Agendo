@@ -17,7 +17,7 @@ namespace NUnitTesting
             //A@123!23sda
             _connection = new SqlConnection("Server=localhost,1433;User ID=SA;Password=A@123!23sda;Trusted_Connection=False;Encrypt=False;");
         }
-
+        
         private SqlConnection _connection;
         public  SqlConnection Connection {  get { return _connection; } }
 

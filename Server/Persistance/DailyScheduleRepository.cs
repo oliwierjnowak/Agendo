@@ -9,7 +9,7 @@ namespace Agendo.Server.Persistance
     {
         Task<List<DailyScheduleDTO>> GetAllAsync();
 
-        Task<List<DailyScheduleDTO>> GetSingleShiftAsync(int Shift);
+        Task<DailyScheduleDTO> GetSingleShiftAsync(int Shift);
 
         Task<int> AddNewShift(string Name, int Hrs, string Color);
 
@@ -29,15 +29,16 @@ namespace Agendo.Server.Persistance
             return (List<DailyScheduleDTO>)data;
         }
 
-        public async Task<List<DailyScheduleDTO>> GetSingleShiftAsync(int Shift)
+        public async Task<DailyScheduleDTO> GetSingleShiftAsync(int Shift)
         {
             string shiftQuery = @$"select ds_no AS 'Nr',ds_name AS 'Name' ,ds_hours AS 'Hours',ds_color AS 'Color' from [dbo].[csti_daily_schedule] where ds_no = {Shift}";
             _connection.Open();
             string selectQuery = shiftQuery;
-            IEnumerable<DailyScheduleDTO> data = await _connection.QueryAsync<DailyScheduleDTO>(selectQuery);
+            // IEnumerable<DailyScheduleDTO> data = await _connection.QueryAsync<DailyScheduleDTO>(selectQuery);
+            DailyScheduleDTO data = await _connection.QueryFirstOrDefaultAsync<DailyScheduleDTO>(selectQuery);
             _connection.Close();
-            return (List<DailyScheduleDTO>)data;
-        }
+            return data;
+        } 
 
         public async Task<int> AddNewShift(string Name, int Hrs, string Color)
         {
