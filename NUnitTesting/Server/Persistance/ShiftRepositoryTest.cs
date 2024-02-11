@@ -1,6 +1,7 @@
 ﻿using Agendo.Server;
 using Agendo.Server.Models;
 using Agendo.Server.Persistance;
+using Agendo.Shared.Form;
 using Dapper;
 using Moq;
 using Moq.Dapper;
@@ -173,6 +174,31 @@ namespace NUnitTesting.Server.Persistance
             var notAllowed3 = await repository.ManageEmployeesShift(1, [8], thirdChange);
 
             Assert.That(notAllowed, Is.EqualTo(Enumerable.Empty<EmployeeShift>()));
+        }
+
+
+
+        [Test]
+        public async Task DaySequenceCreate()
+        {
+            //arrange
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
+            var rightsRepository = new RightsRepository(connection);
+            var repository = new ShiftRepository(connection, rightsRepository);
+
+            SequenceForm sf = new SequenceForm
+            {
+                domainsIDs = [2, 3, 4],
+                ISOWeekFrom = 1,
+                ISOWeekTo = 36,
+                shiftNR = 5,
+                weekDays = [DayOfWeek.Monday],
+                year = 2023
+
+            };
+
+            await repository.DaySequenceCreate(1, sf);
+
         }
     }
 

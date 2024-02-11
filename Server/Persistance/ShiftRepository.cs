@@ -1,4 +1,6 @@
-﻿using Agendo.Server.Models;
+﻿using Agendo.Client.Pages.Shifts;
+using Agendo.Server.Models;
+using Agendo.Shared.Form;
 using Dapper;
 using System.Data;
 using System.Data.SqlClient;
@@ -12,6 +14,8 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
         Task<IEnumerable<EmployeeShift>> ManageEmployeesShift(int superior,IEnumerable<int> domains, Shift shift);
 		Task<int> DeleteEmployeesShift(int superior, IEnumerable<int> remove, Shift shift);
+
+        Task DaySequenceCreate(int superior, SequenceForm sequence);
     }
     public class ShiftRepository(IDbConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
     {		
@@ -352,6 +356,40 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             return updatedResult;
 
         
+        }
+
+        public async Task DaySequenceCreate(int superior, SequenceForm sequence)
+        {
+            var right = (await _rightsRepository.RightsOverEmps(sequence.domainsIDs, superior)).Select(x => x.Emp).ToList();
+            sequence.domainsIDs.Sort();
+            right.Sort();
+            if (!right.SequenceEqual( sequence.domainsIDs))
+            {
+                throw new InvalidOperationException("user requested access to not owned domains");
+            }
+
+
+
+            string checkExistence = $@"
+            select dosh_do_no, dosh_week_number from csti_do_shift 
+            join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
+            join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
+            where (dosh_week_number BETWEEN  @ISOWeekFrom  and  @ISOWeekTo) and dosh_year = @ISOYear
+            and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+            ";
+            _connection.Open();
+            var existence = await _connection.QueryAsync<(int,int)>(checkExistence, new
+            {
+                emps = sequence.domainsIDs,
+                superior = superior,
+                ISOYear = sequence.year,
+                ISOWeekFrom = sequence.ISOWeekFrom,
+                ISOWeekTo = sequence.ISOWeekTo,
+            });
+            _connection.Close();
+
+
+            var x = 1 + 1;
         }
     }
 }

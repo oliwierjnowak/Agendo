@@ -4,6 +4,7 @@ using Agendo.Shared.Form.CreateEmployeeShift;
 using System.Globalization;
 using Agendo.Server.Models;
 using Agendo.Server.Services.enums;
+using Agendo.Shared.Form;
 
 namespace Agendo.Server.Services
 {
@@ -13,6 +14,7 @@ namespace Agendo.Server.Services
         Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         Task<List<EmployeeShiftDTO>> GetShiftsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
+        Task DaySequenceCreate(int userid, SequenceForm sequence);
     }
     
     
@@ -134,6 +136,10 @@ namespace Agendo.Server.Services
             return dto;
         }
 
+        public async Task DaySequenceCreate(int userid, SequenceForm sequence)
+        {
+
+        }
 
         public static List<int> GetISOWeekNumbers(DateTime firstSelected)
         {
