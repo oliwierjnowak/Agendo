@@ -192,7 +192,7 @@ namespace NUnitTesting.Server.Persistance
                 ISOWeekFrom = 1,
                 ISOWeekTo = 36,
                 shiftNR = 5,
-                weekDays = [DayOfWeek.Monday],
+                weekDays = [1],
                 year = 2023
 
             };

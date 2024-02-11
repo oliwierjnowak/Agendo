@@ -2,7 +2,7 @@
 {
     public record SequenceForm
     {
-        public List<DayOfWeek> weekDays;
+        public List<int> weekDays;
         public List<int> domainsIDs;
         public int ISOWeekFrom;
         public int ISOWeekTo;

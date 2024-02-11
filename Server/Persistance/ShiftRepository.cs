@@ -216,16 +216,16 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             if (existence.Count() > 0)
             {
                 string update = $@"
-			update s
-			set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = @ShiftNR
-			OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.dosh_monday as 'ShiftNR',{shift.DOW} as 'DOW'
-			FROM [dbo].[csti_do_shift] s
-				 join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
-				 join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
-			where
-			 dosh_week_number = @ISOWeek and dosh_year = @ISOYear
-			 and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
-			";
+			    update s
+			    set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = @ShiftNR
+			    OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.dosh_monday as 'ShiftNR',{shift.DOW} as 'DOW'
+			    FROM [dbo].[csti_do_shift] s
+				     join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
+				     join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
+			    where
+			     dosh_week_number = @ISOWeek and dosh_year = @ISOYear
+			     and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+			    ";
                 _connection.Open();
                  updatedResult = await _connection.QueryAsync<EmployeeShift>(update, new
                 {
@@ -388,8 +388,58 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             });
             _connection.Close();
 
+            string whereForExistence = "";
+            foreach(var i in existence)
+            {
+                whereForExistence += $"(dosh_no = {i.Item1} and dosh_week_number = {i.Item2}) or";     
+            }
+            //remove last 'or'
+            whereForExistence= whereForExistence.Remove(whereForExistence.Length - 2, 2);
+            var days = sequence.weekDays;
+            var daysSetString = "";
+            foreach (var day in days)
+            {
+                var dow = "";
+                switch (day)
+                {
+                    case 1:
+                        dow = "dosh_monday";
+                        break;
+                    case 2:
+                        dow = "dosh_tuesday";
+                        break;
+                    case 3:
+                        dow = "dosh_wednesday";
+                        break;
+                    case 4:
+                        dow = "dosh_thursday";
+                        break;
+                    case 5:
+                        dow = "dosh_friday";
+                        break;
+                    case 6:
+                        dow = "dosh_saturday";
+                        break;
+                    case 7:
+                        dow = "dosh_sunday";
+                        break;
+                }
 
-            var x = 1 + 1;
+                daysSetString += dow + " = @ShiftNr, "; 
+            }
+            //remove last ','
+            daysSetString = daysSetString.Remove(daysSetString.Length - 1, 1);
+            string update = $@"
+			    update s
+			    set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, {daysSetString}
+			 
+			    FROM [dbo].[csti_do_shift] s
+			    where
+			     dosh_week_number = @ISOWeek and dosh_year = @ISOYear and ({whereForExistence})
+			    ";
+
+            var xx = 1 + 1;
+
         }
     }
 }
