@@ -54,7 +54,7 @@ namespace Agendo.Server.Controllers
 
         }
 
-        [HttpPut]
+        [HttpPost]
         [Authorize(Roles = "719")]
         public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromForm] SequenceForm sequence )
         {

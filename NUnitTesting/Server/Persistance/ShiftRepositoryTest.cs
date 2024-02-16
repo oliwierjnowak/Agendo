@@ -192,12 +192,15 @@ namespace NUnitTesting.Server.Persistance
                 ISOWeekFrom = 1,
                 ISOWeekTo = 36,
                 shiftNR = 5,
-                weekDays = [1],
-                year = 2023
+                weekDays = [1,3,5],
+                year = 1
 
             };
 
             await repository.DaySequenceCreate(1, sf);
+            var x = await repository.GetMultipleEmpsAsync(1, new int[] {  2, 3,4 }, [1, 2, 3], 1);
+            Assert.That(x , Is.Not.Null);
+            Assert.That(x.Where(day => day.DOW == 1 || day.DOW == 3 || day.DOW == 4 ).Select(y => y.ShiftNR), Is.All.EqualTo(5));
 
         }
     }
