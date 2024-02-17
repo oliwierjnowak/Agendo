@@ -1,7 +1,7 @@
 ﻿using Agendo.Server.Models;
+using Agendo.Shared.Form;
 using Dapper;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace Agendo.Server.Persistance
 {
@@ -12,6 +12,8 @@ namespace Agendo.Server.Persistance
         Task<IEnumerable<EmployeeShift>> GetSingleEmpAsync(int superior,int emp);
         Task<IEnumerable<EmployeeShift>> ManageEmployeesShift(int superior,IEnumerable<int> domains, Shift shift);
 		Task<int> DeleteEmployeesShift(int superior, IEnumerable<int> remove, Shift shift);
+
+        Task DaySequenceCreate(int superior, SequenceForm sequence);
     }
     public class ShiftRepository(IDbConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
     {		
@@ -212,16 +214,16 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             if (existence.Count() > 0)
             {
                 string update = $@"
-			update s
-			set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = @ShiftNR
-			OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.dosh_monday as 'ShiftNR',{shift.DOW} as 'DOW'
-			FROM [dbo].[csti_do_shift] s
-				 join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
-				 join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
-			where
-			 dosh_week_number = @ISOWeek and dosh_year = @ISOYear
-			 and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
-			";
+			    update s
+			    set  dosh_week_number = @ISOWeek, dosh_year = @ISOYear, [{dow}] = @ShiftNR
+			    OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.dosh_monday as 'ShiftNR',{shift.DOW} as 'DOW'
+			    FROM [dbo].[csti_do_shift] s
+				     join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
+				     join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
+			    where
+			     dosh_week_number = @ISOWeek and dosh_year = @ISOYear
+			     and authdomain.audoen_en_no in @existence and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+			    ";
                 _connection.Open();
                  updatedResult = await _connection.QueryAsync<EmployeeShift>(update, new
                 {
@@ -242,10 +244,10 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 			{
                 
                 string insert = @$"
-insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday] ) 
-OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.{dow} as 'ShiftNR', {shift.DOW} as 'DOW' 
-values 
-";
+            insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday] ) 
+            OUTPUT inserted.dosh_do_no as 'EmpNR', inserted.dosh_week_number as 'ISOWeek',inserted.dosh_year as 'ISOYear',inserted.{dow} as 'ShiftNR', {shift.DOW} as 'DOW' 
+            values 
+            ";
 
                 string values = "";
                 foreach (var x in haveToBeCreated)
@@ -352,6 +354,148 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             return updatedResult;
 
         
+        }
+
+        public async Task DaySequenceCreate(int superior, SequenceForm sequence)
+        {
+            var right = (await _rightsRepository.RightsOverEmps(sequence.domainsIDs, superior)).Select(x => x.Emp).ToList();
+            sequence.domainsIDs.Sort();
+            right.Sort();
+            if (!right.SequenceEqual( sequence.domainsIDs))
+            {
+                throw new InvalidOperationException("user requested access to not owned domains");
+            }
+
+
+
+            string checkExistence = $@"
+            select dosh_do_no, dosh_week_number from csti_do_shift 
+            join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
+            join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
+            where (dosh_week_number BETWEEN  @ISOWeekFrom  and  @ISOWeekTo) and dosh_year = @ISOYear
+            and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+            ";
+            _connection.Open();
+            var existence = await _connection.QueryAsync<(int,int)>(checkExistence, new
+            {
+                emps = sequence.domainsIDs,
+                superior = superior,
+                ISOYear = sequence.year,
+                ISOWeekFrom = sequence.ISOWeekFrom,
+                ISOWeekTo = sequence.ISOWeekTo,
+            });
+            _connection.Close();
+
+            string whereForExistence = "";
+            foreach(var i in sequence.domainsIDs)
+            {
+                whereForExistence += $"(dosh_do_no = {i} and (dosh_week_number BETWEEN @from AND @to))  or ";     
+            }
+            //remove last 'or'
+            whereForExistence= whereForExistence.Remove(whereForExistence.Length - 3, 3);
+            var days = sequence.weekDays;
+            var daysSetString = "";
+            foreach (var day in days)
+            {
+                var dow = "";
+                switch (day)
+                {
+                    case 1:
+                        dow = "dosh_monday";
+                        break;
+                    case 2:
+                        dow = "dosh_tuesday";
+                        break;
+                    case 3:
+                        dow = "dosh_wednesday";
+                        break;
+                    case 4:
+                        dow = "dosh_thursday";
+                        break;
+                    case 5:
+                        dow = "dosh_friday";
+                        break;
+                    case 6:
+                        dow = "dosh_saturday";
+                        break;
+                    case 7:
+                        dow = "dosh_sunday";
+                        break;
+                }
+
+                daysSetString += dow + " = @ShiftNR, "; 
+            }
+            //remove last ','
+            daysSetString = daysSetString.Remove(daysSetString.Length - 2, 2);
+
+            if(existence.Count() > 0)
+            {
+                string update = $@"
+			    update  [dbo].[csti_do_shift] 
+			    set {daysSetString}
+			    where
+			    dosh_year = @ISOYear and ({whereForExistence})
+			    
+                ";
+
+         
+                _connection.Open();
+                var updateResult = await _connection.ExecuteAsync(update, new
+                {
+                    ISOYear = sequence.year,
+                    ShiftNR = sequence.shiftNR,
+                    from = sequence.ISOWeekFrom,
+                    to = sequence.ISOWeekTo
+                }
+                 );
+                _connection.Close();
+            }
+
+            // all combinations of ids and week numbers for the inserts (already existent one will be removed from combinations int notExistingcombinations)
+            List<int> idsCombination = new List<int>(sequence.domainsIDs); 
+            List<int> weeksCombination = new List<int>(Enumerable.Range(sequence.ISOWeekFrom, sequence.ISOWeekTo).ToList());
+            List<(int, int)> combinations = new List<(int, int)>(); 
+            foreach (var domain in idsCombination)
+            {
+                foreach (var week in weeksCombination)
+                {
+                    combinations.Add((domain, week)); 
+                }
+            }
+
+            var notExistingCombinations = new List<(int, int)>(combinations);
+            notExistingCombinations.RemoveAll(x => existence.Any(y => y.Equals(x)));
+
+
+            if(notExistingCombinations.Count() > 0)
+            {
+                string insert = @$"
+                insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday] ) 
+                values 
+                ";
+
+                var insertvalues = "";
+                foreach (var combination in notExistingCombinations) {
+                    insertvalues += $@" ({combination.Item1}, {combination.Item2}, @ISOYear, {(sequence.weekDays.Contains(1) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(2) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(3) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(4) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(5) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(6) ? "@ShiftNR" : "1")},
+									{(sequence.weekDays.Contains(7) ? "@ShiftNR" : "1")}),";
+                }
+  
+                insert += insertvalues[..^1];
+                _connection.Open();
+                var insertResult = await _connection.ExecuteAsync(insert, new
+                {
+                    ISOYear = sequence.year,
+                    ShiftNR = sequence.shiftNR
+                }
+                 );
+                _connection.Close();
+            }
+
         }
     }
 }

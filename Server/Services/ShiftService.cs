@@ -4,6 +4,7 @@ using Agendo.Shared.Form.CreateEmployeeShift;
 using System.Globalization;
 using Agendo.Server.Models;
 using Agendo.Server.Services.enums;
+using Agendo.Shared.Form;
 
 namespace Agendo.Server.Services
 {
@@ -13,15 +14,16 @@ namespace Agendo.Server.Services
         Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         Task<List<EmployeeShiftDTO>> GetShiftsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
+        Task DaySequenceCreate(int userid, SequenceForm sequence);
     }
     
     
-    public class ShiftService(IShiftRepository _employeeShiftRepository, IDomainService _domainService) : IShiftService
+    public class ShiftService(IShiftRepository _shiftRepository, IDomainService _domainService) : IShiftService
     {
 
         public async Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
+            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -50,7 +52,7 @@ namespace Agendo.Server.Services
         }
         public async Task<List<EmployeeShiftDTO>> GetShiftsAsync(int sup, IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _employeeShiftRepository.GetMultipleEmpsAsync(sup, emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
+            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup, emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -79,7 +81,7 @@ namespace Agendo.Server.Services
 
         public async Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp)
         {
-            var shifts = await _employeeShiftRepository.GetSingleEmpAsync(superior,emp);
+            var shifts = await _shiftRepository.GetSingleEmpAsync(superior,emp);
             var ShiftsDTO = new List<EmployeeShiftDTO>(); 
             foreach(var shift in shifts)
             {
@@ -112,13 +114,13 @@ namespace Agendo.Server.Services
                 ShiftNR = details.ShiftNr,
                 DOW = (int)details.ShiftDate.DayOfWeek
             };
-            if (details.RemovedDomains != null)
+            if (details.RemovedDomains != null || details.RemovedDomains.Count() != 0)
             {
-                var deletionResult = await _employeeShiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
+                var deletionResult = await _shiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
             }
  
 
-            var updateResult = await _employeeShiftRepository.ManageEmployeesShift(sup,details.AddedDomains,shift);
+            var updateResult = await _shiftRepository.ManageEmployeesShift(sup,details.AddedDomains,shift);
 
 
             var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8), shift.ShiftNR);
@@ -134,6 +136,10 @@ namespace Agendo.Server.Services
             return dto;
         }
 
+        public async Task DaySequenceCreate(int userid, SequenceForm sequence)
+        {
+            await _shiftRepository.DaySequenceCreate(userid, sequence);
+        }
 
         public static List<int> GetISOWeekNumbers(DateTime firstSelected)
         {
