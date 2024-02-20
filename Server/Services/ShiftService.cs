@@ -114,7 +114,7 @@ namespace Agendo.Server.Services
                 ShiftNR = details.ShiftNr,
                 DOW = (int)details.ShiftDate.DayOfWeek
             };
-            if (details.RemovedDomains != null || details.RemovedDomains.Count() != 0)
+            if (details.RemovedDomains != null )
             {
                 var deletionResult = await _shiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
             }
