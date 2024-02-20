@@ -8,5 +8,6 @@ namespace Agendo.Shared.Form.CreateEmployeeShift
         public DateTime ShiftDate { get; set; }
         public int ShiftNr { get; set; }
         public IEnumerable<int>? NotChangedDomains{ get; set; }
+        public int OldShiftNr {  get; set; }
     }
 }

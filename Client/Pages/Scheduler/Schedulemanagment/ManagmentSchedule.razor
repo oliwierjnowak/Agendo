@@ -144,7 +144,10 @@
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy }
             });
-
+           // employeeShiftDTOs = employeeShiftDTOs.Where(x => x != copy);
+          //  employeeShiftDTOs = employeeShiftDTOs.Concat([(EmployeeShiftDTO)data]);
+            StateHasChanged();
+            await scheduler.Reload();
         }
         catch (Exception ex)
         {
@@ -201,9 +204,12 @@
     }
     async Task DropdownChanged()
     {
+
         SelectionChanged = true;
-        await FetchEmpShifts(null);
+        //await FetchEmpShifts(null);
         SelectionChanged = false;
+        StateHasChanged();
+        await scheduler.Reload();
 
     }
 

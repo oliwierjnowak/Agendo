@@ -104,12 +104,14 @@
 
     List<DomainDTO> domainsSelected = new List<DomainDTO>();
 
-    IEnumerable<DomainDTO> initzializedDomains = [];
+    IEnumerable<DomainDTO> IiitzializedDomains = [];
+    int OldShiftNr;
 
     protected override async Task OnInitializedAsync()
     {
         model = Shift;
-        initzializedDomains = Shift.Domains;
+        IiitzializedDomains = Shift.Domains;
+        OldShiftNr = Shift.ShiftNR;
         shifts = await ApiClient.GetDailySchedule();
         var alldomains = await ApiClient.GetDomains();
         domainsNotSelected = alldomains.Except(model.Domains).ToList();
@@ -126,10 +128,11 @@
         var body = new CreateMultipleEmpShift
         {
                 RemovedDomains = domainsToRemove.Select(x => x.Nr),
-                AddedDomains = EmpNrs,
+                AddedDomains = EmpNrs.Where(x=> !IiitzializedDomains.Any(y => y.Nr == x)),
                 ShiftDate = model.Start,
                 ShiftNr = model.ShiftNR,
-                NotChangedDomains = initzializedDomains.Select(x => x.Nr).Where(x => !domainsToRemove.Any(y => y.Nr == x))
+                NotChangedDomains = IiitzializedDomains.Select(x => x.Nr).Where(x => !domainsToRemove.Any(y => y.Nr == x)),
+                OldShiftNr = OldShiftNr
         };
 
         var x = await ApiClient.ManageEmployeesShift(body);
@@ -148,9 +151,9 @@
             if (!model.Domains.Any(d => d.Nr == domain.Nr))
             {
                 model.Domains= model.Domains.Append(domain);
-                if (initzializedDomains.Any(x=> x.Nr == domain.Nr))
+                if(domainsToRemove.Any(x => x.Nr == domain.Nr))
                 {
-                    EmpNrs.Remove(domain.Nr);
+                   domainsToRemove.Remove(domain);
                 }
             }
         }
