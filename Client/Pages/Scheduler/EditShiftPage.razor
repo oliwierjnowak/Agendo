@@ -148,6 +148,10 @@
             if (!model.Domains.Any(d => d.Nr == domain.Nr))
             {
                 model.Domains= model.Domains.Append(domain);
+                if (initzializedDomains.Any(x=> x.Nr == domain.Nr))
+                {
+                    EmpNrs.Remove(domain.Nr);
+                }
             }
         }
         domainsNotSelected = domainsNotSelected.Except(selectedDomains);
