@@ -15,6 +15,7 @@ namespace Agendo.Server.Services
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         Task<List<EmployeeShiftDTO>> GetShiftsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task DaySequenceCreate(int userid, SequenceForm sequence);
+        Task DatesSequenceCreate(int userid, MultipleSelectionForm sequence);
     }
     
     
@@ -23,7 +24,7 @@ namespace Agendo.Server.Services
 
         public async Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int sup,IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
+            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup,emps, GetISOWeekNumbersOfMonth(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -52,7 +53,7 @@ namespace Agendo.Server.Services
         }
         public async Task<List<EmployeeShiftDTO>> GetShiftsAsync(int sup, IEnumerable<int> emps, DateTime selectedDate)
         {
-            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup, emps, GetISOWeekNumbers(selectedDate), selectedDate.Year);
+            var shifts = await _shiftRepository.GetMultipleEmpsAsync(sup, emps, GetISOWeekNumbersOfMonth(selectedDate), selectedDate.Year);
             var employeeShiftDTOs = new List<EmployeeShiftDTO>();
 
             foreach (var group in shifts.GroupBy(es => new { es.ISOWeek, es.ISOYear, es.DOW, es.ShiftNR, es.ShiftName, es.ShiftHours }))
@@ -145,7 +146,7 @@ namespace Agendo.Server.Services
             await _shiftRepository.DaySequenceCreate(userid, sequence);
         }
 
-        public static List<int> GetISOWeekNumbers(DateTime firstSelected)
+        public static List<int> GetISOWeekNumbersOfMonth(DateTime firstSelected)
         {
             List<int> isoWeekNumbers = new List<int>();
             DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
@@ -172,5 +173,28 @@ namespace Agendo.Server.Services
 
             return isoWeekNumbers;
         }
+        public static DayWeekYear GetISOWeekNumberOfDateTime(DateTime date)
+        {
+            DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
+            Calendar cal = dfi.Calendar;
+
+            int week = cal.GetWeekOfYear(date, dfi.CalendarWeekRule, DayOfWeek.Monday);
+            return new DayWeekYear
+            {
+                WeekNumber = week,
+                Year = date.Year,
+                DayNumber = (int)date.DayOfWeek
+            };
+        
+        }
+
+
+        public async Task DatesSequenceCreate(int userid, MultipleSelectionForm sequence)
+        {
+            var DayWeekYearEntries =  sequence.Dates.Select(x => GetISOWeekNumberOfDateTime(x.ToDateTime(new TimeOnly(0,0 ))) );
+            
+
+        }
     }
 }
+ 

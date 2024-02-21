@@ -63,6 +63,16 @@ namespace Agendo.Server.Controllers
             return StatusCode(201);
 
         }
+
+        [HttpPost("dates_sequence")]
+        [Authorize(Roles = "719")]
+        public async Task<ActionResult<EmployeeShiftDTO?>> DatesSequenceCreate([FromForm] MultipleSelectionForm sequence)
+        {
+            var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
+            await _shiftService.DatesSequenceCreate(userid, sequence);
+            return StatusCode(201);
+
+        }
     }
 }
 

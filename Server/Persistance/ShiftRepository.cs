@@ -358,10 +358,10 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 
         public async Task DaySequenceCreate(int superior, SequenceForm sequence)
         {
-            var right = (await _rightsRepository.RightsOverEmps(sequence.domainsIDs, superior)).Select(x => x.Emp).ToList();
-            sequence.domainsIDs.Sort();
+            var right = (await _rightsRepository.RightsOverEmps(sequence.DomainsIDs, superior)).Select(x => x.Emp).ToList();
+            sequence.DomainsIDs.Sort();
             right.Sort();
-            if (!right.SequenceEqual( sequence.domainsIDs))
+            if (!right.SequenceEqual( sequence.DomainsIDs))
             {
                 throw new InvalidOperationException("user requested access to not owned domains");
             }
@@ -378,22 +378,22 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             _connection.Open();
             var existence = await _connection.QueryAsync<(int,int)>(checkExistence, new
             {
-                emps = sequence.domainsIDs,
+                emps = sequence.DomainsIDs,
                 superior = superior,
-                ISOYear = sequence.year,
+                ISOYear = sequence.Year,
                 ISOWeekFrom = sequence.ISOWeekFrom,
                 ISOWeekTo = sequence.ISOWeekTo,
             });
             _connection.Close();
 
             string whereForExistence = "";
-            foreach(var i in sequence.domainsIDs)
+            foreach(var i in sequence.DomainsIDs)
             {
                 whereForExistence += $"(dosh_do_no = {i} and (dosh_week_number BETWEEN @from AND @to))  or ";     
             }
             //remove last 'or'
             whereForExistence= whereForExistence.Remove(whereForExistence.Length - 3, 3);
-            var days = sequence.weekDays;
+            var days = sequence.WeekDays;
             var daysSetString = "";
             foreach (var day in days)
             {
@@ -442,8 +442,8 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
                 _connection.Open();
                 var updateResult = await _connection.ExecuteAsync(update, new
                 {
-                    ISOYear = sequence.year,
-                    ShiftNR = sequence.shiftNR,
+                    ISOYear = sequence.Year,
+                    ShiftNR = sequence.ShiftNR,
                     from = sequence.ISOWeekFrom,
                     to = sequence.ISOWeekTo
                 }
@@ -452,7 +452,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             }
 
             // all combinations of ids and week numbers for the inserts (already existent one will be removed from combinations int notExistingcombinations)
-            List<int> idsCombination = new List<int>(sequence.domainsIDs); 
+            List<int> idsCombination = new List<int>(sequence.DomainsIDs); 
             List<int> weeksCombination = new List<int>(Enumerable.Range(sequence.ISOWeekFrom, sequence.ISOWeekTo).ToList());
             List<(int, int)> combinations = new List<(int, int)>(); 
             foreach (var domain in idsCombination)
@@ -476,21 +476,21 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
 
                 var insertvalues = "";
                 foreach (var combination in notExistingCombinations) {
-                    insertvalues += $@" ({combination.Item1}, {combination.Item2}, @ISOYear, {(sequence.weekDays.Contains(1) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(2) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(3) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(4) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(5) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(6) ? "@ShiftNR" : "1")},
-									{(sequence.weekDays.Contains(7) ? "@ShiftNR" : "1")}),";
+                    insertvalues += $@" ({combination.Item1}, {combination.Item2}, @ISOYear, {(sequence.WeekDays.Contains(1) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(2) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(3) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(4) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(5) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(6) ? "@ShiftNR" : "1")},
+									{(sequence.WeekDays.Contains(7) ? "@ShiftNR" : "1")}),";
                 }
   
                 insert += insertvalues[..^1];
                 _connection.Open();
                 var insertResult = await _connection.ExecuteAsync(insert, new
                 {
-                    ISOYear = sequence.year,
-                    ShiftNR = sequence.shiftNR
+                    ISOYear = sequence.Year,
+                    ShiftNR = sequence.ShiftNR
                 }
                  );
                 _connection.Close();

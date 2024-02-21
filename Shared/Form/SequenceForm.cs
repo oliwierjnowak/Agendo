@@ -2,18 +2,24 @@
 {
     public record SequenceForm
     {
-        public List<int> weekDays;
-        public List<int> domainsIDs;
+        public List<int> WeekDays;
+        public List<int> DomainsIDs;
         public int ISOWeekFrom;
         public int ISOWeekTo;
-        public int shiftNR;
-        public int year;
+        public int ShiftNR;
+        public int Year;
     }
 
     public record MultipleSelectionForm
     {
-        public List<DateOnly> dates;
-        public List<int> domains;
-        public int shiftNR;
+        public List<DateOnly> Dates;
+        public List<int> Domains;
+        public int ShiftNR;
+    }
+    public record DayWeekYear
+    {
+        public int DayNumber;
+        public int Year;
+        public int WeekNumber;
     }
 }
