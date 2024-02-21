@@ -5,7 +5,7 @@
 @using Radzen.Blazor;
 @using Radzen;
 @using System.Security.Claims;
-
+@using System.Globalization;
 @attribute [Authorize(Roles = "719")]
 
 @inject DialogService DialogService
@@ -49,7 +49,7 @@
 
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
-    <RadzenMonthView />
+    <RadzenMonthView  />
 </RadzenScheduler>
 
 
@@ -66,7 +66,6 @@
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
-
     private List<int> _empNrs = [];
     public List<int> EmpNrs { get; set; }
 
@@ -84,12 +83,9 @@
     EventConsole console;
 
     IEnumerable<EmployeeShiftDTO> employeeShiftDTOs;
-    public bool Adding = false;
-
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
-
 
         if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
         {
@@ -115,7 +111,6 @@
 
         try
         {
-            Adding = true;
             EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
 
             if (data != null)
@@ -149,7 +144,10 @@
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy }
             });
-
+           // employeeShiftDTOs = employeeShiftDTOs.Where(x => x != copy);
+          //  employeeShiftDTOs = employeeShiftDTOs.Concat([(EmployeeShiftDTO)data]);
+            StateHasChanged();
+            await scheduler.Reload();
         }
         catch (Exception ex)
         {
@@ -204,42 +202,10 @@
             DailyShifts = await ApiClient.GetDailySchedule();
         }
 
-        if (!Adding)
-        {
-            var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
-            var end = args != null ? args.End : scheduler.SelectedView.EndDate;
+        var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
+        var end = args != null ? args.End : scheduler.SelectedView.EndDate;
 
-            if (switchedOn == true)
-            {
-                await FetchGroupedEmployeeShifts();
-            }
-            else
-            {
-                await FetchEmployeeShifts();
-            }
-
-            Console.WriteLine("Fetched");
-
-
-
-            Adding = false;
-        }
-
-    }
-
-
-    async Task DropdownChanged()
-    {
-        SelectionChanged = true;
-        await FetchEmpShifts(null);
-        SelectionChanged = false;
-
-    }
-
-    async Task OnChange()
-    {
-
-        if (switchedOn)
+        if (switchedOn == true)
         {
             await FetchGroupedEmployeeShifts();
         }
@@ -247,6 +213,23 @@
         {
             await FetchEmployeeShifts();
         }
+        Console.WriteLine("Fetched");
+    }
+
+
+    async Task DropdownChanged()
+    {
+
+        StateHasChanged();
+        await scheduler.Reload();
+
+    }
+
+    async Task OnChange()
+    {
+
+        StateHasChanged();
+        await scheduler.Reload();
 
     }
 
