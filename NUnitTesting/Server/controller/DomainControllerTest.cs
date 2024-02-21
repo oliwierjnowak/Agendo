@@ -11,11 +11,9 @@ namespace NUnitTesting.Server.controller
     internal class DomainControllerTest : PlaywrightTest
     {
         private IAPIRequestContext Request = null;
-     
-
-   
-
-        private async Task CreateAPIRequestContext(DomainApplicationFactory _applicationFactory)
+        private string jwtToken = null;
+        
+        protected async Task CreateAPIRequestContext719(ApplicationFactory _applicationFactory)
         {
           
             var headers = new Dictionary<string, string>();
@@ -32,13 +30,13 @@ namespace NUnitTesting.Server.controller
         [Test]
         public async Task GetAllAsyncWithFactoryAsync()
         {
-            DomainApplicationFactory _applicationFactory = new DomainApplicationFactory();
-            HttpClient _client= _applicationFactory.CreateClient();
+            ApplicationFactory _applicationFactory = new ApplicationFactory();
+            HttpClient _client = _applicationFactory.CreateClient();
 
 
-            await CreateAPIRequestContext(_applicationFactory);
+            await CreateAPIRequestContext719(_applicationFactory);
 
-            //ArrangeRepository
+            // Arrange
             var x = await _client.GetAsync("api/domain/string");
             var request = await Request.GetAsync("string");
 
@@ -50,32 +48,31 @@ namespace NUnitTesting.Server.controller
         [Test]
         public async Task AuthDomainGet719()
         {
-            DomainApplicationFactory _applicationFactory = new DomainApplicationFactory();
+            ApplicationFactory _applicationFactory = new ApplicationFactory();
             HttpClient _client = _applicationFactory.CreateClient();
-
-
-            await CreateAPIRequestContext(_applicationFactory);
-
+            
+            await CreateAPIRequestContext719(_applicationFactory);
             var request = await Request.GetAsync("api/domain");
-
-
-           ClassicAssert.True(request.Ok);
-
+            
+            ClassicAssert.True(request.Ok);
+           
             var issuesJsonResponse = await request.JsonAsync();
 
             ClassicAssert.NotNull(issuesJsonResponse);
 
             var list = ConvertJsonElementToList(issuesJsonResponse.Value);
-            ClassicAssert.AreEqual(list, new List<DomainDTO>() {
-               new DomainDTO{Nr = 1, Name ="Oliwier Nowak" },
-               new DomainDTO{Nr = 2, Name ="Anton Schubhart" },
-               new DomainDTO{Nr = 3, Name ="Philipp Schaffer" },
-            });
+            Assert.That(list,Is.EqualTo(new List<DomainDTO>() {
+                new DomainDTO{Nr = 1, Name ="Emmett" },
+                new DomainDTO{Nr = 2, Name ="Kettel" },
+                new DomainDTO{Nr = 3, Name ="Bachs" },
+                new DomainDTO{Nr = 4, Name ="Gartell" },
+                new DomainDTO{Nr = 5, Name ="Tante" },
+            }));
+            
             await _applicationFactory.DisposeAsync();
           //  ClassicAssert.AreEqual(1, 3);
         }
-
-
+        
         static List<DomainDTO> ConvertJsonElementToList(JsonElement root)
         {
             List<DomainDTO> domainDTOList = new List<DomainDTO>();
