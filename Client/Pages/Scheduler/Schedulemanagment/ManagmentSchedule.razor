@@ -26,13 +26,16 @@
                             Style="width: 100%; max-width: 400px;" AllowFiltering="true" />
 
 
-        </div>
+            <div>
+                <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
+                                  DateFormat="HH:mm" />
+            </div>
 
-        <div>
-            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
-                              DateFormat="HH:mm" />
         </div>
     </div>
+    <RadzenButton Click="@(() => OpenSequenceWindow())" Text="Add Sequence"></RadzenButton>
+
+
 </div>
 
 
@@ -62,7 +65,6 @@
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
 
-    private List<int> _empNrs = [];
     public List<int> EmpNrs { get; set; }
 
     public bool SelectionChanged { get; set; } = false;
@@ -133,6 +135,23 @@
         await scheduler.Reload();
     }
 
+    async Task OpenSequenceWindow()
+    {
+        try
+        {
+
+            var data = await DialogService.OpenAsync<AddSequence>("Add Sequence", new Dictionary<string, object>
+        {
+                {"employees", employees},
+                {"DailyShifts", DailyShifts }
+        });
+        }
+        catch (Exception ex)
+        {
+            console.Log($"An error occurred: {ex.Message}");
+        }
+    }
+
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
     {
         try
@@ -187,8 +206,8 @@
             var start = args != null ? args.Start : scheduler.SelectedView.StartDate;
             var end = args != null ? args.End : scheduler.SelectedView.EndDate;
             var firstSelectedDay = scheduler.CurrentDate;
-            var result = EmpNrs == null || EmpNrs.Count == 0 ? 
-                    await ApiClient.GetEmployeeShifts(employees.Select(x => x.Nr).ToList(), firstSelectedDay) 
+            var result = EmpNrs == null || EmpNrs.Count == 0 ?
+                    await ApiClient.GetEmployeeShifts(employees.Select(x => x.Nr).ToList(), firstSelectedDay)
                     : await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
             employeeShiftDTOs = result;
             Console.WriteLine("Fetched");

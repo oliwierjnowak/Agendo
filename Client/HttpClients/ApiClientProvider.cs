@@ -1,4 +1,5 @@
 ﻿using Agendo.Shared.DTOs;
+using Agendo.Shared.Form;
 using Agendo.Shared.Form.CreateEmployeeShift;
 using Agendo.Shared.Form.CreateShift;
 using System.Net.Http.Json;
@@ -16,6 +17,8 @@ namespace Agendo.Client.HttpClients
        Task<IEnumerable<DomainDTO>> GetDomainOfShift(DateTime dateOfShift, int shiftNr);
        Task<HttpResponseMessage> PostDailySchedule(CreateShift body);
        Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);
+       Task<HttpResponseMessage> PostSequence(SequenceForm body);
+
     }
 
     public class ApiClientProvider : IApiClient
@@ -68,6 +71,10 @@ namespace Agendo.Client.HttpClients
 
         public async Task<HttpResponseMessage> PostDailySchedule(CreateShift body) =>
             await _httpClient.PostAsJsonAsync("api/DailySchedule", body);
-    
+
+        public async Task<HttpResponseMessage> PostSequence(SequenceForm body) =>
+             await _httpClient.PostAsJsonAsync("api/shift", body);
+
+       
     }
 }

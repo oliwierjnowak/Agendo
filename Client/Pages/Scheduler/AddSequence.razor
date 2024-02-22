@@ -1,0 +1,231 @@
+﻿    @inject DialogService DialogService
+    @using Agendo.Client.HttpClients
+    @using Agendo.Shared.DTOs
+    @using Agendo.Shared.Form;
+    @using Radzen
+    @using System.Text.Json
+    @using System.Text
+    @using System.Net.Http
+    @using System.Net.Http.Headers
+
+
+    @inject IJSRuntime JSRuntime
+    @inject IApiClient ApiClient
+    @attribute [Authorize(Roles = "719")]
+
+
+
+    <RadzenTemplateForm TItem="AddEmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+        <div class="row">
+            <!-- ISO Week from/to input fields -->
+            <div class="col-md-6">
+                <div class="row" style="margin-bottom: 16px;">
+                    <div class="col-md-6">
+                        <RadzenLabel Text="ISO Week from:" />
+                        <RadzenNumeric @bind-Value=@from InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenLabel Text="ISO Week until:" />
+                        <RadzenNumeric @bind-Value=@until InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenLabel Text="Year: " />
+                        <RadzenNumeric @bind-Value=@YearToSubmit InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                </div>
+
+                <!-- Employees dropdown -->
+                <div style="margin-bottom: 16px;">
+                    <RadzenLabel Text="Employees:" />
+                    <RadzenDropDown TItem="DomainDTO"
+                                    @bind-Value="@EmpNrs"
+                                    Data=@Employees
+                                    TextProperty="Name"
+                                    ValueProperty="Nr"
+                                    Multiple=true
+                                    Placeholder="Select employees"
+                                    AllowClear="true"
+                                    Chips="true"
+                                    Style="width: 100%; max-width: 400px;"
+                                    AllowFiltering="true" />
+                </div>
+
+                <!-- Shifts dropdown -->
+                <div style="margin-bottom: 16px;">
+                    <RadzenLabel Text="Shifts:" />
+
+                    <RadzenDropDown TItem="DailyScheduleDTO"
+                                    @bind-Value=@ShiftNr
+                                    Data=@DailyShifts
+                                    TextProperty="Name"
+                                    ValueProperty="Nr"
+                                    Placeholder="Select shift types"
+                                    Style="width: 100%; max-width: 400px;" />
+                </div>
+            </div>
+
+
+            <!-- Weekday checkboxes -->
+            <div class="col-md-6">
+                <RadzenLabel Text="Weekday/s: " />
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Monday Name="Monday" />
+                    <RadzenLabel Text="Monday" Component="Monday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Tuesday Name="Tuesday" />
+                    <RadzenLabel Text="Tuesday" Component="Tuesday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Wednesday Name="Wednesday" />
+                    <RadzenLabel Text="Wednesday" Component="Wednesday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Thursday Name="Thursday" />
+                    <RadzenLabel Text="Thursday" Component="Thursday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Friday Name="Friday" />
+                    <RadzenLabel Text="Friday" Component="Friday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Saturday Name="Saturday" />
+                    <RadzenLabel Text="Saturday" Component="Saturday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Sunday Name="Sunday" />
+                    <RadzenLabel Text="Sunday" Component="Sunday" Style="margin-left: 8px; vertical-align: middle;" />
+                    <!-- Add your checkbox list here as it was -->
+                    <div class="rz-text-align-left">
+                        <!-- Repeat for each weekday as you have it in your original code -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+            </div>
+        </div>
+    </RadzenTemplateForm>
+
+
+    @code {
+
+        private int YearToSubmit = DateTime.Now.Year;
+
+        [Parameter]
+        public IEnumerable<DomainDTO>? Employees { get; set; }
+
+        [Parameter]
+        public IEnumerable<DailyScheduleDTO>? DailyShifts { get; set; }
+
+        public int ShiftNr { get; set; }
+        public List<int> EmpNrs { get; set; } = new List<int>();
+
+
+
+
+        public int from { get; set; }
+        public int until { get; set; }
+
+
+        private AddEmployeeShiftDTO model = new AddEmployeeShiftDTO();
+        private List<int> weekDaysList;
+        private List<int> domainsIDs;
+        private int ISOWeekFrom;
+        private int ISOWeekTo;
+        private int year;
+
+        //for weekdays - Philipp
+        private bool Monday;
+        private bool Tuesday;
+        private bool Wednesday;
+        private bool Thursday;
+        private bool Friday;
+        private bool Saturday;
+        private bool Sunday;
+
+
+        protected override async Task OnInitializedAsync()
+        {
+
+        }
+
+
+        async void OnSubmit()
+        {
+            weekDaysList = new List<int>{
+                Monday ? 1 : 0,
+                Tuesday ? 1 : 0,
+                Wednesday ? 1 : 0,
+                Thursday ? 1 : 0,
+                Friday ? 1 : 0,
+                Saturday ? 1 : 0,
+                Sunday ? 1 : 0
+            };
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted weekDays: ", weekDaysList);
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted domainIDs: ", EmpNrs);
+
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted from: ", from);
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted until: ", until);
+
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted shiftNr: ", ShiftNr);
+            await JSRuntime.InvokeVoidAsync("console.log", "Submitted Year: ", YearToSubmit);
+
+
+            var body2 = new SequenceForm
+            {
+                weekDays = weekDaysList,
+                domainsIDs = EmpNrs,
+                ISOWeekFrom = from,
+                ISOWeekTo = until,
+                shiftNR = ShiftNr,
+                year = YearToSubmit
+            };
+
+            await JSRuntime.InvokeVoidAsync("console.log", "body: ", body2.weekDays);
+            await JSRuntime.InvokeVoidAsync("console.log", "body: ", body2.domainsIDs);
+
+            try
+            {
+
+
+                var content = new StringContent(body2.ToString());
+                var json = JsonSerializer.Serialize(content);
+                await JSRuntime.InvokeVoidAsync("console.log", "json after content: ", json);
+
+                var myHttpClient = new HttpClient();
+
+                var response = await ApiClient.PostSequence(body2);
+
+                //var response = await myHttpClient.PostAsync("https://localhost:7271/api/shift", content);
+
+                // If you need to use the response
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the response content and do something with it
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    // Process the response content as needed
+                }
+                else
+                {
+                    // Handle the error
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions here
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+    }
