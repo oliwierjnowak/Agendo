@@ -199,6 +199,11 @@ insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year]
 insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (3, 52, 2023, 3, 2, 2, 2, 3, 3, 5, 89);
 
 
+insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (2, 5, 2024, 1, 1, 1, 4, 3, 2, 1, 76);
+insert into [dbo].[csti_do_shift] ([dosh_do_no], [dosh_week_number], [dosh_year], [dosh_monday], [dosh_tuesday], [dosh_wednesday], [dosh_thursday], [dosh_friday], [dosh_saturday], [dosh_sunday], [dosh_ws_no]) values (3,5, 2024, 1, 1, 1, 4, 3, 2, 1, 89);
+
+
+
 insert into [dbo].[csmd_authorizations] ([au_ri_no], [au_enabled],[au_from],[au_to]) values (719,1,'1900-01-01','3000-12-31'); -- schichtverwalten 
 insert into [dbo].[csmd_authorizations] ([au_ri_no], [au_enabled],[au_from],[au_to]) values (1000,1,'1900-01-01','3000-12-31'); -- schicht lesen
 

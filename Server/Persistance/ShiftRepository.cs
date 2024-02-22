@@ -14,6 +14,7 @@ namespace Agendo.Server.Persistance
 		Task<int> DeleteEmployeesShift(int superior, IEnumerable<int> remove, Shift shift);
 
         Task DaySequenceCreate(int superior, SequenceForm sequence);
+        Task DatesSequenceCreate(int superior, MultipleSelectionForm sequence, IEnumerable<DayWeekYear> dayWeekYears);
     }
     public class ShiftRepository(IDbConnection _connection, IRightsRepository _rightsRepository) : IShiftRepository
     {		
@@ -495,6 +496,38 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
                  );
                 _connection.Close();
             }
+
+        }
+
+        public async Task DatesSequenceCreate(int superior, MultipleSelectionForm sequence, IEnumerable<DayWeekYear> dayWeekYears)
+        {
+            var right = (await _rightsRepository.RightsOverEmps(sequence.Domains, superior)).Select(x => x.Emp).ToList();
+            sequence.Domains.Sort();
+            right.Sort();
+            if (!right.SequenceEqual(sequence.Domains))
+            {
+                throw new InvalidOperationException("user requested access to not owned domains");
+            }
+            var onlyWeekAndYear = dayWeekYears.Select(x => new { year = x.Year , week = x.WeekNumber});
+            var datesdono= sequence.Domains.SelectMany(x => onlyWeekAndYear.Select(y => new {  week = y.week, year = y.year, dono=x })).ToList();
+            var h = 1 + 1;
+
+            string checkExistence = $@"
+            select dosh_do_no, dosh_week_number from csti_do_shift 
+            join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
+            join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
+            where (dosh_week_number = @week) and dosh_year = @year
+            and authdomain.audoen_en_no = @dono and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+            ";
+            _connection.Open();
+            var existence = await _connection.QueryAsync(checkExistence, datesdono.Select(x => (x , new
+            {
+                
+                superior = superior
+            })));
+            _connection.Close();
+
+            var x = 1 + 1;
 
         }
     }

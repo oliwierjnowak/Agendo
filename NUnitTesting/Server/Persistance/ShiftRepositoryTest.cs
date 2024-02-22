@@ -1,6 +1,7 @@
 ﻿using Agendo.Server;
 using Agendo.Server.Models;
 using Agendo.Server.Persistance;
+using Agendo.Server.Services;
 using Agendo.Shared.Form;
 using Dapper;
 using Moq;
@@ -10,6 +11,7 @@ using System.Collections;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NUnitTesting.Server.Persistance
 {
@@ -201,6 +203,31 @@ namespace NUnitTesting.Server.Persistance
             var x = await repository.GetMultipleEmpsAsync(1, new int[] {  2, 3,4 }, [1, 2, 3], 1);
             Assert.That(x , Is.Not.Null);
             Assert.That(x.Where(day => day.DOW == 1 || day.DOW == 3 || day.DOW == 4 ).Select(y => y.ShiftNR), Is.All.EqualTo(5));
+
+        }
+
+
+        [Test]
+        public async Task DatesSequenceCreate()
+        {
+            //arrange
+            SqlConnection connection = TestDbConnection.GetInstance().Connection;
+            var rightsRepository = new RightsRepository(connection);
+            var repository = new ShiftRepository(connection, rightsRepository);
+
+            MultipleSelectionForm sequence = new MultipleSelectionForm
+            {
+                Domains = [2, 3],
+                Dates = [new DateOnly(2024, 2, 1), new DateOnly(2024, 2, 2), new DateOnly(2024, 2, 3)],
+                ShiftNR = 3
+            };
+
+            var daysweekyear = sequence.Dates.Select(x => ShiftService.GetISOWeekNumberOfDateTime(x.ToDateTime(new TimeOnly(0, 0))));
+
+
+            var result = repository.DatesSequenceCreate(1, sequence, daysweekyear);
+
+
 
         }
     }

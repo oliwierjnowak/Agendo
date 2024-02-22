@@ -191,9 +191,9 @@ namespace Agendo.Server.Services
 
         public async Task DatesSequenceCreate(int userid, MultipleSelectionForm sequence)
         {
-            var DayWeekYearEntries =  sequence.Dates.Select(x => GetISOWeekNumberOfDateTime(x.ToDateTime(new TimeOnly(0,0 ))) );
+            var dayWeekYearEntries =  sequence.Dates.Select(x => GetISOWeekNumberOfDateTime(x.ToDateTime(new TimeOnly(0,0 ))) );
             
-
+            await _shiftRepository.DatesSequenceCreate(userid, sequence,dayWeekYearEntries);
         }
     }
 }
