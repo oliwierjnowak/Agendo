@@ -227,6 +227,7 @@ namespace NUnitTesting.Server.Persistance
 
             var result = repository.DatesSequenceCreate(1, sequence, daysweekyear);
 
+            var x = 1 + 1;
 
 
         }

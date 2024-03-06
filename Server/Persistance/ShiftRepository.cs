@@ -512,22 +512,42 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             var datesdono= sequence.Domains.SelectMany(x => onlyWeekAndYear.Select(y => new {  week = y.week, year = y.year, dono=x })).ToList();
             var h = 1 + 1;
 
+            string whereforExistence = "";
+            foreach (var i in dayWeekYears)
+            {
+                whereforExistence += $"(dosh_weeknumber = {i.WeekNumber}  and dosh_year = {i.Year}) or ";
+            }
+
+            //remove last 'or'
+            whereforExistence = whereforExistence.Remove(whereforExistence.Length - 3, 3);
+
+
             string checkExistence = $@"
-            select dosh_do_no, dosh_week_number from csti_do_shift 
+            select dosh_do_no, dosh_week_number, dosh_year from csti_do_shift 
             join csmd_authorizations_domain_entity authdomain on authdomain.audoen_en_no = dosh_do_no
             join csmd_authorizations auth on auth.au_ri_no = authdomain.audoen_no
-            where (dosh_week_number = @week) and dosh_year = @year
-            and authdomain.audoen_en_no = @dono and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
+            where ({whereforExistence})
+            and authdomain.audoen_en_no in @dono and audoen_do_no = @superior and CONVERT(DATE, GETDATE()) between auth.au_from and auth.au_to and auth.au_enabled = 1
             ";
             _connection.Open();
-            var existence = await _connection.QueryAsync(checkExistence, datesdono.Select(x => (x , new
+            var existence = await _connection.QueryAsync<(int?, int?, int?)?>(checkExistence,new
             {
-                
-                superior = superior
-            })));
+                superior = superior,
+                dono = sequence.Domains
+            });
             _connection.Close();
 
             var x = 1 + 1;
+
+           /* if ( existence.Count() > 0 ) 
+            {
+                string 
+            }*/
+
+
+            // all combinations of ids and week numbers for the inserts (already existent one will be removed from combinations int notExistingcombinations)
+            
+
 
         }
     }
