@@ -515,7 +515,7 @@ and authdomain.audoen_en_no in @emps and audoen_do_no = @superior and CONVERT(DA
             string whereforExistence = "";
             foreach (var i in dayWeekYears)
             {
-                whereforExistence += $"(dosh_weeknumber = {i.WeekNumber}  and dosh_year = {i.Year}) or ";
+                whereforExistence += $"(dosh_week_number = {i.WeekNumber}  and dosh_year = {i.Year}) or ";
             }
 
             //remove last 'or'

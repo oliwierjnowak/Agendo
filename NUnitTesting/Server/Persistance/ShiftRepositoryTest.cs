@@ -225,7 +225,7 @@ namespace NUnitTesting.Server.Persistance
             var daysweekyear = sequence.Dates.Select(x => ShiftService.GetISOWeekNumberOfDateTime(x.ToDateTime(new TimeOnly(0, 0))));
 
 
-            var result = repository.DatesSequenceCreate(1, sequence, daysweekyear);
+            await repository.DatesSequenceCreate(1, sequence, daysweekyear);
 
             var x = 1 + 1;
 
