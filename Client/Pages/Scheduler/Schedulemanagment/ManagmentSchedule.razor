@@ -70,7 +70,7 @@
     public List<int> EmpNrs { get; set; }
 
     public bool SelectionChanged { get; set; } = false;
-    public bool switchedOn;
+    public bool switchedOn = false;
     private IEnumerable<DomainDTO>? employees;
 
     protected override async Task OnInitializedAsync()
@@ -111,18 +111,22 @@
 
         try
         {
-            EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
-
-            if (data != null)
+            if (EmpNrs != null)
             {
-                var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
-                data.ShiftHours = shiftInfo.Hours;
-                data.ShiftName = shiftInfo.Name;
+                EmployeeShiftDTO data = await DialogService.OpenAsync<AddShiftPage>("Add Shift", new Dictionary<string, object>(dict));
 
-                employeeShiftDTOs = employeeShiftDTOs.Where(x => !x.Start.Equals(data.Start));
-                employeeShiftDTOs = employeeShiftDTOs.Append(data);
+                if (data != null)
+                {
+                    var shiftInfo = DailyShifts.Where(x => x.Nr == data.ShiftNR).First();
+                    data.ShiftHours = shiftInfo.Hours;
+                    data.ShiftName = shiftInfo.Name;
 
+                    employeeShiftDTOs = employeeShiftDTOs.Where(x => !x.Start.Equals(data.Start));
+                    employeeShiftDTOs = employeeShiftDTOs.Append(data);
+
+                }
             }
+
         }
         catch (Exception ex)
         {
@@ -144,8 +148,8 @@
             var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
                 { "Shift", copy }
             });
-           // employeeShiftDTOs = employeeShiftDTOs.Where(x => x != copy);
-          //  employeeShiftDTOs = employeeShiftDTOs.Concat([(EmployeeShiftDTO)data]);
+            // employeeShiftDTOs = employeeShiftDTOs.Where(x => x != copy);
+            //  employeeShiftDTOs = employeeShiftDTOs.Concat([(EmployeeShiftDTO)data]);
             StateHasChanged();
             await scheduler.Reload();
         }
@@ -219,7 +223,10 @@
 
     async Task DropdownChanged()
     {
-
+        if (EmpNrs == null)
+        {
+            switchedOn = false;
+        }
         StateHasChanged();
         await scheduler.Reload();
 
@@ -227,9 +234,15 @@
 
     async Task OnChange()
     {
-
-        StateHasChanged();
-        await scheduler.Reload();
+        if (EmpNrs == null)
+        {
+            switchedOn = false;
+        }
+        else
+        {
+            StateHasChanged();
+            await scheduler.Reload();
+        }
 
     }
 
