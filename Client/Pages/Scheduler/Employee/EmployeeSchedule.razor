@@ -18,7 +18,6 @@
                  TItem="EmployeeShiftDTO"
                  Data=@shifts
                  SlotRender=@OnSlotRender
-                 AppointmentSelect=@OnAppointmentSelect
                  AppointmentRender=@OnAppointmentRender
                  TextProperty="ShiftName" SelectedIndex="1"
                  StartProperty="Start" EndProperty="End" Style="width: auto; height: 700px;" >
@@ -72,27 +71,6 @@
         }
     }
 
-
-
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<EmployeeShiftDTO> args)
-    {
-        try
-        {
-            console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
-
-            EmployeeShiftDTO copy = args.Data;
-
-            var data = await DialogService.OpenAsync<EditShiftPage>("Edit Shift", new Dictionary<string, object> {
-                { "Shift", copy }
-            });
-
-        
-        }
-        catch (Exception ex)
-        {
-            console.Log($"An error occurred: {ex.Message}");
-        }
-    }
 
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO> args)
