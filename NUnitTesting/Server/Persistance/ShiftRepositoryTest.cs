@@ -186,14 +186,14 @@ namespace NUnitTesting.Server.Persistance
             var rightsRepository = new RightsRepository(connection);
             var repository = new ShiftRepository(connection, rightsRepository);
 
-            SequenceForm sf = new SequenceForm
+            CreateSequenceForm sf = new CreateSequenceForm
             {
-                domainsIDs = [2, 3, 4],
+                DomainsIDs = [2, 3, 4],
                 ISOWeekFrom = 1,
                 ISOWeekTo = 36,
-                shiftNR = 5,
-                weekDays = [1,3,5],
-                year = 1
+                ShiftNR = 5,
+                WeekDays = [1,3,5],
+                Year = 1
 
             };
 

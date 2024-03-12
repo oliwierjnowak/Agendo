@@ -5,6 +5,7 @@ using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Agendo.Shared.Form;
+using System.Text.Json;
 
 namespace Agendo.Server.Controllers
 {
@@ -56,13 +57,15 @@ namespace Agendo.Server.Controllers
 
         [HttpPost]
         [Authorize(Roles = "719")]
-        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromForm] SequenceForm sequence )
+        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromBody] CreateSequenceForm sequence)
         {
+
+
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
             await _shiftService.DaySequenceCreate(userid, sequence);
             return StatusCode(201);
-
         }
+
     }
 }
 

@@ -15,6 +15,7 @@ namespace Agendo.Server.Persistance
     {
         public async Task<EmployeeRights> RightsOverEmp(int emp, int user)
         {
+            _connection.Open();
             var query = @"select audoen_no as AuthType ,
                             audoen_do_no as Superior,
                             audoen_en_no as Emp,
@@ -26,7 +27,6 @@ namespace Agendo.Server.Persistance
                             join csmd_authorizations auth on audoen_no = au_ri_no 
                             where auth.au_enabled = 1 and GETDATE() BETWEEN auth.au_from AND auth.au_to and
                             ((audoen_en_no = @emp and audoen_en_no = @user )or (audoen_do_no = @user and audoen_en_no = @emp) );";
-            _connection.Open();
             var result = await _connection.QueryFirstOrDefaultAsync<EmployeeRights>(query,new
             {
                 emp = emp,

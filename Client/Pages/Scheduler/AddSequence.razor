@@ -163,69 +163,47 @@
 
         async void OnSubmit()
         {
-            weekDaysList = new List<int>{
-                Monday ? 1 : 0,
-                Tuesday ? 1 : 0,
-                Wednesday ? 1 : 0,
-                Thursday ? 1 : 0,
-                Friday ? 1 : 0,
-                Saturday ? 1 : 0,
-                Sunday ? 1 : 0
-            };
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted weekDays: ", weekDaysList);
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted domainIDs: ", EmpNrs);
-
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted from: ", from);
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted until: ", until);
-
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted shiftNr: ", ShiftNr);
-            await JSRuntime.InvokeVoidAsync("console.log", "Submitted Year: ", YearToSubmit);
+            weekDaysList = new List<int>();
 
 
-            var body2 = new SequenceForm
-            {
-                weekDays = weekDaysList,
-                domainsIDs = EmpNrs,
-                ISOWeekFrom = from,
-                ISOWeekTo = until,
-                shiftNR = ShiftNr,
-                year = YearToSubmit
-            };
+            if (Monday) weekDaysList.Add(1);
+            if (Tuesday) weekDaysList.Add(2);
+            if (Wednesday) weekDaysList.Add(3);
+            if (Thursday) weekDaysList.Add(4);
+            if (Friday) weekDaysList.Add(5);
+            if (Saturday) weekDaysList.Add(6);
+            if (Sunday) weekDaysList.Add(7);
 
-            await JSRuntime.InvokeVoidAsync("console.log", "body: ", body2.weekDays);
-            await JSRuntime.InvokeVoidAsync("console.log", "body: ", body2.domainsIDs);
 
+
+            // Replace your `try` block with this code for debugging purposes
             try
             {
+                CreateSequenceForm body2 = new CreateSequenceForm
+                {
+                    WeekDays = weekDaysList,
+                    DomainsIDs = EmpNrs,
+                    ISOWeekFrom = from,
+                    ISOWeekTo = until,
+                    ShiftNR = ShiftNr,
+                    Year = YearToSubmit
+                };
 
+                await JSRuntime.InvokeVoidAsync("console.log", "Submitted Body: ", body2);
 
-                var content = new StringContent(body2.ToString());
-                var json = JsonSerializer.Serialize(content);
-                await JSRuntime.InvokeVoidAsync("console.log", "json after content: ", json);
-
-                var myHttpClient = new HttpClient();
-
+                var jsonContent = JsonSerializer.Serialize(body2);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                //HttpClient _httpClient = new HttpClient();
+                //var response = _httpClient.PostAsJsonAsync("https://localhost:7271/api/shift", content);
                 var response = await ApiClient.PostSequence(body2);
 
-                //var response = await myHttpClient.PostAsync("https://localhost:7271/api/shift", content);
+                //DialogService.Close(response);
 
-                // If you need to use the response
-                if (response.IsSuccessStatusCode)
-                {
-                    // Read the response content and do something with it
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    // Process the response content as needed
-                }
-                else
-                {
-                    // Handle the error
-                    Console.WriteLine($"Error: {response.StatusCode}");
-                }
             }
             catch (Exception ex)
             {
-                // Handle any exceptions here
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
+
         }
     }

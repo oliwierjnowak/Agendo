@@ -10,6 +10,16 @@
         public int year;
     }
 
+    public class CreateSequenceForm
+    {
+        public List<int> WeekDays { get; set; }
+        public List<int> DomainsIDs { get; set; }
+        public int ISOWeekFrom { get; set; }
+        public int ISOWeekTo { get; set; }
+        public int ShiftNR { get; set; }
+        public int Year { get; set; }
+    }
+
     public record MultipleSelectionForm
     {
         public List<DateOnly> dates;
