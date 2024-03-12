@@ -56,7 +56,7 @@ namespace Agendo.Server.Controllers
 
         [HttpPost]
         [Authorize(Roles = "719")]
-        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromForm] SequenceForm sequence )
+        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromBody] SequenceForm sequence )
         {
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
             await _shiftService.DaySequenceCreate(userid, sequence);
