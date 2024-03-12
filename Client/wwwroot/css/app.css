@@ -116,5 +116,66 @@ a, .btn-link {
         content: var(--blazor-load-percentage-text, "Loading");
     }
 
+.container {
+    position: relative;
+    width: 300px; /* Adjust the width as needed */
+    height: 300px; /* Adjust the height as needed */
+}
 
+.circle {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(20px);
+    animation: move1 1s infinite linear;
+}
+
+    .circle.blue {
+        background-color: rgba(0, 0, 255, 0.5); /* Blue */
+    }
+
+    .circle.navy {
+        background-color: rgba(0, 0, 128, 0.5); /* Navy */
+        animation: move2 1s infinite linear;
+    }
+
+@keyframes move1 {
+    0% {
+        transform: rotate(0deg) translateX(150px) rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    }
+}
+
+@keyframes move2 {
+    0% {
+        transform: rotate(180deg) translateX(150px) rotate(-180deg);
+    }
+
+    100% {
+        transform: rotate(540deg) translateX(150px) rotate(-540deg);
+    }
+}
+
+.svg-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1; /* Ensure SVG is above circles */
+}
+
+.loadingdiv {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(229 240 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 

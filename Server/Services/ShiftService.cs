@@ -114,13 +114,17 @@ namespace Agendo.Server.Services
                 ShiftNR = details.ShiftNr,
                 DOW = (int)details.ShiftDate.DayOfWeek
             };
-            if (details.RemovedDomains != null || details.RemovedDomains.Count() != 0)
+            if (details.RemovedDomains != null )
             {
-                var deletionResult = await _shiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift);
+                var deletionResult = await _shiftRepository.DeleteEmployeesShift(sup, details.RemovedDomains, shift with { ShiftNR = details.OldShiftNr});
             }
- 
 
-            var updateResult = await _shiftRepository.ManageEmployeesShift(sup,details.AddedDomains,shift);
+            var added = details.AddedDomains ?? Enumerable.Empty<int>();
+            var notChanged = details.NotChangedDomains ?? Enumerable.Empty<int>();
+            var notChangedAndAdded = notChanged.Concat(added);
+
+
+            var updateResult = await _shiftRepository.ManageEmployeesShift(sup,notChangedAndAdded,shift);
 
 
             var domains = await _domainService.GetShiftEmployees(sup, ISOWeek.ToDateTime(shift.ISOYear, shift.ISOWeek, (DayOfWeek)shift.DOW).AddHours(8), shift.ShiftNR);
