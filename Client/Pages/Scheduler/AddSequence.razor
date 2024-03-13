@@ -22,11 +22,11 @@
                 <div class="row" style="margin-bottom: 16px;">
                     <div class="col-md-6">
                         <RadzenLabel Text="ISO Week from:" />
-                        <RadzenNumeric @bind-Value=@from InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                        <RadzenNumeric @bind-Value=@from Min="1" Max="53" Step="1" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
                     </div>
                     <div class="col-md-6">
                         <RadzenLabel Text="ISO Week until:" />
-                        <RadzenNumeric @bind-Value=@until InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                        <RadzenNumeric @bind-Value=@until Min="1" Max="53" Step="1" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
                     </div>
                     <div class="col-md-6">
                         <RadzenLabel Text="Year: " />
@@ -115,6 +115,9 @@
                 <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
             </div>
         </div>
+        <div class="text-red-500">
+            @error
+        </div>
     </RadzenTemplateForm>
 
 
@@ -131,11 +134,11 @@
         public int ShiftNr { get; set; }
         public List<int> EmpNrs { get; set; } = new List<int>();
 
+        private String error;
 
 
-
-        public int from { get; set; }
-        public int until { get; set; }
+        public int from { get; set; } = 1;
+        public int until { get; set; } = 1;
 
 
         private AddEmployeeShiftDTO model = new AddEmployeeShiftDTO();
@@ -155,12 +158,6 @@
         private bool Sunday;
 
 
-        protected override async Task OnInitializedAsync()
-        {
-
-        }
-
-
         async void OnSubmit()
         {
             weekDaysList = new List<int>();
@@ -175,29 +172,52 @@
             if (Sunday) weekDaysList.Add(7);
 
 
-
             // Replace your `try` block with this code for debugging purposes
             try
             {
-                CreateSequenceForm body2 = new CreateSequenceForm
+
+                error = "";
+
+                // Example validation checks
+                if (from > until)
                 {
-                    WeekDays = weekDaysList,
-                    DomainsIDs = EmpNrs,
-                    ISOWeekFrom = from,
-                    ISOWeekTo = until,
-                    ShiftNR = ShiftNr,
-                    Year = YearToSubmit
-                };
+                    error += "From Date cannot be greater than Until Date. ";
+                    StateHasChanged();
+                }
+                else if (EmpNrs.Count == 0)
+                {
+                    error += "Please select at least one employee. ";
+                    StateHasChanged();
 
-                await JSRuntime.InvokeVoidAsync("console.log", "Submitted Body: ", body2);
+                }
+                else if (weekDaysList.Count == 0)
+                {
+                    error += "Please select at least one weekday. ";
+                    StateHasChanged();
 
-                var jsonContent = JsonSerializer.Serialize(body2);
-                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                //HttpClient _httpClient = new HttpClient();
-                //var response = _httpClient.PostAsJsonAsync("https://localhost:7271/api/shift", content);
-                var response = await ApiClient.PostSequence(body2);
+                }
+                else if(ShiftNr == 0)
+                {
+                    error += "Please select a shift type. ";
+                }
 
-                //DialogService.Close(response);
+                else
+                {
+                    CreateSequenceForm body2 = new CreateSequenceForm
+                    {
+                        WeekDays = weekDaysList,
+                        DomainsIDs = EmpNrs,
+                        ISOWeekFrom = from,
+                        ISOWeekTo = until,
+                        ShiftNR = ShiftNr,
+                        Year = YearToSubmit
+                    };
+                    await JSRuntime.InvokeVoidAsync("console.log", "Submitted Body: ", body2);
+                    var jsonContent = JsonSerializer.Serialize(body2);
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    var response = await ApiClient.PostSequence(body2);
+                    DialogService.Close(response);
+                }
 
             }
             catch (Exception ex)

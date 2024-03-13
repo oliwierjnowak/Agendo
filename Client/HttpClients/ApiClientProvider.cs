@@ -21,7 +21,6 @@ namespace Agendo.Client.HttpClients
         Task<EmployeeShiftDTO> ManageEmployeesShift(CreateMultipleEmpShift body);
         Task<HttpResponseMessage> PostSequence(CreateSequenceForm body);
 
-        Task<HttpResponseMessage> PostSequence(SequenceForm body);
         Task<IEnumerable<EmployeeShiftDTO>> GetGroupedEmployeeShifts(List<int>? EmpNrs, DateTime ViewFirstDay);
     }
 

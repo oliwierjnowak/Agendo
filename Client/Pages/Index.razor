@@ -1,10 +1,12 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Hhome</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
-<RadzenButton Variant="Variant.Outlined"  Text="Primary" ButtonStyle="ButtonStyle.Primary" />
+<AuthorizeView>
+
+    <h3 class="text-2xl">Hello @context.User.Identity.Name!</h3>
+    <p>Welcome to your new Scheduling Tool.</p>
+ </AuthorizeView>
+
