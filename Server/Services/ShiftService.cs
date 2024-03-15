@@ -14,7 +14,7 @@ namespace Agendo.Server.Services
         Task<List<EmployeeShiftDTO>> GetShiftsGroupedAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
         Task<List<EmployeeShiftDTO>> GetSingleEmpAsync(int superior, int emp);
         Task<List<EmployeeShiftDTO>> GetShiftsAsync(int superior, IEnumerable<int> emps, DateTime ViewSelectedDate);
-        Task DaySequenceCreate(int userid, SequenceForm sequence);
+        Task DaySequenceCreate(int userid, CreateSequenceForm sequence);
     }
     
     
@@ -140,7 +140,7 @@ namespace Agendo.Server.Services
             return dto;
         }
 
-        public async Task DaySequenceCreate(int userid, SequenceForm sequence)
+        public async Task DaySequenceCreate(int userid, CreateSequenceForm sequence)
         {
             await _shiftRepository.DaySequenceCreate(userid, sequence);
         }

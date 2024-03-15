@@ -16,36 +16,50 @@
 
 <PageTitle>Schdule Role 719</PageTitle>
 
-
+   
 <div class="w-full mb-3">
-    <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
-    <div class="flex justify-between items-center">
-        <div>
-            <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
-                            Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true" Change="@DropdownChanged"
-                            Style="width: 100%; max-width: 400px;" AllowFiltering="true" />
+        <div class="flex flex-row w-full align-top items-top w-full justify-between w-full">
+            <div>
+                <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Employee:</label>
+
+                <RadzenDropDown TItem="DomainDTO" @bind-Value=@EmpNrs Data=@employees TextProperty="Name" ValueProperty="Nr"
+                                Multiple=true Placeholder="Select Employees" AllowClear="true" Chips="true" Change="@DropdownChanged"
+                                Style="width: 100%; max-width: 400px;" AllowFiltering="true" />
+
+            </div>
+
+            <div class="ml-4">
+                <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Add Squence</label>
+
+                <RadzenButton class="" Click="@(() => OpenSequenceWindow())" Icon="autorenew"></RadzenButton>
+
+            </div>
+            <div>
+                <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Collaborating Shifts</label>
 
 
-        </div>
-        <RadzenStack Style=" padding: 0.5%; background-color: white; border-radius: var(--rz-border-radius); border-block-color:black">
-            <div class="flex items-center">
-                <RadzenLabel Text="Colaborating Shifts" class="mr-2" />
                 <RadzenSwitch @bind-Value=@switchedOn Change=@(args => OnChange()) InputAttributes="@(new Dictionary<string, object>(){ { "aria-label", "Switch value" }})" />
             </div>
-        </RadzenStack>
-        <div>
-            <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
-                              DateFormat="HH:mm" />
+            <div>
+                <label for="input" class="block text-gray-700 text-sm font-bold mb-2">Time</label>
+
+                <RadzenDatePicker Change=@ChangeStartTime @bind-Value=@valstart1 ShowTime="true" TimeOnly="true"
+                                  DateFormat="HH:mm" />
+            </div>
+
+
+
         </div>
+
     </div>
-</div>
+
 
 
 
 <RadzenScheduler @ref=@scheduler TItem="EmployeeShiftDTO" Data=@employeeShiftDTOs SlotRender=@OnSlotRender
                  SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender LoadData=@FetchEmpShifts
                  TextProperty="ShiftName" SelectedIndex="1" StartProperty="Start" EndProperty="End"
-                 Style="width: auto; height: 700px;">
+                 Style="width: auto; height: 700px; border-radius:10px; padding:0.5rem;">
 
 
     <RadzenWeekView TimeFormat="HH:mm" EndTime="Endtime" StartTime="Starttime" />
@@ -53,7 +67,6 @@
 </RadzenScheduler>
 
 
-<EventConsole @ref=@console />
 
 
 
@@ -66,6 +79,7 @@
     public TimeSpan Starttime = new TimeSpan(0, 0, 0);
     public Action<SchedulerAppointmentRenderEventArgs<EmployeeShiftDTO>> AppointmentRender { get; set; }
     private IEnumerable<DailyScheduleDTO>? DailyShifts;
+
     private List<int> _empNrs = [];
     public List<int> EmpNrs { get; set; }
 
@@ -80,7 +94,6 @@
 
 
     public Dictionary<string, object> dict { get; set; } = new Dictionary<string, object>();
-    EventConsole console;
 
     IEnumerable<EmployeeShiftDTO> employeeShiftDTOs;
 
@@ -130,9 +143,29 @@
         }
         catch (Exception ex)
         {
-            console.Log($"Error: {ex.Message}");
         }
 
+        StateHasChanged();
+        await scheduler.Reload();
+    }
+
+    async Task OpenSequenceWindow()
+    {
+        try
+        {
+
+            var data = await DialogService.OpenAsync<AddSequence>("Add Sequence", new Dictionary<string, object>
+        {
+                {"employees", employees},
+                {"DailyShifts", DailyShifts }
+        });
+
+
+        }
+        catch (Exception ex)
+        {
+            //console.Log($"An error occurred: {ex.Message}");
+        }
         StateHasChanged();
         await scheduler.Reload();
     }
@@ -141,7 +174,7 @@
     {
         try
         {
-            console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
+           // console.Log($"AppointmentSelect: Appointment={args.Data.ShiftName}");
 
             EmployeeShiftDTO copy = args.Data;
 
@@ -155,7 +188,7 @@
         }
         catch (Exception ex)
         {
-            console.Log($"An error occurred: {ex.Message}");
+            //console.Log($"An error occurred: {ex.Message}");
         }
     }
 
@@ -211,6 +244,13 @@
 
         if (switchedOn == true)
         {
+
+            var firstSelectedDay = scheduler.CurrentDate;
+            var result = EmpNrs == null || EmpNrs.Count == 0 ?
+                    await ApiClient.GetEmployeeShifts(employees.Select(x => x.Nr).ToList(), firstSelectedDay)
+                    : await ApiClient.GetEmployeeShifts(EmpNrs, firstSelectedDay);
+            employeeShiftDTOs = result;
+            Console.WriteLine("Fetched");
             await FetchGroupedEmployeeShifts();
         }
         else

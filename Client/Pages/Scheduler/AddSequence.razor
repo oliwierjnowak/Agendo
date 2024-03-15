@@ -1,0 +1,229 @@
+﻿    @inject DialogService DialogService
+    @using Agendo.Client.HttpClients
+    @using Agendo.Shared.DTOs
+    @using Agendo.Shared.Form;
+    @using Radzen
+    @using System.Text.Json
+    @using System.Text
+    @using System.Net.Http
+    @using System.Net.Http.Headers
+
+
+    @inject IJSRuntime JSRuntime
+    @inject IApiClient ApiClient
+    @attribute [Authorize(Roles = "719")]
+
+
+
+    <RadzenTemplateForm TItem="AddEmployeeShiftDTO" Data="@model" Submit=@OnSubmit>
+        <div class="row">
+            <!-- ISO Week from/to input fields -->
+            <div class="col-md-6">
+                <div class="row" style="margin-bottom: 16px;">
+                    <div class="col-md-6">
+                        <RadzenLabel Text="ISO Week from:" />
+                        <RadzenNumeric @bind-Value=@from Min="1" Max="53" Step="1" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenLabel Text="ISO Week until:" />
+                        <RadzenNumeric @bind-Value=@until Min="1" Max="53" Step="1" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenLabel Text="Year: " />
+                        <RadzenNumeric @bind-Value=@YearToSubmit InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                    </div>
+                </div>
+
+                <!-- Employees dropdown -->
+                <div style="margin-bottom: 16px;">
+                    <RadzenLabel Text="Employees:" />
+                    <RadzenDropDown TItem="DomainDTO"
+                                    @bind-Value="@EmpNrs"
+                                    Data=@Employees
+                                    TextProperty="Name"
+                                    ValueProperty="Nr"
+                                    Multiple=true
+                                    Placeholder="Select employees"
+                                    AllowClear="true"
+                                    Chips="true"
+                                    Style="width: 100%; max-width: 400px;"
+                                    AllowFiltering="true" />
+                </div>
+
+                <!-- Shifts dropdown -->
+                <div style="margin-bottom: 16px;">
+                    <RadzenLabel Text="Shifts:" />
+
+                    <RadzenDropDown TItem="DailyScheduleDTO"
+                                    @bind-Value=@ShiftNr
+                                    Data=@DailyShifts
+                                    TextProperty="Name"
+                                    ValueProperty="Nr"
+                                    Placeholder="Select shift types"
+                                    Style="width: 100%; max-width: 400px;" />
+                </div>
+            </div>
+
+
+            <!-- Weekday checkboxes -->
+            <div class="col-md-6">
+                <RadzenLabel Text="Weekday/s: " />
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Monday Name="Monday" />
+                    <RadzenLabel Text="Monday" Component="Monday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Tuesday Name="Tuesday" />
+                    <RadzenLabel Text="Tuesday" Component="Tuesday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Wednesday Name="Wednesday" />
+                    <RadzenLabel Text="Wednesday" Component="Wednesday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Thursday Name="Thursday" />
+                    <RadzenLabel Text="Thursday" Component="Thursday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Friday Name="Friday" />
+                    <RadzenLabel Text="Friday" Component="Friday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Saturday Name="Saturday" />
+                    <RadzenLabel Text="Saturday" Component="Saturday" Style="margin-left: 8px; vertical-align: middle;" />
+                </div>
+
+                <div class="rz-text-align-left">
+                    <RadzenCheckBox @bind-Value=@Sunday Name="Sunday" />
+                    <RadzenLabel Text="Sunday" Component="Sunday" Style="margin-left: 8px; vertical-align: middle;" />
+                    <!-- Add your checkbox list here as it was -->
+                    <div class="rz-text-align-left">
+                        <!-- Repeat for each weekday as you have it in your original code -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+            </div>
+        </div>
+        <div class="text-red-500">
+            @error
+        </div>
+    </RadzenTemplateForm>
+
+
+    @code {
+
+        private int YearToSubmit = DateTime.Now.Year;
+
+        [Parameter]
+        public IEnumerable<DomainDTO>? Employees { get; set; }
+
+        [Parameter]
+        public IEnumerable<DailyScheduleDTO>? DailyShifts { get; set; }
+
+        public int ShiftNr { get; set; }
+        public List<int> EmpNrs { get; set; } = new List<int>();
+
+        private String error;
+
+
+        public int from { get; set; } = 1;
+        public int until { get; set; } = 1;
+
+
+        private AddEmployeeShiftDTO model = new AddEmployeeShiftDTO();
+        private List<int> weekDaysList;
+        private List<int> domainsIDs;
+        private int ISOWeekFrom;
+        private int ISOWeekTo;
+        private int year;
+
+        //for weekdays - Philipp
+        private bool Monday;
+        private bool Tuesday;
+        private bool Wednesday;
+        private bool Thursday;
+        private bool Friday;
+        private bool Saturday;
+        private bool Sunday;
+
+
+        async void OnSubmit()
+        {
+            weekDaysList = new List<int>();
+
+
+            if (Monday) weekDaysList.Add(1);
+            if (Tuesday) weekDaysList.Add(2);
+            if (Wednesday) weekDaysList.Add(3);
+            if (Thursday) weekDaysList.Add(4);
+            if (Friday) weekDaysList.Add(5);
+            if (Saturday) weekDaysList.Add(6);
+            if (Sunday) weekDaysList.Add(7);
+
+
+            // Replace your `try` block with this code for debugging purposes
+            try
+            {
+
+                error = "";
+
+                // Example validation checks
+                if (from > until)
+                {
+                    error += "From Date cannot be greater than Until Date. ";
+                    StateHasChanged();
+                }
+                else if (EmpNrs.Count == 0)
+                {
+                    error += "Please select at least one employee. ";
+                    StateHasChanged();
+
+                }
+                else if (weekDaysList.Count == 0)
+                {
+                    error += "Please select at least one weekday. ";
+                    StateHasChanged();
+
+                }
+                else if(ShiftNr == 0)
+                {
+                    error += "Please select a shift type. ";
+                }
+
+                else
+                {
+                    CreateSequenceForm body2 = new CreateSequenceForm
+                    {
+                        WeekDays = weekDaysList,
+                        DomainsIDs = EmpNrs,
+                        ISOWeekFrom = from,
+                        ISOWeekTo = until,
+                        ShiftNR = ShiftNr,
+                        Year = YearToSubmit
+                    };
+                    await JSRuntime.InvokeVoidAsync("console.log", "Submitted Body: ", body2);
+                    var jsonContent = JsonSerializer.Serialize(body2);
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    var response = await ApiClient.PostSequence(body2);
+                    DialogService.Close(response);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+        }
+    }

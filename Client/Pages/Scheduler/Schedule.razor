@@ -4,25 +4,20 @@
 @using System.Security.Claims;
 
 <AuthorizeView>
+
+
     <NotAuthorized>
+
         <span>u are not authorized</span>
     </NotAuthorized>
 </AuthorizeView>
 <AuthorizeView Roles="719">
-    <span>Authorized Managment as @context.User.Identity.Name</span>
-    <p>  <span>Role: @context.User.Identity.ToString()</span></p>
 
-    <span>Authorized Managment as @context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Type</span>
-    <p>  <span>Actor:@context.User.Claims.FirstOrDefault(claim => claim.Type ==  ClaimTypes.Actor).Value</span></p>
+
     <ManagmentSchedule />
 </AuthorizeView>
 
 <AuthorizeView Roles="1000">
-    <span>Authorized Managment as @context.User.Identity.Name</span>
-    <p>  <span>Role: @context.User.Identity.ToString()</span></p>
-
-    <span>Authorized Managment as @context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Type</span>
-    <p>  <span>Actor:@context.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value</span></p>
     <EmployeeSchedule/>
 </AuthorizeView>
 

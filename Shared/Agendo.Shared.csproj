@@ -13,4 +13,10 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Form\CreateSequence\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Form\CreateSequence\" />
+  </ItemGroup>
 </Project>

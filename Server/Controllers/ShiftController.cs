@@ -5,6 +5,7 @@ using Agendo.Shared.Form.CreateEmployeeShift;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Agendo.Shared.Form;
+using System.Text.Json;
 
 namespace Agendo.Server.Controllers
 {
@@ -17,24 +18,24 @@ namespace Agendo.Server.Controllers
         [HttpGet]
         [Authorize(Roles = "1000")]
         [Route("{Emp:int}")]
-        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle( int Emp)
+        public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetSingle(int Emp)
         {
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
-           
-            var emp = Emp == null ? userid : (int) Emp;
 
-            return Ok(await _shiftService.GetSingleEmpAsync(userid,emp));
-           
+            var emp = Emp == null ? userid : (int)Emp;
+
+            return Ok(await _shiftService.GetSingleEmpAsync(userid, emp));
+
         }
 
         [HttpGet]
-        [Authorize(Roles ="719")]
+        [Authorize(Roles = "719")]
         public async Task<ActionResult<IEnumerable<EmployeeShiftDTO>>> GetMultiple([FromQuery] IEnumerable<int> Emps, [FromQuery] DateTime ViewFirstDay, [FromQuery] bool Grouped = true)
         {
             //asads
             var userid = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value;
-            
-            if ( Emps.Count() == 0)
+
+            if (Emps.Count() == 0)
             {
                 var nrs = await _domainService.GetAllAsync(int.Parse(userid));
                 Emps = nrs.Select(x => x.Nr);
@@ -56,13 +57,15 @@ namespace Agendo.Server.Controllers
 
         [HttpPost]
         [Authorize(Roles = "719")]
-        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromForm] SequenceForm sequence )
+        public async Task<ActionResult<EmployeeShiftDTO?>> DaySequenceCreate([FromBody] CreateSequenceForm sequence)
         {
+
+
             var userid = int.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Actor).Value);
             await _shiftService.DaySequenceCreate(userid, sequence);
             return StatusCode(201);
-
         }
+
     }
 }
 
